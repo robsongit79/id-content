@@ -21,8 +21,11 @@
       <button class="tab-btn" id="tabPost" onclick="switchTab('post')"><span class="tab-badge badge-post">Post</span> Post</button>
     </div>
   </div>
-  <div class="topbar-right" id="topbarActions">
-    <!-- injected by state -->
+  <div class="topbar-right">
+    <div id="topbarActions" style="display:flex;align-items:center;gap:8px;">
+      <!-- injected by state -->
+    </div>
+    <button class="btn btn-ghost btn-logout" id="btnLogout" onclick="auth.logout()" style="display:none;">Sair 🚪</button>
   </div>
 </div>
 
@@ -359,7 +362,27 @@
 
 </div><!-- /screenEditor -->
 
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="screenLogin" class="login-screen" style="display:none;">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">ID<span>Content</span></div>
+      <div class="login-title">Acesso Restrito</div>
+      <div class="login-subtitle">Entre com suas credenciais do Supabase para gerenciar suas marcas.</div>
+    </div>
+    <form class="login-form" id="loginForm" onsubmit="event.preventDefault(); handleLoginSubmit();">
+      <input type="email" id="loginEmail" placeholder="E-mail" required autocomplete="username">
+      <input type="password" id="loginPassword" placeholder="Senha" required autocomplete="current-password">
+      <div id="loginError" class="login-error" style="display:none;"></div>
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span>Entrar</span>
+      </button>
+    </form>
+  </div>
+</div>
+
 <script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/db.js"></script>
 <script src="js/prompts.js"></script>
 <script src="js/ui.js"></script>

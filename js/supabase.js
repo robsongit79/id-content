@@ -5,13 +5,14 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = {
   async query(table, method = 'GET', body = null, filter = '') {
     const url = `${SUPABASE_URL}/rest/v1/${table}${filter}`;
+    const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
     const res = await fetch(url, {
       method,
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
-        'Prefer': method === 'POST' ? 'return=representation' : 'return=representation',
+        'Prefer': 'return=representation',
       },
       body: body ? JSON.stringify(body) : null,
     });
@@ -41,11 +42,12 @@ const supabase = {
 
   async upsert(table, data) {
     const url = `${SUPABASE_URL}/rest/v1/${table}`;
+    const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates,return=representation',
       },

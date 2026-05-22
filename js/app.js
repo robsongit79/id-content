@@ -24,8 +24,27 @@ const app = {
 
   // ── INIT ──
   async init() {
+    const user = await auth.checkSession();
+    if (user) {
+      this.showAuthenticatedApp();
+    } else {
+      this.showLoginForm();
+    }
+  },
+
+  showLoginForm() {
+    document.getElementById('screenList').style.display = 'none';
+    document.getElementById('screenEditor').style.display = 'none';
+    document.getElementById('tabs').style.display = 'none';
+    document.getElementById('btnLogout').style.display = 'none';
+    document.getElementById('screenLogin').style.display = 'flex';
+  },
+
+  showAuthenticatedApp() {
+    document.getElementById('screenLogin').style.display = 'none';
+    document.getElementById('btnLogout').style.display = 'inline-flex';
     this.showScreen('list');
-    await this.loadBrandList();
+    this.loadBrandList();
     initScrollNav();
   },
 
@@ -338,6 +357,40 @@ const app = {
 
 // ── GLOBAL SHORTCUTS ──
 function newBrand() { app.newBrand(); }
+
+async function handleLoginSubmit() {
+  const emailEl = document.getElementById('loginEmail');
+  const passwordEl = document.getElementById('loginPassword');
+  const btnEl = document.getElementById('loginBtn');
+  const errorEl = document.getElementById('loginError');
+
+  errorEl.style.display = 'none';
+  errorEl.textContent = '';
+  
+  const originalBtnText = btnEl.innerHTML;
+  btnEl.disabled = true;
+  btnEl.innerHTML = '<span class="spinner"></span> <span>Entrando...</span>';
+
+  try {
+    const email = emailEl.value.trim();
+    const password = passwordEl.value;
+    
+    await auth.login(email, password);
+    
+    // Sucesso!
+    app.showAuthenticatedApp();
+    
+    // Limpar campos
+    emailEl.value = '';
+    passwordEl.value = '';
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.style.display = 'block';
+  } finally {
+    btnEl.disabled = false;
+    btnEl.innerHTML = originalBtnText;
+  }
+}
 
 // ── START ──
 document.addEventListener('DOMContentLoaded', () => app.init());
