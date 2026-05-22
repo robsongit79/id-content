@@ -1,2 +1,2 @@
-# id-content
-Identity Studio — Brand &amp; Post System
+# IDContent
+IDContent — Brand & Post System
