@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identity Studio — id-content</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="brand-mark">Identity<span>Studio</span></div>
+    <div class="tabs" id="tabs" style="display:none;">
+      <button class="tab-btn active-base" id="tabBase" onclick="switchTab('base')"><span class="tab-badge badge-base">Base</span> Marca</button>
+      <button class="tab-btn" id="tabCar" onclick="switchTab('car')"><span class="tab-badge badge-car">Carrossel</span> Carrossel</button>
+      <button class="tab-btn" id="tabPost" onclick="switchTab('post')"><span class="tab-badge badge-post">Post</span> Post</button>
+    </div>
+  </div>
+  <div class="topbar-right" id="topbarActions">
+    <!-- injected by state -->
+  </div>
+</div>
+
+<!-- ══ BRAND LIST (home screen) ══ -->
+<div id="screenList" class="screen">
+  <div class="list-header">
+    <div>
+      <h1 class="list-title">Suas Marcas</h1>
+      <p class="list-subtitle">Selecione uma marca para editar ou crie uma nova.</p>
+    </div>
+    <button class="btn btn-base" onclick="newBrand()">+ Nova marca</button>
+  </div>
+  <div id="brandGrid" class="brand-grid">
+    <div class="loading-state">Carregando marcas...</div>
+  </div>
+</div>
+
+<!-- ══ EDITOR ══ -->
+<div id="screenEditor" class="screen" style="display:none;">
+
+  <!-- BASE TAB -->
+  <div class="tab-panel active" id="panelBase">
+  <div class="layout base-focus">
+    <nav class="sidebar">
+      <div class="sidebar-section base-nav">
+        <div class="sidebar-label">Seções</div>
+        <a href="#b1" class="nav-item active" data-base="b1"><span class="nav-dot"></span> 01 · Identidade</a>
+        <a href="#b2" class="nav-item" data-base="b2"><span class="nav-dot"></span> 02 · Paleta</a>
+        <a href="#b3" class="nav-item" data-base="b3"><span class="nav-dot"></span> 03 · Tipografia</a>
+        <a href="#b4" class="nav-item" data-base="b4"><span class="nav-dot"></span> 04 · Tom de voz</a>
+        <a href="#b5" class="nav-item" data-base="b5"><span class="nav-dot"></span> 05 · Visual</a>
+        <a href="#b6" class="nav-item" data-base="b6"><span class="nav-dot"></span> 06 · Audiência</a>
+        <a href="#b7" class="nav-item" data-base="b7"><span class="nav-dot"></span> 07 · Referências</a>
+      </div>
+      <div class="sidebar-section base-prog">
+        <div class="sidebar-label">Progresso</div>
+        <div class="progress-mini"><div class="progress-mini-fill" id="baseProgFill"></div></div>
+        <div class="progress-mini-label"><span id="baseProgLabel">0 campos</span><span id="baseProgPct">0%</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="save-status" id="saveStatus">● Salvo</div>
+      </div>
+    </nav>
+    <main class="main" id="baseMain">
+      <section class="section" id="b1">
+        <div class="section-header"><div><div class="section-num base-num">01</div><h2 class="section-title">Identidade da Marca</h2><p class="section-desc">Informações base usadas em todos os tipos de conteúdo.</p></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Nome da marca <span class="required">*</span></label><input type="text" id="bName" placeholder="Ex: CFC Produtivo" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label">Handle Instagram</label><input type="text" id="bHandle" placeholder="@cfcprodutivo" oninput="markDirty()"></div>
+        </div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Tagline</label><input type="text" id="bTagline" placeholder="Ex: Gestão para autoescolas" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label">Segmento / Nicho</label><input type="text" id="bNiche" placeholder="Ex: Autoescolas" oninput="markDirty()"></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Posicionamento</label><textarea id="bPositioning" placeholder="Como a marca quer ser percebida..." oninput="markDirty()"></textarea></div></div>
+        <div class="divider"></div>
+        <div class="field-group">
+          <div class="field">
+            <label class="field-label">URL da logo</label>
+            <div class="field-hint">PNG com fundo transparente. Link direto (Dropbox, Drive, Imgur).</div>
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                <input type="url" id="bLogoUrl" placeholder="https://..." oninput="markDirty();previewLogo()">
+                <div id="bLogoStatus" style="font-size:11px;color:var(--muted);"></div>
+              </div>
+              <div class="logo-thumb" id="bLogoThumb"><span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem<br>logo</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="b2">
+        <div class="section-header"><div><div class="section-num base-num">02</div><h2 class="section-title">Paleta de Cores</h2></div></div>
+        <div class="palette-grid">
+          <div class="field"><div class="field-label">Primária <span class="required">*</span></div><div class="palette-swatch-row"><input type="color" id="cPrimary" value="#1E40AF" oninput="document.getElementById('cPrimaryHex').value=this.value;markDirty()"><input type="text" id="cPrimaryHex" value="#1E40AF" oninput="syncColor('cPrimary','cPrimaryHex')" style="flex:1;"></div></div>
+          <div class="field"><div class="field-label">Secundária</div><div class="palette-swatch-row"><input type="color" id="cSecondary" value="#3B82F6" oninput="document.getElementById('cSecondaryHex').value=this.value;markDirty()"><input type="text" id="cSecondaryHex" value="#3B82F6" oninput="syncColor('cSecondary','cSecondaryHex')" style="flex:1;"></div></div>
+          <div class="field"><div class="field-label">Acento</div><div class="palette-swatch-row"><input type="color" id="cAccent" value="#FFFFFF" oninput="document.getElementById('cAccentHex').value=this.value;markDirty()"><input type="text" id="cAccentHex" value="#FFFFFF" oninput="syncColor('cAccent','cAccentHex')" style="flex:1;"></div></div>
+          <div class="field"><div class="field-label">Fundo escuro</div><div class="palette-swatch-row"><input type="color" id="cDark" value="#0A0F1E" oninput="document.getElementById('cDarkHex').value=this.value;markDirty()"><input type="text" id="cDarkHex" value="#0A0F1E" oninput="syncColor('cDark','cDarkHex')" style="flex:1;"></div></div>
+          <div class="field"><div class="field-label">Fundo claro</div><div class="palette-swatch-row"><input type="color" id="cLight" value="#F0F4FF" oninput="document.getElementById('cLightHex').value=this.value;markDirty()"><input type="text" id="cLightHex" value="#F0F4FF" oninput="syncColor('cLight','cLightHex')" style="flex:1;"></div></div>
+          <div class="field"><div class="field-label">Texto</div><div class="palette-swatch-row"><input type="color" id="cText" value="#F5F0E8" oninput="document.getElementById('cTextHex').value=this.value;markDirty()"><input type="text" id="cTextHex" value="#F5F0E8" oninput="syncColor('cText','cTextHex')" style="flex:1;"></div></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="bColorsNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+
+      <section class="section" id="b3">
+        <div class="section-header"><div><div class="section-num base-num">03</div><h2 class="section-title">Tipografia</h2><p class="section-desc">Nome exato como aparece em <a href="https://fonts.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">fonts.google.com</a></p></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Fonte de display <span class="required">*</span></label><div style="position:relative;"><input type="text" id="bFontDisplay" placeholder="Ex: Playfair Display" oninput="markDirty();loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay')" style="padding-right:36px;"><span id="bStatusDisplay" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewDisplay" style="font-size:22px;">Título de exemplo</div></div>
+          <div class="field"><label class="field-label">Fonte de corpo</label><div style="position:relative;"><input type="text" id="bFontBody" placeholder="Ex: DM Sans" oninput="markDirty();loadFont('bFontBody','bPreviewBody','bStatusBody')" style="padding-right:36px;"><span id="bStatusBody" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewBody" style="font-size:14px;">Texto de corpo. Clareza e leitura fluida.</div></div>
+        </div>
+        <div class="field-group cols-3">
+          <div class="field"><label class="field-label">Tamanho — Título</label><input type="text" id="bSizeTitle" placeholder="28–36px" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label">Tamanho — Subtítulo</label><input type="text" id="bSizeSubtitle" placeholder="16–20px" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label">Tamanho — Corpo</label><input type="text" id="bSizeBody" placeholder="13–15px" oninput="markDirty()"></div>
+        </div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Peso dos títulos</label><select id="bWeightTitle" oninput="markDirty()"><option value="">Selecione</option><option>300 — Light</option><option>400 — Regular</option><option>500 — Medium</option><option>600 — SemiBold</option><option>700 — Bold</option><option>800 — ExtraBold</option><option>900 — Black</option></select></div>
+          <div class="field"><label class="field-label">Itálico</label><select id="bItalicUse" oninput="markDirty()"><option value="">Selecione</option><option>Nunca usar itálico</option><option>Itálico apenas em palavras-chave dos títulos</option><option>Itálico em citações e pull quotes</option><option>Itálico usado livremente para ênfase</option></select></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas tipográficas</label><textarea id="bTypoNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+
+      <section class="section" id="b4">
+        <div class="section-header"><div><div class="section-num base-num">04</div><h2 class="section-title">Tom de Voz</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Personalidade</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="personalityChips" onclick="document.getElementById('personalityInput').focus()"><input class="chip-input" id="personalityInput" placeholder="Ex: Direto, Autoritário..." onkeydown="addChip(event,'personalityChips','personality')"></div></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Tom principal</label><select id="bToneMain" oninput="markDirty()"><option value="">Selecione</option><option>Autoritário e direto</option><option>Consultivo e educativo</option><option>Provocativo e agressivo</option><option>Inspiracional e motivacional</option><option>Premium e sofisticado</option><option>Técnico e objetivo</option><option>Próximo e conversacional</option><option>Editorial e jornalístico</option></select></div>
+          <div class="field"><label class="field-label">Tratamento</label><select id="bToneReader" oninput="markDirty()"><option value="">Selecione</option><option>Você (informal)</option><option>Você (formal)</option><option>Tu</option><option>Gestor / Profissional (3ª pessoa)</option></select></div>
+        </div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Nunca fazer</label><textarea id="bToneNever" oninput="markDirty()"></textarea></div>
+          <div class="field"><label class="field-label">Exemplo de headline</label><textarea id="bToneExample" oninput="markDirty()"></textarea></div>
+        </div>
+      </section>
+
+      <section class="section" id="b5">
+        <div class="section-header"><div><div class="section-num base-num">05</div><h2 class="section-title">Estrutura Visual</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Estilo visual geral</label><div class="radio-grid base-radio" id="styleGrid"><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Minimalista e limpo"><span class="radio-title">Minimalista</span><span class="radio-desc">Espaço generoso, poucos elementos</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Bold e agressivo"><span class="radio-title">Bold / Agressivo</span><span class="radio-desc">Alto contraste, tipografia pesada</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Premium e editorial"><span class="radio-title">Premium / Editorial</span><span class="radio-desc">Serifado, dourado, sofisticado</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Tech e moderno"><span class="radio-title">Tech / Moderno</span><span class="radio-desc">Geométrico, neon, data-driven</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Orgânico e humano"><span class="radio-title">Orgânico / Humano</span><span class="radio-desc">Arredondado, acolhedor, quente</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Brutalist e cru"><span class="radio-title">Brutalist / Cru</span><span class="radio-desc">Bordas, grid exposto, raw</span></label></div></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Bordas</label><select id="bBorderUse" oninput="markDirty()"><option value="">Selecione</option><option>Sem bordas</option><option>Bordas finas e sutis (1px)</option><option>Bordas coloridas como elemento de design</option><option>Linhas ornamentais (topo, base)</option><option>Quadros e molduras nos cards</option></select></div>
+          <div class="field"><label class="field-label">Cantos</label><select id="bCornerRadius" oninput="markDirty()"><option value="">Selecione</option><option>Sharp — sem arredondamento (0px)</option><option>Levemente arredondado (4–6px)</option><option>Arredondado médio (10–14px)</option><option>Muito arredondado (20px+)</option><option>Misto — cards arredondados, layout sharp</option></select></div>
+        </div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Ritmo de fundo</label><select id="bBgRhythm" oninput="markDirty()"><option value="">Selecione</option><option>Todos escuros</option><option>Todos claros</option><option>Alternado: escuro / claro</option><option>Maioria escuro, CTA diferente</option><option>Gradiente da marca no hero e CTA</option></select></div>
+          <div class="field"><label class="field-label">Gradientes</label><select id="bGradientUse" oninput="markDirty()"><option value="">Selecione</option><option>Não usar gradientes</option><option>Apenas na barra de progresso</option><option>Gradiente no slide CTA</option><option>Gradientes liberados em qualquer slide</option></select></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Assinatura visual</label><textarea id="bVisualSig" oninput="markDirty()"></textarea></div></div>
+      </section>
+
+      <section class="section" id="b6">
+        <div class="section-header"><div><div class="section-num base-num">06</div><h2 class="section-title">Audiência</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Perfil do público</label><textarea id="bAudience" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Principal dor</label><textarea id="bPain" style="min-height:66px;" oninput="markDirty()"></textarea></div>
+          <div class="field"><label class="field-label">Principal desejo</label><textarea id="bDesire" style="min-height:66px;" oninput="markDirty()"></textarea></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Objetivos de conteúdo</label><div class="chips-wrap" id="goalChips" onclick="document.getElementById('goalInput').focus()"><input class="chip-input" id="goalInput" placeholder="Ex: Gerar leads, Educar..." onkeydown="addChip(event,'goalChips','goal')"></div></div></div>
+      </section>
+
+      <section class="section" id="b7">
+        <div class="section-header"><div><div class="section-num base-num">07</div><h2 class="section-title">Referências & Restrições</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Referências visuais</label><textarea id="bReferences" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Proibições globais</label><textarea id="bForbidden" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Referência canônica aprovada</label><textarea id="bCanonical" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="bFinalNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+    </main>
+    <aside class="preview-panel">
+      <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="baseCopy()">⌘ Copiar prompt base</button><div class="copy-success" id="baseCopyMsg">✓ Copiado</div></div>
+      <div class="info-box">As abas Carrossel e Post combinam a Base com os dados específicos de cada formato.</div>
+    </aside>
+  </div>
+  </div>
+
+  <!-- CARROSSEL TAB -->
+  <div class="tab-panel" id="panelCar">
+  <div class="layout car-focus">
+    <nav class="sidebar">
+      <div class="sidebar-section car-nav">
+        <div class="sidebar-label">Seções</div>
+        <a href="#c1" class="nav-item active" data-car="c1"><span class="nav-dot"></span> 01 · Logo</a>
+        <a href="#c2" class="nav-item" data-car="c2"><span class="nav-dot"></span> 02 · Estrutura</a>
+        <a href="#c3" class="nav-item" data-car="c3"><span class="nav-dot"></span> 03 · Slides</a>
+      </div>
+      <div class="sidebar-section car-prog">
+        <div class="sidebar-label">Progresso</div>
+        <div class="progress-mini"><div class="progress-mini-fill" id="carProgFill"></div></div>
+        <div class="progress-mini-label"><span id="carProgLabel">0 campos</span><span id="carProgPct">0%</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="save-status" id="saveStatusCar">● Salvo</div>
+      </div>
+    </nav>
+    <main class="main">
+      <section class="section" id="c1">
+        <div class="section-header"><div><div class="section-num car-num">01</div><h2 class="section-title">Posicionamento da Logo</h2><p class="section-desc">URL definida na aba Base. Aqui você define onde aparece em cada slide.</p></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Posição — Slide capa</label>
+            <div class="logo-pos-grid car-radio" id="carLogoPosHeroGrid">
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="topo esquerdo">↖ Topo esq.</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="topo centro">↑ Topo centro</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="topo direito">↗ Topo dir.</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="base esquerda">↙ Base esq.</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="base centro">↓ Base centro</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosHeroGrid');markDirty()"><input type="radio" name="carLogoPosHero" value="base direita">↘ Base dir.</div>
+            </div>
+          </div>
+          <div class="field"><label class="field-label">Posição — Último slide (CTA)</label>
+            <div class="logo-pos-grid car-radio" id="carLogoPosCtaGrid">
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="topo esquerdo">↖ Topo esq.</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="topo centro">↑ Topo centro</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="topo direito">↗ Topo dir.</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="centro">● Centro</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="base centro">↓ Base centro</div>
+              <div class="logo-pos-item" onclick="selectRadio(this,'carLogoPosCtaGrid');markDirty()"><input type="radio" name="carLogoPosCta" value="base direita">↘ Base dir.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="c2">
+        <div class="section-header"><div><div class="section-num car-num">02</div><h2 class="section-title">Estrutura do Carrossel</h2></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Formato padrão</label><select id="cFormat" oninput="markDirty()"><option value="">Selecione</option><option>4:5 — Instagram padrão (1080×1350)</option><option>1:1 — Quadrado (1080×1080)</option><option>9:16 — Stories (1080×1920)</option></select></div>
+          <div class="field"><label class="field-label">Nº de slides padrão</label><input type="text" id="cSlideCount" placeholder="Ex: 5 a 10 slides" oninput="markDirty()"></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Sequência de slides</label><textarea id="cSequence" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Elementos fixos</label><textarea id="cFixedEl" oninput="markDirty()"></textarea></div></div>
+      </section>
+      <section class="section" id="c3">
+        <div class="section-header"><div><div class="section-num car-num">03</div><h2 class="section-title">Slides Especiais</h2></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Slide hero — estrutura</label><textarea id="cSlide1" style="min-height:80px;" oninput="markDirty()"></textarea></div>
+          <div class="field"><label class="field-label">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" oninput="markDirty()"></textarea></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas de carrossel</label><textarea id="cNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+    </main>
+    <aside class="preview-panel">
+      <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Carrossel. Cole no início de qualquer conversa.</div>
+    </aside>
+  </div>
+  </div>
+
+  <!-- POST TAB -->
+  <div class="tab-panel" id="panelPost">
+  <div class="layout post-focus">
+    <nav class="sidebar">
+      <div class="sidebar-section post-nav">
+        <div class="sidebar-label">Seções</div>
+        <a href="#p1" class="nav-item active" data-post="p1"><span class="nav-dot"></span> 01 · Logo</a>
+        <a href="#p2" class="nav-item" data-post="p2"><span class="nav-dot"></span> 02 · Tipo</a>
+        <a href="#p3" class="nav-item" data-post="p3"><span class="nav-dot"></span> 03 · Formatos</a>
+        <a href="#p4" class="nav-item" data-post="p4"><span class="nav-dot"></span> 04 · Conteúdo</a>
+        <a href="#p5" class="nav-item" data-post="p5"><span class="nav-dot"></span> 05 · Layout</a>
+        <a href="#p6" class="nav-item" data-post="p6"><span class="nav-dot"></span> 06 · Entrega</a>
+      </div>
+      <div class="sidebar-section post-prog">
+        <div class="sidebar-label">Progresso</div>
+        <div class="progress-mini"><div class="progress-mini-fill" id="postProgFill"></div></div>
+        <div class="progress-mini-label"><span id="postProgLabel">0 campos</span><span id="postProgPct">0%</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="save-status" id="saveStatusPost">● Salvo</div>
+      </div>
+    </nav>
+    <main class="main">
+      <section class="section" id="p1">
+        <div class="section-header"><div><div class="section-num post-num">01</div><h2 class="section-title">Posicionamento da Logo</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Posição da logo no post</label>
+          <div class="logo-pos-grid post-radio" id="postLogoPosGrid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="topo esquerdo">↖ Topo esq.</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="topo centro">↑ Topo centro</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="topo direito">↗ Topo dir.</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="não exibir">✕ Não exibir</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="base esquerda">↙ Base esq.</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="base centro">↓ Base centro</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="base direita">↘ Base dir.</div>
+            <div class="logo-pos-item" onclick="selectRadio(this,'postLogoPosGrid');markDirty()"><input type="radio" name="postLogoPos" value="centro">● Centro</div>
+          </div>
+        </div></div>
+      </section>
+      <section class="section" id="p2">
+        <div class="section-header"><div><div class="section-num post-num">02</div><h2 class="section-title">Tipo de Post</h2></div></div>
+        <div class="type-grid">
+          <div class="type-card" onclick="selectPostType(this,'frase-impacto')"><input type="radio" name="pType" value="frase-impacto"><span class="type-icon">💥</span><span class="type-name">Frase de impacto</span><span class="type-desc">Headline grande com fundo de cor ou foto.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'checklist')"><input type="radio" name="pType" value="checklist"><span class="type-icon">✅</span><span class="type-name">Checklist</span><span class="type-desc">Lista de itens escaneável.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'estatistica')"><input type="radio" name="pType" value="estatistica"><span class="type-icon">📊</span><span class="type-name">Estatística / Dado</span><span class="type-desc">Número em destaque.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'antes-depois')"><input type="radio" name="pType" value="antes-depois"><span class="type-icon">↔️</span><span class="type-name">Antes e depois</span><span class="type-desc">Comparação em dois painéis.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'passo-a-passo')"><input type="radio" name="pType" value="passo-a-passo"><span class="type-icon">🔢</span><span class="type-name">Passo a passo</span><span class="type-desc">Etapas numeradas.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'pergunta')"><input type="radio" name="pType" value="pergunta"><span class="type-icon">❓</span><span class="type-name">Pergunta provocativa</span><span class="type-desc">Questão que gera engajamento.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'comparativo')"><input type="radio" name="pType" value="comparativo"><span class="type-icon">⚖️</span><span class="type-name">Comparativo X vs Y</span><span class="type-desc">Layout dividido.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'anuncio')"><input type="radio" name="pType" value="anuncio"><div class="type-category">Conversão</div><span class="type-icon">📣</span><span class="type-name">Anúncio / Oferta</span><span class="type-desc">CTA direto, preço em destaque.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'urgencia')"><input type="radio" name="pType" value="urgencia"><div class="type-category">Conversão</div><span class="type-icon">⏰</span><span class="type-name">Urgência / Prazo</span><span class="type-desc">Escassez protagonista.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'lancamento')"><input type="radio" name="pType" value="lancamento"><div class="type-category">Conversão</div><span class="type-icon">🚀</span><span class="type-name">Lançamento</span><span class="type-desc">Novo produto ou feature.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'depoimento')"><input type="radio" name="pType" value="depoimento"><div class="type-category">Autoridade</div><span class="type-icon">💬</span><span class="type-name">Depoimento</span><span class="type-desc">Fala de cliente.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'citacao')"><input type="radio" name="pType" value="citacao"><div class="type-category">Autoridade</div><span class="type-icon">🗣️</span><span class="type-name">Citação especialista</span><span class="type-desc">Layout editorial.</span></div>
+          <div class="type-card" onclick="selectPostType(this,'mini-artigo')"><input type="radio" name="pType" value="mini-artigo"><div class="type-category">Autoridade</div><span class="type-icon">📝</span><span class="type-name">Mini artigo</span><span class="type-desc">Título, lead e corpo.</span></div>
+        </div>
+        <div id="pTypeInfo" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:6px;font-size:12px;color:var(--acc-post);">✓ Tipo: <strong id="pTypeLabel"></strong></div>
+      </section>
+      <section class="section" id="p3">
+        <div class="section-header"><div><div class="section-num post-num">03</div><h2 class="section-title">Formatos</h2></div></div>
+        <div class="format-row">
+          <div class="format-card post-fmt" id="pFmt1x1" onclick="togglePostFmt('1x1')"><div class="format-visual format-sq"></div><div><div class="format-label">Feed Quadrado</div><div class="format-ratio">1080×1080 · 1:1</div></div><div class="format-check" id="pCheck1x1">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt4x5" onclick="togglePostFmt('4x5')"><div class="format-visual format-port"></div><div><div class="format-label">Feed Retrato</div><div class="format-ratio">1080×1350 · 4:5</div></div><div class="format-check" id="pCheck4x5">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt9x16" onclick="togglePostFmt('9x16')"><div class="format-visual format-stor"></div><div><div class="format-label">Stories / Reels</div><div class="format-ratio">1080×1920 · 9:16</div></div><div class="format-check" id="pCheck9x16">✓</div></div>
+        </div>
+      </section>
+      <section class="section" id="p4">
+        <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Conteúdo</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Headline <span class="required">*</span></label><input type="text" id="pHeadline" oninput="markDirty()"></div></div>
+        <div class="field-group cols-2"><div class="field"><label class="field-label">Subtítulo</label><input type="text" id="pSubtitle" oninput="markDirty()"></div><div class="field"><label class="field-label">CTA</label><input type="text" id="pCta" oninput="markDirty()"></div></div>
+        <div id="pDynamic" style="display:none;">
+          <div class="dynamic-fields">
+            <div class="dynamic-label" id="pDynLabel">Campos específicos</div>
+            <div id="pFieldItems" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Itens</label><div class="chips-wrap" id="pItemsChips" onclick="document.getElementById('pItemsInput').focus()"><input class="chip-input" id="pItemsInput" placeholder="Item e Enter" onkeydown="addChip(event,'pItemsChips','pItems')"></div></div></div></div>
+            <div id="pFieldStat" style="display:none;"><div class="field-group cols-2"><div class="field"><label class="field-label">Número</label><input type="text" id="pStatNum" oninput="markDirty()"></div><div class="field"><label class="field-label">Contexto</label><input type="text" id="pStatCtx" oninput="markDirty()"></div></div><div class="field-group"><div class="field"><label class="field-label">Fonte</label><input type="text" id="pStatSrc" oninput="markDirty()"></div></div></div>
+            <div id="pFieldComp" style="display:none;"><div class="field-group cols-2"><div class="field"><label class="field-label" id="pCompLabelA">Lado A</label><textarea id="pCompA" oninput="markDirty()" style="min-height:60px;"></textarea></div><div class="field"><label class="field-label" id="pCompLabelB">Lado B</label><textarea id="pCompB" oninput="markDirty()" style="min-height:60px;"></textarea></div></div></div>
+            <div id="pFieldAnuncio" style="display:none;"><div class="field-group cols-2"><div class="field"><label class="field-label">Preço</label><input type="text" id="pAnPrice" oninput="markDirty()"></div><div class="field"><label class="field-label">Benefício</label><input type="text" id="pAnBenefit" oninput="markDirty()"></div></div></div>
+            <div id="pFieldUrg" style="display:none;"><div class="field-group cols-2"><div class="field"><label class="field-label">Prazo</label><input type="text" id="pUrgPrazo" oninput="markDirty()"></div><div class="field"><label class="field-label">O que acaba</label><input type="text" id="pUrgOque" oninput="markDirty()"></div></div></div>
+            <div id="pFieldQuote" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Citação</label><textarea id="pQuoteText" oninput="markDirty()"></textarea></div></div><div class="field-group cols-2"><div class="field"><label class="field-label" id="pQuoteALabel">Autor</label><input type="text" id="pQuoteAuthor" oninput="markDirty()"></div><div class="field"><label class="field-label" id="pQuoteRLabel">Cargo</label><input type="text" id="pQuoteRole" oninput="markDirty()"></div></div></div>
+            <div id="pFieldArt" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Corpo</label><textarea id="pArtBody" oninput="markDirty()" style="min-height:90px;"></textarea></div></div></div>
+          </div>
+        </div>
+        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+      <section class="section" id="p5">
+        <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Layout por Formato</h2></div></div>
+        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 03</div>
+      </section>
+      <section class="section" id="p6">
+        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" oninput="markDirty()"></textarea></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
+          <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" oninput="markDirty()"></textarea></div></div>
+      </section>
+    </main>
+    <aside class="preview-panel">
+      <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Post. Cole no início de qualquer conversa.</div>
+    </aside>
+  </div>
+  </div>
+
+</div><!-- /screenEditor -->
+
+<script src="js/supabase.js"></script>
+<script src="js/db.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
