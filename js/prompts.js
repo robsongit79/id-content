@@ -99,6 +99,7 @@ const prompts = {
     if (hasLogo) {
       if (lh) c1.push(`LOGO CAPA:      ${lh}`);
       if (lc) c1.push(`LOGO CTA:       ${lc}`);
+      c1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     } else {
       c1.push(`LOGO:           Nenhuma — não exibir placeholder nos slides de capa e CTA`);
     }
@@ -130,7 +131,10 @@ const prompts = {
     const p1 = [];
     const lp = getRadio('postLogoPos');
     const hasLogo = app.logoData && (app.logoData.primary || app.logoData.secondary);
-    if (hasLogo) { if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`); }
+    if (hasLogo) {
+      if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`);
+      p1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
+    }
     else p1.push(`LOGO:           Nenhuma — não exibir placeholder`);
     if (p1.length) s.push(`## LOGO\n${p1.join('\n')}`);
 
