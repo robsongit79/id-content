@@ -439,7 +439,16 @@ const app = {
     
     if (!this.logoData.presets) this.logoData.presets = [];
     
-    this.logoData.presets.push({ name, type, colors, fonts, layout });
+    const existingIndex = this.logoData.presets.findIndex(p => p.name === name && p.type === type);
+    
+    if (existingIndex !== -1) {
+      if (!confirm(`Já existe um preset de ${type === 'carousel' ? 'carrossel' : 'post'} com o nome "${name}". Deseja sobrescrevê-lo?`)) {
+        return;
+      }
+      this.logoData.presets[existingIndex] = { name, type, colors, fonts, layout };
+    } else {
+      this.logoData.presets.push({ name, type, colors, fonts, layout });
+    }
     
     nameEl.value = ''; // Limpa o input
     
