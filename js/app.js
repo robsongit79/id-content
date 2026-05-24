@@ -408,11 +408,58 @@ const app = {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         
-        const base64 = canvas.toDataURL('image/png');
-        this.logoData[type] = base64;
-        updateLogoPreview(type, base64);
-        markDirty();
-        input.value = '';
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            if (statusEl) {
+              statusEl.textContent = 'Erro ao comprimir';
+              statusEl.style.color = 'var(--red)';
+            }
+            return;
+          }
+          
+          if (statusEl) statusEl.textContent = 'Subindo...';
+          
+          try {
+            const fileName = `${this.currentBrandId || 'brand'}_${type}.png`;
+            const uploadUrl = `${SUPABASE_URL}/storage/v1/object/logos/${fileName}`;
+            const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
+            
+            const res = await fetch(uploadUrl, {
+              method: 'POST',
+              headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${token}`,
+                'x-upsert': 'true'
+              },
+              body: blob
+            });
+            
+            if (!res.ok) {
+              const err = await res.json();
+              throw new Error(err.message || 'Erro no upload do arquivo');
+            }
+            
+            // Gerar a URL pública real no Supabase Storage público
+            const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/logos/${fileName}?t=${Date.now()}`;
+            
+            this.logoData[type] = publicUrl;
+            updateLogoPreview(type, publicUrl);
+            markDirty();
+            input.value = '';
+            
+            if (statusEl) {
+              statusEl.textContent = '✓';
+              statusEl.style.color = 'var(--accent2)';
+            }
+          } catch (uploadError) {
+            console.error('Erro no upload para o Storage:', uploadError);
+            if (statusEl) {
+              statusEl.textContent = 'Erro no envio';
+              statusEl.style.color = 'var(--red)';
+            }
+            toast('Erro ao subir imagem para o Storage do Supabase.', 'error');
+          }
+        }, 'image/png');
       };
       img.onerror = () => {
         if (statusEl) {
@@ -423,6 +470,48 @@ const app = {
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  },
+
+  async removeUploadedLogo(type) {
+    if (!this.logoData) return;
+    
+    const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
+    const statusEl = document.getElementById(`bLogo${prefix}Status`);
+    if (statusEl) {
+      statusEl.textContent = 'Removendo...';
+      statusEl.style.color = 'var(--muted)';
+    }
+
+    try {
+      const fileName = `${this.currentBrandId || 'brand'}_${type}.png`;
+      const deleteUrl = `${SUPABASE_URL}/storage/v1/object/logos/${fileName}`;
+      const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
+      
+      const res = await fetch(deleteUrl, {
+        method: 'DELETE',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!res.ok) {
+        console.warn('Erro ao remover arquivo físico do Storage:', await res.text());
+      }
+    } catch (e) {
+      console.error('Erro na requisição de remoção:', e);
+    }
+
+    this.logoData[type] = '';
+    updateLogoPreview(type, '');
+    markDirty();
+    await this.save();
+    
+    if (statusEl) {
+      statusEl.textContent = 'Removida';
+      statusEl.style.color = 'var(--muted)';
+    }
+    toast('Logo removida com sucesso.', 'success');
   },
 
   // ── PRESETS ──
