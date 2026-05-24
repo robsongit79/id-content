@@ -12,6 +12,8 @@ function syncColor(pickId, hexId) {
 function selectRadio(el, gridId) {
   document.querySelectorAll(`#${gridId} .radio-item, #${gridId} .logo-pos-item`).forEach(i => i.classList.remove('selected'));
   el.classList.add('selected');
+  const radio = el.querySelector('input[type="radio"]');
+  if (radio) radio.checked = true;
   markDirty();
   setTimeout(updatePreviews, 50);
 }
