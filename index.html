@@ -85,30 +85,10 @@
         <div class="field-group" style="margin-top:14px;">
           <div class="field">
             <label class="field-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
-              <input type="checkbox" id="bLogoActive" onchange="toggleLogoActiveFields();markDirty()" style="width:16px;height:16px;cursor:pointer;">
+              <input type="checkbox" id="bLogoActive" onchange="markDirty()" style="width:16px;height:16px;cursor:pointer;">
               <span>Logo ativa nesta marca</span>
             </label>
             <div class="field-hint">Marque se você deseja usar logo nos carrosséis e posts desta marca.</div>
-          </div>
-        </div>
-
-        <div id="logoUrlFields" class="field-group cols-2" style="display:none;margin-top:14px;">
-          <div class="field">
-            <label class="field-label">URL da Logo Principal</label>
-            <div class="field-hint">Cole o link direto da imagem PNG com fundo transparente.</div>
-            <div style="display:flex;gap:12px;align-items:center;margin-top:4px;">
-              <div class="logo-thumb" id="bLogoPrincipalThumb"><span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem logo</span></div>
-              <input type="text" id="bLogoUrlPrimary" placeholder="https://exemplo.com/logo-principal.png" oninput="updateLogoFromUrl('primary');markDirty()" style="flex:1;">
-            </div>
-          </div>
-          
-          <div class="field">
-            <label class="field-label">URL da Logo Secundária</label>
-            <div class="field-hint">Cole o link direto da logo alternativa.</div>
-            <div style="display:flex;gap:12px;align-items:center;margin-top:4px;">
-              <div class="logo-thumb" id="bLogoSecundariaThumb"><span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem logo</span></div>
-              <input type="text" id="bLogoUrlSecondary" placeholder="https://exemplo.com/logo-secundaria.png" oninput="updateLogoFromUrl('secondary');markDirty()" style="flex:1;">
-            </div>
           </div>
         </div>
       </section>

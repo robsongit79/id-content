@@ -21,18 +21,10 @@ const prompts = {
     if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
     if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
-    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
-    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
-    
-    if (activeLogo && logoPrimary) {
-      s1.push(`LOGO PRINCIPAL:  ${logoPrimary}`);
+    if (activeLogo) {
+      s1.push("LOGO:           Ativa — Solicite o envio do link da logo ao usuário.");
     } else {
-      s1.push(`LOGO PRINCIPAL:  Nenhuma`);
-    }
-    if (activeLogo && logoSecondary) {
-      s1.push(`LOGO SECUNDÁRIA: ${logoSecondary}`);
-    } else {
-      s1.push(`LOGO SECUNDÁRIA: Nenhuma`);
+      s1.push("LOGO:           Nenhuma — não exibir logo.");
     }
     if (s1.length) s.push(`## 01 · IDENTIDADE\n${s1.join('\n')}`);
 
@@ -100,12 +92,10 @@ const prompts = {
     const c1 = [];
     const lh = getRadio('carLogoPosHero'), lc = getRadio('carLogoPosCta');
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
-    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
-    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
-    const hasLogo = activeLogo && (logoPrimary || logoSecondary);
-    if (hasLogo) {
+    if (activeLogo) {
       if (lh) c1.push(`LOGO CAPA:      ${lh}`);
       if (lc) c1.push(`LOGO CTA:       ${lc}`);
+      c1.push(`LOGO:           Solicite a imagem da logo ao usuário. Quando ela for fornecida, respeite a seguinte regra de exibição:`);
       c1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     } else {
       c1.push(`LOGO:           Nenhuma — não exibir placeholder nos slides de capa e CTA. O carrossel deve ser criado sem nenhum tipo de logo.`);
@@ -138,11 +128,9 @@ const prompts = {
     const p1 = [];
     const lp = getRadio('postLogoPos');
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
-    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
-    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
-    const hasLogo = activeLogo && (logoPrimary || logoSecondary);
-    if (hasLogo) {
+    if (activeLogo) {
       if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`);
+      p1.push(`LOGO:           Solicite a imagem da logo ao usuário. Quando ela for fornecida, respeite a seguinte regra de exibição:`);
       p1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     }
     else p1.push(`LOGO:           Nenhuma — não exibir placeholder. O post deve ser criado sem nenhum tipo de logo.`);

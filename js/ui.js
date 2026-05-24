@@ -75,44 +75,7 @@ function loadFont(inputId, previewId, statusId) {
   }, 600);
 }
 
-// ── LOGO PREVIEW ──
-function updateLogoPreview(type, base64OrUrl) {
-  const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
-  const thumb = document.getElementById(`bLogo${prefix}Thumb`);
-  
-  if (!thumb) return;
-  
-  if (!base64OrUrl) {
-    thumb.innerHTML = '<span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem logo</span>';
-    return;
-  }
-  
-  const img = new Image();
-  img.onload = () => {
-    thumb.innerHTML = '';
-    img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-    thumb.appendChild(img);
-  };
-  img.onerror = () => {
-    thumb.innerHTML = '<span style="font-size:18px;color:var(--red);">✗</span>';
-  };
-  img.src = base64OrUrl;
-}
 
-function toggleLogoActiveFields() {
-  const active = document.getElementById('bLogoActive')?.checked || false;
-  const fields = document.getElementById('logoUrlFields');
-  if (fields) fields.style.display = active ? 'grid' : 'none';
-}
-
-function updateLogoFromUrl(type) {
-  const inputId = type === 'primary' ? 'bLogoUrlPrimary' : 'bLogoUrlSecondary';
-  const val = document.getElementById(inputId)?.value.trim() || '';
-  if (app.logoData) {
-    app.logoData[type] = val;
-  }
-  updateLogoPreview(type, val);
-}
 
 // ── TOAST ──
 function toast(msg, type = 'success') {

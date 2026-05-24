@@ -182,35 +182,23 @@ const app = {
     if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
     
-    let logoData = { active: false, primary: '', secondary: '', presets: [] };
+    let logoData = { active: false, presets: [] };
     try {
       if (b.logo_url && b.logo_url.startsWith('{')) {
         logoData = JSON.parse(b.logo_url);
       } else if (b.logo_url) {
-        logoData.primary = b.logo_url;
-        logoData.active = true;
+        logoData.active = b.logo_url !== 'Nenhuma' && b.logo_url !== '';
       }
     } catch(e) {
-      if (b.logo_url) {
-        logoData.primary = b.logo_url;
-        logoData.active = true;
-      }
+      logoData.active = !!b.logo_url;
     }
     this.logoData = logoData;
     if (!this.logoData.presets) this.logoData.presets = [];
     
     const bActive = document.getElementById('bLogoActive');
     if (bActive) bActive.checked = !!logoData.active;
-    toggleLogoActiveFields();
-    
-    const urlPrimary = document.getElementById('bLogoUrlPrimary');
-    if (urlPrimary) urlPrimary.value = logoData.primary || '';
-    const urlSecondary = document.getElementById('bLogoUrlSecondary');
-    if (urlSecondary) urlSecondary.value = logoData.secondary || '';
     
     setTimeout(() => {
-      updateLogoPreview('primary', logoData.primary);
-      updateLogoPreview('secondary', logoData.secondary);
       renderPresets();
     }, 100);
   },
@@ -269,8 +257,8 @@ const app = {
   collectBrand() {
     if (!this.logoData) this.logoData = { presets: [] };
     this.logoData.active = document.getElementById('bLogoActive')?.checked || false;
-    this.logoData.primary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
-    this.logoData.secondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
+    delete this.logoData.primary;
+    delete this.logoData.secondary;
     
     return {
       name: f('bName') || 'Sem nome',
@@ -383,12 +371,9 @@ const app = {
     });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
     Object.entries(defs).forEach(([id,v]) => { document.getElementById(id).value = v; document.getElementById(id+'Hex').value = v; });
-    this.logoData = { active: false, primary: '', secondary: '', presets: [] };
+    this.logoData = { active: false, presets: [] };
     const bActive = document.getElementById('bLogoActive');
     if (bActive) bActive.checked = false;
-    toggleLogoActiveFields();
-    updateLogoPreview('primary', '');
-    updateLogoPreview('secondary', '');
     renderPresets();
     ['bPreviewDisplay','bPreviewBody'].forEach(id => { document.getElementById(id).style.fontFamily = ''; });
     ['bStatusDisplay','bStatusBody'].forEach(id => { document.getElementById(id).textContent = ''; });
