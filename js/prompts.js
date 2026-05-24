@@ -20,14 +20,17 @@ const prompts = {
     if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
     if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
     if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
-    const activeLogo = app.logoData && app.logoData.active;
-    if (activeLogo && app.logoData.primary) {
-      s1.push(`LOGO PRINCIPAL:  ${app.logoData.primary}`);
+    const activeLogo = document.getElementById('bLogoActive')?.checked || false;
+    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
+    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
+    
+    if (activeLogo && logoPrimary) {
+      s1.push(`LOGO PRINCIPAL:  ${logoPrimary}`);
     } else {
       s1.push(`LOGO PRINCIPAL:  Nenhuma`);
     }
-    if (activeLogo && app.logoData.secondary) {
-      s1.push(`LOGO SECUNDÁRIA: ${app.logoData.secondary}`);
+    if (activeLogo && logoSecondary) {
+      s1.push(`LOGO SECUNDÁRIA: ${logoSecondary}`);
     } else {
       s1.push(`LOGO SECUNDÁRIA: Nenhuma`);
     }
@@ -96,7 +99,10 @@ const prompts = {
 
     const c1 = [];
     const lh = getRadio('carLogoPosHero'), lc = getRadio('carLogoPosCta');
-    const hasLogo = app.logoData && app.logoData.active && (app.logoData.primary || app.logoData.secondary);
+    const activeLogo = document.getElementById('bLogoActive')?.checked || false;
+    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
+    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
+    const hasLogo = activeLogo && (logoPrimary || logoSecondary);
     if (hasLogo) {
       if (lh) c1.push(`LOGO CAPA:      ${lh}`);
       if (lc) c1.push(`LOGO CTA:       ${lc}`);
@@ -131,7 +137,10 @@ const prompts = {
 
     const p1 = [];
     const lp = getRadio('postLogoPos');
-    const hasLogo = app.logoData && app.logoData.active && (app.logoData.primary || app.logoData.secondary);
+    const activeLogo = document.getElementById('bLogoActive')?.checked || false;
+    const logoPrimary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
+    const logoSecondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
+    const hasLogo = activeLogo && (logoPrimary || logoSecondary);
     if (hasLogo) {
       if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`);
       p1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
