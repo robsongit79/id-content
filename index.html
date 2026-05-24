@@ -248,19 +248,6 @@
       </section>
       <section class="section" id="c2">
         <div class="section-header"><div><div class="section-num car-num">02</div><h2 class="section-title">Estrutura do Carrossel</h2></div></div>
-        <div class="field-group" style="margin-bottom:16px;">
-          <div class="field">
-            <label class="field-label">Presets de Layout para Carrossel</label>
-            <div class="field-hint">Salve a combinação atual de cores, tipografia e estrutura de slides como um preset exclusivo desta marca.</div>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <input type="text" id="cPresetName" placeholder="Nome do preset (ex: Carrossel Padrão)..." style="flex:1;">
-              <button type="button" class="btn btn-car" onclick="savePreset('carousel')">Salvar Preset</button>
-            </div>
-            <div id="cPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
-              <!-- Injetado dinamicamente via JS -->
-            </div>
-          </div>
-        </div>
         <div class="field-group cols-2">
           <div class="field"><label class="field-label">Formato padrão</label><select id="cFormat" oninput="markDirty()"><option value="">Selecione</option><option>4:5 — Instagram padrão (1080×1350)</option><option>1:1 — Quadrado (1080×1080)</option><option>9:16 — Stories (1080×1920)</option></select></div>
           <div class="field"><label class="field-label">Nº de slides padrão</label><input type="text" id="cSlideCount" placeholder="Ex: 5 a 10 slides" oninput="markDirty()"></div>
@@ -275,6 +262,20 @@
           <div class="field"><label class="field-label">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" placeholder="Ex: Logo centralizada. Frase de ação abaixo. Handle do Instagram. Fundo com gradiente da marca." oninput="markDirty()"></textarea></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Notas de carrossel</label><textarea id="cNotes" placeholder="Ex: Manter ritmo de leitura progressivo — do problema (slide 1) para a solução (slide final). Não ultrapassar 30 palavras por slide de conteúdo." oninput="markDirty()"></textarea></div></div>
+        <div class="divider"></div>
+        <div class="field-group" style="margin-top:16px;">
+          <div class="field">
+            <label class="field-label">Presets de Layout para Carrossel</label>
+            <div class="field-hint">Salve a combinação atual de cores, tipografia e estrutura de slides como um preset exclusivo desta marca.</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <input type="text" id="cPresetName" placeholder="Nome do preset (ex: Carrossel Padrão)..." style="flex:1;">
+              <button type="button" class="btn btn-car" onclick="savePreset('carousel')">Salvar Preset</button>
+            </div>
+            <div id="cPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
+              <!-- Injetado dinamicamente via JS -->
+            </div>
+          </div>
+        </div>
       </section>
     </main>
     <aside class="preview-panel">
@@ -370,19 +371,6 @@
       </section>
       <section class="section" id="p5">
         <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Layout por Formato</h2></div></div>
-        <div class="field-group" style="margin-bottom:16px;">
-          <div class="field">
-            <label class="field-label">Presets de Layout para Post</label>
-            <div class="field-hint">Salve a combinação atual de cores, tipografia e posicionamento do post como um preset exclusivo desta marca.</div>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <input type="text" id="pPresetName" placeholder="Nome do preset (ex: Post de Citação)..." style="flex:1;">
-              <button type="button" class="btn btn-post" onclick="savePreset('post')">Salvar Preset</button>
-            </div>
-            <div id="pPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
-              <!-- Injetado dinamicamente via JS -->
-            </div>
-          </div>
-        </div>
         <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
         <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
         <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
@@ -396,6 +384,20 @@
           <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
+        <div class="divider"></div>
+        <div class="field-group" style="margin-top:16px;">
+          <div class="field">
+            <label class="field-label">Presets de Layout para Post</label>
+            <div class="field-hint">Salve a combinação atual de cores, tipografia e posicionamento do post como um preset exclusivo desta marca.</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <input type="text" id="pPresetName" placeholder="Nome do preset (ex: Post de Citação)..." style="flex:1;">
+              <button type="button" class="btn btn-post" onclick="savePreset('post')">Salvar Preset</button>
+            </div>
+            <div id="pPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
+              <!-- Injetado dinamicamente via JS -->
+            </div>
+          </div>
+        </div>
       </section>
     </main>
     <aside class="preview-panel">
