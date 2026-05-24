@@ -115,6 +115,13 @@ const prompts = {
     if (f('cNotes'))    c3.push(`NOTAS:          ${f('cNotes')}`);
     if (c3.length) s.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
 
+    const c4 = [];
+    if (f('cForbidden')) c4.push(`PROIBIDO:       ${f('cForbidden')}`);
+    if (f('cDelivery'))  c4.push(`ENTREGA:        ${f('cDelivery')}`);
+    if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
+    if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
+    if (c4.length) s.push(`## ENTREGA\n${c4.join('\n')}`);
+
     s.push(`---\nFIM — ${f('bName') || 'MARCA'} · CARROSSEL`);
     return s.join('\n\n');
   },

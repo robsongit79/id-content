@@ -207,7 +207,37 @@ const app = {
     const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
     set('cFormat', c.format); set('cSlideCount', c.slide_count);
     set('cSequence', c.sequence); set('cFixedEl', c.fixed_elements);
-    set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta); set('cNotes', c.notes);
+    set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta);
+    
+    let notes = '';
+    let forbidden = '';
+    let delivery_format = 'HTML standalone por formato';
+    let font_base64 = 'Embutir fontes em base64 no CSS';
+    let final_notes = '';
+    
+    if (c.notes) {
+      try {
+        const parsed = JSON.parse(c.notes);
+        if (parsed && typeof parsed === 'object') {
+          notes = parsed.notes || '';
+          forbidden = parsed.forbidden || '';
+          delivery_format = parsed.delivery_format || 'HTML standalone por formato';
+          font_base64 = parsed.font_base64 || 'Embutir fontes em base64 no CSS';
+          final_notes = parsed.final_notes || '';
+        } else {
+          notes = c.notes;
+        }
+      } catch (e) {
+        notes = c.notes;
+      }
+    }
+    
+    set('cNotes', notes);
+    set('cForbidden', forbidden);
+    set('cDelivery', delivery_format);
+    set('cFontB64', font_base64);
+    set('cFinalNotes', final_notes);
+    
     if (c.logo_pos_hero) {
       document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => { if (r.value === c.logo_pos_hero) { r.checked = true; r.closest('.logo-pos-item')?.classList.add('selected'); } });
     }
@@ -288,11 +318,19 @@ const app = {
   },
 
   collectCarousel() {
+    const notesData = {
+      notes: f('cNotes'),
+      forbidden: f('cForbidden'),
+      delivery_format: f('cDelivery'),
+      font_base64: f('cFontB64'),
+      final_notes: f('cFinalNotes')
+    };
     return {
       logo_pos_hero: getRadio('carLogoPosHero'), logo_pos_cta: getRadio('carLogoPosCta'),
       format: f('cFormat'), slide_count: f('cSlideCount'),
       sequence: f('cSequence'), fixed_elements: f('cFixedEl'),
-      slide_hero: f('cSlide1'), slide_cta: f('cSlideCta'), notes: f('cNotes'),
+      slide_hero: f('cSlide1'), slide_cta: f('cSlideCta'),
+      notes: JSON.stringify(notesData),
     };
   },
 
@@ -496,7 +534,36 @@ const app = {
       setVal('cFixedEl', preset.layout.fixed_elements || preset.layout.cFixedEl);
       setVal('cSlide1', preset.layout.slide_hero || preset.layout.cSlide1);
       setVal('cSlideCta', preset.layout.slide_cta || preset.layout.cSlideCta);
-      setVal('cNotes', preset.layout.notes || preset.layout.cNotes);
+      
+      const notesRaw = preset.layout.notes || preset.layout.cNotes;
+      let notes = '';
+      let forbidden = '';
+      let delivery_format = 'HTML standalone por formato';
+      let font_base64 = 'Embutir fontes em base64 no CSS';
+      let final_notes = '';
+      
+      if (notesRaw) {
+        try {
+          const parsed = JSON.parse(notesRaw);
+          if (parsed && typeof parsed === 'object') {
+            notes = parsed.notes || '';
+            forbidden = parsed.forbidden || '';
+            delivery_format = parsed.delivery_format || 'HTML standalone por formato';
+            font_base64 = parsed.font_base64 || 'Embutir fontes em base64 no CSS';
+            final_notes = parsed.final_notes || '';
+          } else {
+            notes = notesRaw;
+          }
+        } catch (e) {
+          notes = notesRaw;
+        }
+      }
+      
+      setVal('cNotes', notes);
+      setVal('cForbidden', forbidden);
+      setVal('cDelivery', delivery_format);
+      setVal('cFontB64', font_base64);
+      setVal('cFinalNotes', final_notes);
       
       const logoPosHero = preset.layout.logo_pos_hero || preset.layout.carLogoPosHero;
       const logoPosCta = preset.layout.logo_pos_cta || preset.layout.carLogoPosCta;

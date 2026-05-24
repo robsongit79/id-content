@@ -131,7 +131,7 @@ function updateProgress() {
   document.getElementById('baseProgLabel').textContent = bf + ' campos';
   document.getElementById('baseProgPct').textContent = bPct + '%';
 
-  const cIds = ['cFormat','cSlideCount','cSequence'];
+  const cIds = ['cFormat','cSlideCount','cSequence','cDelivery','cFontB64'];
   let cf = cIds.filter(id => f(id)).length;
   if (getRadio('carLogoPosHero')) cf++; if (getRadio('carLogoPosCta')) cf++;
   const cPct = Math.round((cf / (cIds.length + 2)) * 100);
@@ -265,6 +265,11 @@ const FIELD_TIPS = {
   cSlide1:   'Layout e hierarquia do slide de abertura. É o mais importante para o swipe.',
   cSlideCta: 'Layout do slide final. Deve converter: direcionar para uma ação clara.',
   cNotes:    'Instruções adicionais: ritmo, limite de palavras por slide, variações.',
+  // Carrossel — Entrega
+  cForbidden:  'Restrições visuais ou de conteúdo específicas para este carrossel.',
+  cDelivery:   'Como o código HTML do carrossel será estruturado na entrega.',
+  cFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
+  cFinalNotes: 'Últimas instruções antes de o Claude gerar o código do carrossel.',
   // Post — Conteúdo
   pHeadline:     'Texto de maior destaque. Deve capturar atenção em 3 segundos.',
   pSubtitle:     'Complementa ou contextualiza a headline.',

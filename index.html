@@ -186,6 +186,7 @@
         <a href="#c1" class="nav-item active" data-car="c1"><span class="nav-dot"></span> 01 · Logo</a>
         <a href="#c2" class="nav-item" data-car="c2"><span class="nav-dot"></span> 02 · Estrutura</a>
         <a href="#c3" class="nav-item" data-car="c3"><span class="nav-dot"></span> 03 · Slides</a>
+        <a href="#c4" class="nav-item" data-car="c4"><span class="nav-dot"></span> 04 · Entrega</a>
       </div>
       <div class="sidebar-section car-prog">
         <div class="sidebar-label">Progresso</div>
@@ -238,6 +239,15 @@
           <div class="field"><label class="field-label">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" placeholder="Ex: Logo centralizada. Frase de ação abaixo. Handle do Instagram. Fundo com gradiente da marca." oninput="markDirty()"></textarea></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Notas de carrossel</label><textarea id="cNotes" placeholder="Ex: Manter ritmo de leitura progressivo — do problema (slide 1) para a solução (slide final). Não ultrapassar 30 palavras por slide de conteúdo." oninput="markDirty()"></textarea></div></div>
+      </section>
+      <section class="section" id="c4">
+        <div class="section-header"><div><div class="section-num car-num">04</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="cForbidden" placeholder="Ex: Não usar fundo branco neste carrossel. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Formato de entrega</label><select id="cDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
+          <div class="field"><label class="field-label">Fontes</label><select id="cFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="cFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
         <div class="divider"></div>
         <div class="field-group" style="margin-top:16px;">
           <div class="field">
