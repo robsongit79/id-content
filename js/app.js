@@ -4,6 +4,9 @@ const app = {
   currentTab: 'base',
   isDirty: false,
   chipData: { personality: [], goal: [], pItems: [] },
+  activeCarouselPresetIndex: null,
+  activePostPresetIndex: null,
+  isApplyingPreset: false,
   postType: '',
   postFmts: new Set(),
   postTypeConfig: {
@@ -348,6 +351,8 @@ const app = {
 
   // ── RESET FORM ──
   resetForm() {
+    this.activeCarouselPresetIndex = null;
+    this.activePostPresetIndex = null;
     document.querySelectorAll('#screenEditor input[type="text"],#screenEditor input[type="url"],#screenEditor textarea').forEach(e => e.value = '');
     document.querySelectorAll('#screenEditor select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
     document.querySelectorAll('.radio-item,.logo-pos-item,.type-card').forEach(e => e.classList.remove('selected'));
@@ -561,8 +566,18 @@ const app = {
   },
   
   applyPreset(index) {
+    this.isApplyingPreset = true;
     const preset = this.logoData.presets[index];
-    if (!preset) return;
+    if (!preset) {
+      this.isApplyingPreset = false;
+      return;
+    }
+    
+    if (preset.type === 'carousel') {
+      this.activeCarouselPresetIndex = index;
+    } else if (preset.type === 'post') {
+      this.activePostPresetIndex = index;
+    }
     
     const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
     
@@ -679,6 +694,8 @@ const app = {
     }
     
     markDirty();
+    this.isApplyingPreset = false;
+    renderPresets();
     toast(`Preset "${preset.name}" aplicado!`, 'success');
   },
   
@@ -688,6 +705,9 @@ const app = {
     if (!confirm(`Excluir preset "${preset.name}" da nuvem?`)) return;
     
     this.logoData.presets.splice(index, 1);
+    
+    this.activeCarouselPresetIndex = null;
+    this.activePostPresetIndex = null;
     
     markDirty();
     this.save(); // Salva na nuvem imediatamente

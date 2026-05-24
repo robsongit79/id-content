@@ -233,6 +233,11 @@ function markDirty() {
     const el = document.getElementById(id);
     if (el) { el.textContent = '● Alterações não salvas'; el.className = 'save-status dirty'; }
   });
+  if (!app.isApplyingPreset) {
+    app.activeCarouselPresetIndex = null;
+    app.activePostPresetIndex = null;
+    renderPresets();
+  }
   updatePreviews();
   // Autosave after 2 seconds of inactivity
   clearTimeout(saveTimer);
@@ -367,6 +372,11 @@ function renderPresets() {
   presets.forEach((preset, index) => {
     const card = document.createElement('div');
     card.className = 'preset-card';
+    if (preset.type === 'carousel' && index === app.activeCarouselPresetIndex) {
+      card.classList.add('active');
+    } else if (preset.type === 'post' && index === app.activePostPresetIndex) {
+      card.classList.add('active');
+    }
     card.setAttribute('onclick', `applyPreset(${index})`);
     
     // Nome do preset
@@ -374,15 +384,6 @@ function renderPresets() {
     title.className = 'preset-title';
     title.textContent = preset.name;
     card.appendChild(title);
-    
-    // Descrição do preset
-    const desc = document.createElement('span');
-    desc.className = 'preset-desc';
-    
-    let fontName = preset.fonts?.font_display || 'Padrão';
-    let primaryColor = preset.colors?.color_primary || '#FFF';
-    desc.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${primaryColor};margin-right:4px;"></span> Fonte: ${fontName}`;
-    card.appendChild(desc);
     
     // Botão de deletar
     const delBtn = document.createElement('button');
