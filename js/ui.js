@@ -74,14 +74,46 @@ function loadFont(inputId, previewId, statusId) {
 }
 
 // ── LOGO PREVIEW ──
-function previewLogo() {
-  const url = f('bLogoUrl'), thumb = document.getElementById('bLogoThumb'), status = document.getElementById('bLogoStatus');
-  if (!url) { thumb.innerHTML = '<span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem<br>logo</span>'; status.textContent = ''; return; }
-  status.textContent = 'Carregando...'; status.style.color = 'var(--muted)';
+function updateLogoPreview(type, base64OrUrl) {
+  const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
+  const thumb = document.getElementById(`bLogo${prefix}Thumb`);
+  const status = document.getElementById(`bLogo${prefix}Status`);
+  const removeBtn = document.getElementById(`btnRemoveLogo${prefix}`);
+  
+  if (!thumb) return;
+  
+  if (!base64OrUrl) {
+    thumb.innerHTML = '<span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem logo</span>';
+    if (status) status.textContent = '';
+    if (removeBtn) removeBtn.style.display = 'none';
+    return;
+  }
+  
+  if (status) {
+    status.textContent = 'Otimizado';
+    status.style.color = 'var(--muted)';
+  }
+  
   const img = new Image();
-  img.onload = () => { thumb.innerHTML = ''; img.style.cssText = 'width:100%;height:100%;object-fit:contain;'; thumb.appendChild(img); status.textContent = '✓'; status.style.color = 'var(--accent2)'; };
-  img.onerror = () => { thumb.innerHTML = '<span style="font-size:18px;">✗</span>'; status.textContent = 'URL inválida'; status.style.color = 'var(--red)'; };
-  img.src = url;
+  img.onload = () => {
+    thumb.innerHTML = '';
+    img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+    thumb.appendChild(img);
+    if (status) {
+      status.textContent = '✓';
+      status.style.color = 'var(--accent2)';
+    }
+    if (removeBtn) removeBtn.style.display = 'inline-flex';
+  };
+  img.onerror = () => {
+    thumb.innerHTML = '<span style="font-size:18px;">✗</span>';
+    if (status) {
+      status.textContent = 'Erro';
+      status.style.color = 'var(--red)';
+    }
+    if (removeBtn) removeBtn.style.display = 'inline-flex';
+  };
+  img.src = base64OrUrl;
 }
 
 // ── TOAST ──
@@ -317,4 +349,67 @@ function initScrollNav() {
     entries.forEach(e => { if (e.isIntersecting) { document.querySelectorAll('[data-base]').forEach(n => n.classList.remove('active')); const m = document.querySelector(`[data-base="${e.target.id}"]`); if (m) m.classList.add('active'); }});
   }, { threshold: 0.3, root: document.getElementById('baseMain') });
   document.querySelectorAll('#panelBase .section').forEach(s => bObs.observe(s));
+}
+
+// ── RENDER PRESETS ──
+function renderPresets() {
+  const cList = document.getElementById('cPresetsList');
+  const pList = document.getElementById('pPresetsList');
+  
+  if (cList) cList.innerHTML = '';
+  if (pList) pList.innerHTML = '';
+  
+  const presets = (app.logoData && app.logoData.presets) ? app.logoData.presets : [];
+  
+  let cCount = 0;
+  let pCount = 0;
+  
+  presets.forEach((preset, index) => {
+    const card = document.createElement('div');
+    card.className = 'preset-card';
+    card.setAttribute('onclick', `applyPreset(${index})`);
+    
+    // Nome do preset
+    const title = document.createElement('span');
+    title.className = 'preset-title';
+    title.textContent = preset.name;
+    card.appendChild(title);
+    
+    // Descrição do preset
+    const desc = document.createElement('span');
+    desc.className = 'preset-desc';
+    
+    let fontName = preset.fonts?.font_display || 'Padrão';
+    let primaryColor = preset.colors?.color_primary || '#FFF';
+    desc.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${primaryColor};margin-right:4px;"></span> Fonte: ${fontName}`;
+    card.appendChild(desc);
+    
+    // Botão de deletar
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'preset-card-delete';
+    delBtn.innerHTML = '✕';
+    delBtn.setAttribute('onclick', `event.stopPropagation(); deletePreset(${index})`);
+    card.appendChild(delBtn);
+    
+    if (preset.type === 'carousel') {
+      if (cList) {
+        cList.appendChild(card);
+        cCount++;
+      }
+    } else if (preset.type === 'post') {
+      if (pList) {
+        pList.appendChild(card);
+        pCount++;
+      }
+    }
+  });
+  
+  // Mensagens vazias se não houver presets
+  if (cCount === 0 && cList) {
+    cList.innerHTML = '<span style="font-size:11px;color:var(--muted);grid-column:span 3;text-align:center;padding:12px 0;">Nenhum preset de carrossel salvo para esta marca.</span>';
+  }
+  if (pCount === 0 && pList) {
+    pList.innerHTML = '<span style="font-size:11px;color:var(--muted);grid-column:span 3;text-align:center;padding:12px 0;">Nenhum preset de post salvo para esta marca.</span>';
+  }
 }

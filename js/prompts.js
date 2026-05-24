@@ -20,8 +20,16 @@ const prompts = {
     if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
     if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
     if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
-    if (f('bLogoUrl'))     s1.push(`LOGO URL:       ${f('bLogoUrl')}`);
-    else                   s1.push(`LOGO:           Nenhuma — não exibir placeholder ou lockup`);
+    if (app.logoData && app.logoData.primary) {
+      s1.push(`LOGO PRINCIPAL:  ${app.logoData.primary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.primary}`);
+    } else {
+      s1.push(`LOGO PRINCIPAL:  Nenhuma`);
+    }
+    if (app.logoData && app.logoData.secondary) {
+      s1.push(`LOGO SECUNDÁRIA: ${app.logoData.secondary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.secondary}`);
+    } else {
+      s1.push(`LOGO SECUNDÁRIA: Nenhuma`);
+    }
     if (s1.length) s.push(`## 01 · IDENTIDADE\n${s1.join('\n')}`);
 
     const s2 = [];
@@ -87,7 +95,8 @@ const prompts = {
 
     const c1 = [];
     const lh = getRadio('carLogoPosHero'), lc = getRadio('carLogoPosCta');
-    if (f('bLogoUrl')) {
+    const hasLogo = app.logoData && (app.logoData.primary || app.logoData.secondary);
+    if (hasLogo) {
       if (lh) c1.push(`LOGO CAPA:      ${lh}`);
       if (lc) c1.push(`LOGO CTA:       ${lc}`);
     } else {
@@ -120,7 +129,8 @@ const prompts = {
 
     const p1 = [];
     const lp = getRadio('postLogoPos');
-    if (f('bLogoUrl')) { if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`); }
+    const hasLogo = app.logoData && (app.logoData.primary || app.logoData.secondary);
+    if (hasLogo) { if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`); }
     else p1.push(`LOGO:           Nenhuma — não exibir placeholder`);
     if (p1.length) s.push(`## LOGO\n${p1.join('\n')}`);
 

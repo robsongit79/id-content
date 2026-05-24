@@ -146,7 +146,7 @@ const app = {
   fillBrand(b) {
     const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
     set('bName', b.name); set('bHandle', b.handle); set('bTagline', b.tagline);
-    set('bNiche', b.niche); set('bPositioning', b.positioning); set('bLogoUrl', b.logo_url);
+    set('bNiche', b.niche); set('bPositioning', b.positioning);
     set('cPrimaryHex', b.color_primary); set('cSecondaryHex', b.color_secondary);
     set('cAccentHex', b.color_accent); set('cDarkHex', b.color_dark);
     set('cLightHex', b.color_light); set('cTextHex', b.color_text);
@@ -178,7 +178,24 @@ const app = {
     // Font previews
     if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
-    if (b.logo_url) setTimeout(previewLogo, 100);
+    
+    let logoData = { primary: '', secondary: '', presets: [] };
+    try {
+      if (b.logo_url && b.logo_url.startsWith('{')) {
+        logoData = JSON.parse(b.logo_url);
+      } else if (b.logo_url) {
+        logoData.primary = b.logo_url;
+      }
+    } catch(e) {
+      if (b.logo_url) logoData.primary = b.logo_url;
+    }
+    this.logoData = logoData;
+    if (!this.logoData.presets) this.logoData.presets = [];
+    setTimeout(() => {
+      updateLogoPreview('primary', logoData.primary);
+      updateLogoPreview('secondary', logoData.secondary);
+      renderPresets();
+    }, 100);
   },
 
   fillCarousel(c) {
@@ -232,12 +249,12 @@ const app = {
     });
   },
 
-  // ── COLLECT DATA ──
   collectBrand() {
     return {
       name: f('bName') || 'Sem nome',
       handle: f('bHandle'), tagline: f('bTagline'), niche: f('bNiche'),
-      positioning: f('bPositioning'), logo_url: f('bLogoUrl'),
+      positioning: f('bPositioning'),
+      logo_url: JSON.stringify(this.logoData || { primary: '', secondary: '' }),
       color_primary: document.getElementById('cPrimaryHex')?.value,
       color_secondary: document.getElementById('cSecondaryHex')?.value,
       color_accent: document.getElementById('cAccentHex')?.value,
@@ -342,8 +359,10 @@ const app = {
     });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
     Object.entries(defs).forEach(([id,v]) => { document.getElementById(id).value = v; document.getElementById(id+'Hex').value = v; });
-    document.getElementById('bLogoThumb').innerHTML = '<span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem<br>logo</span>';
-    document.getElementById('bLogoStatus').textContent = '';
+    this.logoData = { primary: '', secondary: '', presets: [] };
+    updateLogoPreview('primary', '');
+    updateLogoPreview('secondary', '');
+    renderPresets();
     ['bPreviewDisplay','bPreviewBody'].forEach(id => { document.getElementById(id).style.fontFamily = ''; });
     ['bStatusDisplay','bStatusBody'].forEach(id => { document.getElementById(id).textContent = ''; });
     this.postType = '';
@@ -353,11 +372,248 @@ const app = {
     document.getElementById('pDynamic').style.display = 'none';
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
+  },
+
+  // ── LOGO UPLOADS ──
+  async handleLogoUpload(input, type) {
+    const file = input.files[0];
+    if (!file) return;
+    const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
+    const statusEl = document.getElementById(`bLogo${prefix}Status`);
+    if (statusEl) {
+      statusEl.textContent = 'Otimizando...';
+      statusEl.style.color = 'var(--muted)';
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        
+        const base64 = canvas.toDataURL('image/png');
+        this.logoData[type] = base64;
+        updateLogoPreview(type, base64);
+        markDirty();
+        input.value = '';
+      };
+      img.onerror = () => {
+        if (statusEl) {
+          statusEl.textContent = 'Erro ao ler imagem';
+          statusEl.style.color = 'var(--red)';
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
+  // ── PRESETS ──
+  savePreset(type) {
+    const nameInputId = type === 'carousel' ? 'cPresetName' : 'pPresetName';
+    const nameEl = document.getElementById(nameInputId);
+    const name = nameEl ? nameEl.value.trim() : '';
+    
+    if (!name) {
+      toast('Por favor, digite um nome para o preset.', 'error');
+      return;
+    }
+    
+    const colors = {
+      color_primary: document.getElementById('cPrimaryHex')?.value,
+      color_secondary: document.getElementById('cSecondaryHex')?.value,
+      color_accent: document.getElementById('cAccentHex')?.value,
+      color_dark: document.getElementById('cDarkHex')?.value,
+      color_light: document.getElementById('cLightHex')?.value,
+      color_text: document.getElementById('cTextHex')?.value,
+      colors_notes: f('bColorsNotes')
+    };
+    
+    const fonts = {
+      font_display: f('bFontDisplay'),
+      font_body: f('bFontBody'),
+      size_title: f('bSizeTitle'),
+      size_subtitle: f('bSizeSubtitle'),
+      size_body: f('bSizeBody'),
+      weight_title: f('bWeightTitle'),
+      italic_use: f('bItalicUse'),
+      typo_notes: f('bTypoNotes')
+    };
+    
+    const layout = type === 'carousel' ? this.collectCarousel() : this.collectPost();
+    
+    if (!this.logoData.presets) this.logoData.presets = [];
+    
+    this.logoData.presets.push({ name, type, colors, fonts, layout });
+    
+    nameEl.value = ''; // Limpa o input
+    
+    markDirty();
+    this.save(); // Salva na nuvem imediatamente
+    renderPresets();
+    toast(`Preset "${name}" salvo com sucesso na nuvem!`, 'success');
+  },
+  
+  applyPreset(index) {
+    const preset = this.logoData.presets[index];
+    if (!preset) return;
+    
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+    
+    // Cores
+    setVal('cPrimaryHex', preset.colors.color_primary);
+    setVal('cSecondaryHex', preset.colors.color_secondary);
+    setVal('cAccentHex', preset.colors.color_accent);
+    setVal('cDarkHex', preset.colors.color_dark);
+    setVal('cLightHex', preset.colors.color_light);
+    setVal('cTextHex', preset.colors.color_text);
+    setVal('bColorsNotes', preset.colors.colors_notes);
+    
+    // Sincroniza color pickers
+    ['Primary','Secondary','Accent','Dark','Light','Text'].forEach(n => {
+      const hex = document.getElementById(`c${n}Hex`), picker = document.getElementById(`c${n}`);
+      if (hex && picker) picker.value = hex.value;
+    });
+    
+    // Fontes
+    setVal('bFontDisplay', preset.fonts.font_display);
+    setVal('bFontBody', preset.fonts.font_body);
+    setVal('bSizeTitle', preset.fonts.size_title);
+    setVal('bSizeSubtitle', preset.fonts.size_subtitle);
+    setVal('bSizeBody', preset.fonts.size_body);
+    setVal('bWeightTitle', preset.fonts.weight_title);
+    setVal('bItalicUse', preset.fonts.italic_use);
+    setVal('bTypoNotes', preset.fonts.typo_notes);
+    
+    // Previews de fontes
+    if (preset.fonts.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
+    if (preset.fonts.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
+    
+    // Layout específico
+    if (preset.type === 'carousel') {
+      setVal('cFormat', preset.layout.format || preset.layout.cFormat);
+      setVal('cSlideCount', preset.layout.slide_count || preset.layout.cSlideCount);
+      setVal('cSequence', preset.layout.sequence || preset.layout.cSequence);
+      setVal('cFixedEl', preset.layout.fixed_elements || preset.layout.cFixedEl);
+      setVal('cSlide1', preset.layout.slide_hero || preset.layout.cSlide1);
+      setVal('cSlideCta', preset.layout.slide_cta || preset.layout.cSlideCta);
+      setVal('cNotes', preset.layout.notes || preset.layout.cNotes);
+      
+      const logoPosHero = preset.layout.logo_pos_hero || preset.layout.carLogoPosHero;
+      const logoPosCta = preset.layout.logo_pos_cta || preset.layout.carLogoPosCta;
+      if (logoPosHero) {
+        document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => {
+          const sel = r.value === logoPosHero; r.checked = sel;
+          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
+        });
+      }
+      if (logoPosCta) {
+        document.querySelectorAll(`input[name="carLogoPosCta"]`).forEach(r => {
+          const sel = r.value === logoPosCta; r.checked = sel;
+          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
+        });
+      }
+    } else if (preset.type === 'post') {
+      const logoPos = preset.layout.logo_pos || preset.layout.postLogoPos;
+      if (logoPos) {
+        document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => {
+          const sel = r.value === logoPos; r.checked = sel;
+          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
+        });
+      }
+      
+      if (preset.layout.post_type || preset.layout.pType) {
+        const type = preset.layout.post_type || preset.layout.pType;
+        const card = document.querySelector(`input[name="pType"][value="${type}"]`);
+        if (card) selectPostType(card.closest('.type-card'), type);
+      }
+      
+      if (preset.layout.formats) {
+        app.postFmts.clear();
+        document.querySelectorAll(`.post-fmt`).forEach(c => c.classList.remove('checked'));
+        preset.layout.formats.forEach(fmt => togglePostFmt(fmt));
+      }
+      
+      const pFields = {
+        pHeadline: preset.layout.headline || preset.layout.pHeadline,
+        pSubtitle: preset.layout.subtitle || preset.layout.pSubtitle,
+        pCta: preset.layout.cta || preset.layout.pCta,
+        pContentNotes: preset.layout.content_notes || preset.layout.pContentNotes,
+        pStatNum: preset.layout.stat_number || preset.layout.pStatNum,
+        pStatCtx: preset.layout.stat_context || preset.layout.pStatCtx,
+        pStatSrc: preset.layout.stat_source || preset.layout.pStatSrc,
+        pCompA: preset.layout.comp_a || preset.layout.pCompA,
+        pCompB: preset.layout.comp_b || preset.layout.pCompB,
+        pAnPrice: preset.layout.anuncio_price || preset.layout.pAnPrice,
+        pAnBenefit: preset.layout.anuncio_benefit || preset.layout.pAnBenefit,
+        pUrgPrazo: preset.layout.urgencia_prazo || preset.layout.pUrgPrazo,
+        pUrgOque: preset.layout.urgencia_oque || preset.layout.pUrgOque,
+        pQuoteText: preset.layout.quote_text || preset.layout.pQuoteText,
+        pQuoteAuthor: preset.layout.quote_author || preset.layout.pQuoteAuthor,
+        pQuoteRole: preset.layout.quote_role || preset.layout.pQuoteRole,
+        pArtBody: preset.layout.article_body || preset.layout.pArtBody,
+        pL1TextPos: preset.layout.layout_1x1_text_pos || preset.layout.pL1TextPos,
+        pL1Bg: preset.layout.layout_1x1_bg || preset.layout.pL1Bg,
+        pL1Notes: preset.layout.layout_1x1_notes || preset.layout.pL1Notes,
+        pL4TextPos: preset.layout.layout_4x5_text_pos || preset.layout.pL4TextPos,
+        pL4Bg: preset.layout.layout_4x5_bg || preset.layout.pL4Bg,
+        pL4Notes: preset.layout.layout_4x5_notes || preset.layout.pL4Notes,
+        pL9TextPos: preset.layout.layout_9x16_text_pos || preset.layout.pL9TextPos,
+        pL9Bg: preset.layout.layout_9x16_bg || preset.layout.pL9Bg,
+        pL9Notes: preset.layout.layout_9x16_notes || preset.layout.pL9Notes,
+        pForbidden: preset.layout.forbidden || preset.layout.pForbidden,
+        pDelivery: preset.layout.delivery_format || preset.layout.pDelivery,
+        pFontB64: preset.layout.font_base64 || preset.layout.pFontB64,
+        pFinalNotes: preset.layout.final_notes || preset.layout.pFinalNotes
+      };
+      Object.entries(pFields).forEach(([id, val]) => setVal(id, val));
+      
+      const items = preset.layout.items || preset.layout.pItems || [];
+      this.fillChips('pItems', items, 'pItemsChips', 'pItemsInput');
+    }
+    
+    markDirty();
+    toast(`Preset "${preset.name}" aplicado!`, 'success');
+  },
+  
+  deletePreset(index) {
+    const preset = this.logoData.presets[index];
+    if (!preset) return;
+    if (!confirm(`Excluir preset "${preset.name}" da nuvem?`)) return;
+    
+    this.logoData.presets.splice(index, 1);
+    
+    markDirty();
+    this.save(); // Salva na nuvem imediatamente
+    renderPresets();
+    toast(`Preset "${preset.name}" excluído.`, 'success');
   }
 };
 
 // ── GLOBAL SHORTCUTS ──
 function newBrand() { app.newBrand(); }
+function handleLogoUpload(input, type) { app.handleLogoUpload(input, type); }
+function removeUploadedLogo(type) { app.removeUploadedLogo(type); }
+function savePreset(type) { app.savePreset(type); }
+function applyPreset(index) { app.applyPreset(index); }
+function deletePreset(index) { app.deletePreset(index); }
 
 async function handleLoginSubmit() {
   const emailEl = document.getElementById('loginEmail');
