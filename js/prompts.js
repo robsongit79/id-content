@@ -22,12 +22,12 @@ const prompts = {
     if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
     const activeLogo = app.logoData && app.logoData.active;
     if (activeLogo && app.logoData.primary) {
-      s1.push(`LOGO PRINCIPAL:  ${app.logoData.primary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.primary}`);
+      s1.push(`LOGO PRINCIPAL:  ${app.logoData.primary}`);
     } else {
       s1.push(`LOGO PRINCIPAL:  Nenhuma`);
     }
     if (activeLogo && app.logoData.secondary) {
-      s1.push(`LOGO SECUNDÁRIA: ${app.logoData.secondary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.secondary}`);
+      s1.push(`LOGO SECUNDÁRIA: ${app.logoData.secondary}`);
     } else {
       s1.push(`LOGO SECUNDÁRIA: Nenhuma`);
     }
