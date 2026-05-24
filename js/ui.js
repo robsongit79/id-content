@@ -77,21 +77,12 @@ function loadFont(inputId, previewId, statusId) {
 function updateLogoPreview(type, base64OrUrl) {
   const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
   const thumb = document.getElementById(`bLogo${prefix}Thumb`);
-  const status = document.getElementById(`bLogo${prefix}Status`);
-  const removeBtn = document.getElementById(`btnRemoveLogo${prefix}`);
   
   if (!thumb) return;
   
   if (!base64OrUrl) {
     thumb.innerHTML = '<span style="font-size:10px;color:var(--border-hi);text-align:center;line-height:1.3;">sem logo</span>';
-    if (status) status.textContent = '';
-    if (removeBtn) removeBtn.style.display = 'none';
     return;
-  }
-  
-  if (status) {
-    status.textContent = 'Otimizado';
-    status.style.color = 'var(--muted)';
   }
   
   const img = new Image();
@@ -99,21 +90,26 @@ function updateLogoPreview(type, base64OrUrl) {
     thumb.innerHTML = '';
     img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
     thumb.appendChild(img);
-    if (status) {
-      status.textContent = '✓';
-      status.style.color = 'var(--accent2)';
-    }
-    if (removeBtn) removeBtn.style.display = 'inline-flex';
   };
   img.onerror = () => {
-    thumb.innerHTML = '<span style="font-size:18px;">✗</span>';
-    if (status) {
-      status.textContent = 'Erro';
-      status.style.color = 'var(--red)';
-    }
-    if (removeBtn) removeBtn.style.display = 'inline-flex';
+    thumb.innerHTML = '<span style="font-size:18px;color:var(--red);">✗</span>';
   };
   img.src = base64OrUrl;
+}
+
+function toggleLogoActiveFields() {
+  const active = document.getElementById('bLogoActive')?.checked || false;
+  const fields = document.getElementById('logoUrlFields');
+  if (fields) fields.style.display = active ? 'grid' : 'none';
+}
+
+function updateLogoFromUrl(type) {
+  const inputId = type === 'primary' ? 'bLogoUrlPrimary' : 'bLogoUrlSecondary';
+  const val = document.getElementById(inputId)?.value.trim() || '';
+  if (app.logoData) {
+    app.logoData[type] = val;
+  }
+  updateLogoPreview(type, val);
 }
 
 // ── TOAST ──

@@ -182,18 +182,32 @@ const app = {
     if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
     
-    let logoData = { primary: '', secondary: '', presets: [] };
+    let logoData = { active: false, primary: '', secondary: '', presets: [] };
     try {
       if (b.logo_url && b.logo_url.startsWith('{')) {
         logoData = JSON.parse(b.logo_url);
       } else if (b.logo_url) {
         logoData.primary = b.logo_url;
+        logoData.active = true;
       }
     } catch(e) {
-      if (b.logo_url) logoData.primary = b.logo_url;
+      if (b.logo_url) {
+        logoData.primary = b.logo_url;
+        logoData.active = true;
+      }
     }
     this.logoData = logoData;
     if (!this.logoData.presets) this.logoData.presets = [];
+    
+    const bActive = document.getElementById('bLogoActive');
+    if (bActive) bActive.checked = !!logoData.active;
+    toggleLogoActiveFields();
+    
+    const urlPrimary = document.getElementById('bLogoUrlPrimary');
+    if (urlPrimary) urlPrimary.value = logoData.primary || '';
+    const urlSecondary = document.getElementById('bLogoUrlSecondary');
+    if (urlSecondary) urlSecondary.value = logoData.secondary || '';
+    
     setTimeout(() => {
       updateLogoPreview('primary', logoData.primary);
       updateLogoPreview('secondary', logoData.secondary);
@@ -253,11 +267,16 @@ const app = {
   },
 
   collectBrand() {
+    if (!this.logoData) this.logoData = { presets: [] };
+    this.logoData.active = document.getElementById('bLogoActive')?.checked || false;
+    this.logoData.primary = document.getElementById('bLogoUrlPrimary')?.value.trim() || '';
+    this.logoData.secondary = document.getElementById('bLogoUrlSecondary')?.value.trim() || '';
+    
     return {
       name: f('bName') || 'Sem nome',
       handle: f('bHandle'), tagline: f('bTagline'), niche: f('bNiche'),
       positioning: f('bPositioning'),
-      logo_url: JSON.stringify(this.logoData || { primary: '', secondary: '' }),
+      logo_url: JSON.stringify(this.logoData),
       color_primary: document.getElementById('cPrimaryHex')?.value,
       color_secondary: document.getElementById('cSecondaryHex')?.value,
       color_accent: document.getElementById('cAccentHex')?.value,
@@ -364,7 +383,10 @@ const app = {
     });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
     Object.entries(defs).forEach(([id,v]) => { document.getElementById(id).value = v; document.getElementById(id+'Hex').value = v; });
-    this.logoData = { primary: '', secondary: '', presets: [] };
+    this.logoData = { active: false, primary: '', secondary: '', presets: [] };
+    const bActive = document.getElementById('bLogoActive');
+    if (bActive) bActive.checked = false;
+    toggleLogoActiveFields();
     updateLogoPreview('primary', '');
     updateLogoPreview('secondary', '');
     renderPresets();
@@ -379,145 +401,7 @@ const app = {
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
   },
 
-  // ── LOGO UPLOADS ──
-  async handleLogoUpload(input, type) {
-    const file = input.files[0];
-    if (!file) return;
-    const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
-    const statusEl = document.getElementById(`bLogo${prefix}Status`);
-    if (statusEl) {
-      statusEl.textContent = 'Otimizando...';
-      statusEl.style.color = 'var(--muted)';
-    }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxDim = 200;
-        let w = img.width;
-        let h = img.height;
-        if (w > maxDim || h > maxDim) {
-          if (w > h) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          } else {
-            w = Math.round((w * maxDim) / h);
-            h = maxDim;
-          }
-        }
-        
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        
-        canvas.toBlob(async (blob) => {
-          if (!blob) {
-            if (statusEl) {
-              statusEl.textContent = 'Erro ao comprimir';
-              statusEl.style.color = 'var(--red)';
-            }
-            return;
-          }
-          
-          if (statusEl) statusEl.textContent = 'Subindo...';
-          
-          try {
-            const fileName = `${this.currentBrandId || 'brand'}_${type}.png`;
-            const uploadUrl = `${SUPABASE_URL}/storage/v1/object/logos/${fileName}`;
-            const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
-            
-            const res = await fetch(uploadUrl, {
-              method: 'POST',
-              headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${token}`,
-                'x-upsert': 'true'
-              },
-              body: blob
-            });
-            
-            if (!res.ok) {
-              const err = await res.json();
-              throw new Error(err.message || 'Erro no upload do arquivo');
-            }
-            
-            // Gerar a URL pública real no Supabase Storage público
-            const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/logos/${fileName}?t=${Date.now()}`;
-            
-            this.logoData[type] = publicUrl;
-            updateLogoPreview(type, publicUrl);
-            markDirty();
-            input.value = '';
-            
-            if (statusEl) {
-              statusEl.textContent = '✓';
-              statusEl.style.color = 'var(--accent2)';
-            }
-          } catch (uploadError) {
-            console.error('Erro no upload para o Storage:', uploadError);
-            if (statusEl) {
-              statusEl.textContent = 'Erro no envio';
-              statusEl.style.color = 'var(--red)';
-            }
-            toast('Erro ao subir imagem para o Storage do Supabase.', 'error');
-          }
-        }, 'image/png');
-      };
-      img.onerror = () => {
-        if (statusEl) {
-          statusEl.textContent = 'Erro ao ler imagem';
-          statusEl.style.color = 'var(--red)';
-        }
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  },
-
-  async removeUploadedLogo(type) {
-    if (!this.logoData) return;
-    
-    const prefix = type === 'primary' ? 'Principal' : 'Secundaria';
-    const statusEl = document.getElementById(`bLogo${prefix}Status`);
-    if (statusEl) {
-      statusEl.textContent = 'Removendo...';
-      statusEl.style.color = 'var(--muted)';
-    }
-
-    try {
-      const fileName = `${this.currentBrandId || 'brand'}_${type}.png`;
-      const deleteUrl = `${SUPABASE_URL}/storage/v1/object/logos/${fileName}`;
-      const token = localStorage.getItem('supabase_access_token') || SUPABASE_KEY;
-      
-      const res = await fetch(deleteUrl, {
-        method: 'DELETE',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!res.ok) {
-        console.warn('Erro ao remover arquivo físico do Storage:', await res.text());
-      }
-    } catch (e) {
-      console.error('Erro na requisição de remoção:', e);
-    }
-
-    this.logoData[type] = '';
-    updateLogoPreview(type, '');
-    markDirty();
-    await this.save();
-    
-    if (statusEl) {
-      statusEl.textContent = 'Removida';
-      statusEl.style.color = 'var(--muted)';
-    }
-    toast('Logo removida com sucesso.', 'success');
-  },
 
   // ── PRESETS ──
   savePreset(type) {
@@ -718,8 +602,6 @@ const app = {
 
 // ── GLOBAL SHORTCUTS ──
 function newBrand() { app.newBrand(); }
-function handleLogoUpload(input, type) { app.handleLogoUpload(input, type); }
-function removeUploadedLogo(type) { app.removeUploadedLogo(type); }
 function savePreset(type) { app.savePreset(type); }
 function applyPreset(index) { app.applyPreset(index); }
 function deletePreset(index) { app.deletePreset(index); }

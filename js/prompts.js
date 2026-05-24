@@ -20,12 +20,13 @@ const prompts = {
     if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
     if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
     if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
-    if (app.logoData && app.logoData.primary) {
+    const activeLogo = app.logoData && app.logoData.active;
+    if (activeLogo && app.logoData.primary) {
       s1.push(`LOGO PRINCIPAL:  ${app.logoData.primary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.primary}`);
     } else {
       s1.push(`LOGO PRINCIPAL:  Nenhuma`);
     }
-    if (app.logoData && app.logoData.secondary) {
+    if (activeLogo && app.logoData.secondary) {
       s1.push(`LOGO SECUNDÁRIA: ${app.logoData.secondary.startsWith('data:') ? '[Imagem carregada via upload]' : app.logoData.secondary}`);
     } else {
       s1.push(`LOGO SECUNDÁRIA: Nenhuma`);
@@ -95,13 +96,13 @@ const prompts = {
 
     const c1 = [];
     const lh = getRadio('carLogoPosHero'), lc = getRadio('carLogoPosCta');
-    const hasLogo = app.logoData && (app.logoData.primary || app.logoData.secondary);
+    const hasLogo = app.logoData && app.logoData.active && (app.logoData.primary || app.logoData.secondary);
     if (hasLogo) {
       if (lh) c1.push(`LOGO CAPA:      ${lh}`);
       if (lc) c1.push(`LOGO CTA:       ${lc}`);
       c1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     } else {
-      c1.push(`LOGO:           Nenhuma — não exibir placeholder nos slides de capa e CTA`);
+      c1.push(`LOGO:           Nenhuma — não exibir placeholder nos slides de capa e CTA. O carrossel deve ser criado sem nenhum tipo de logo.`);
     }
     if (c1.length) s.push(`## LOGO\n${c1.join('\n')}`);
 
@@ -130,12 +131,12 @@ const prompts = {
 
     const p1 = [];
     const lp = getRadio('postLogoPos');
-    const hasLogo = app.logoData && (app.logoData.primary || app.logoData.secondary);
+    const hasLogo = app.logoData && app.logoData.active && (app.logoData.primary || app.logoData.secondary);
     if (hasLogo) {
       if (lp) p1.push(`LOGO POSIÇÃO:   ${lp}`);
       p1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     }
-    else p1.push(`LOGO:           Nenhuma — não exibir placeholder`);
+    else p1.push(`LOGO:           Nenhuma — não exibir placeholder. O post deve ser criado sem nenhum tipo de logo.`);
     if (p1.length) s.push(`## LOGO\n${p1.join('\n')}`);
 
     if (app.postType) s.push(`## TIPO\nTIPO:           ${app.postTypeConfig[app.postType].label}`);
