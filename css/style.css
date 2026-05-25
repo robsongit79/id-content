@@ -2,7 +2,7 @@
   --bg:#0E0E0E; --surface:#161616; --border:#2A2A2A; --border-hi:#3D3D3D;
   --text:#F0F0F0; --muted:#666; --label:#999; --red:#FF5C5C; --accent2:#47FFD4;
   --acc-base:#B482FF; --acc-car:#E8FF47; --acc-post:#FF6B35;
-  --font-d:'Syne',sans-serif; --font-m:'IBM Plex Mono',monospace;
+  --font-d:'Montserrat',sans-serif; --font-m:'IBM Plex Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-m);font-size:13px;line-height:1.6;min-height:100vh;}
@@ -52,7 +52,7 @@ a{color:inherit;text-decoration:none;}
 .brand-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:32px 48px;}
 .brand-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:12px;}
 .brand-card:hover{border-color:var(--acc-base);background:rgba(180,130,255,0.04);}
-.brand-card-name{font-family:var(--font-d);font-size:16px;font-weight:700;color:var(--text);}
+.brand-card-name{font-family:var(--font-d);font-size:16px;font-weight:800;color:var(--text);}
 .brand-card-meta{font-size:11px;color:var(--muted);}
 .brand-card-colors{display:flex;gap:6px;}
 .color-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);}
@@ -101,7 +101,7 @@ a{color:inherit;text-decoration:none;}
 .base-num{color:var(--acc-base);background:rgba(180,130,255,0.08);}
 .car-num{color:var(--acc-car);background:rgba(232,255,71,0.08);}
 .post-num{color:var(--acc-post);background:rgba(255,107,53,0.08);}
-.section-title{font-family:var(--font-d);font-size:20px;font-weight:700;color:var(--text);line-height:1;}
+.section-title{font-family:var(--font-d);font-size:20px;font-weight:800;color:var(--text);line-height:1;}
 .section-desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;max-width:480px;}
 
 /* ══ FIELDS ══ */
@@ -233,7 +233,7 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 /* ══ MODAL ══ */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:flex;align-items:center;justify-content:center;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;width:420px;display:flex;flex-direction:column;gap:20px;}
-.modal-title{font-family:var(--font-d);font-size:18px;font-weight:700;color:var(--text);}
+.modal-title{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--text);}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
 
 /* ══ TOAST ══ */
@@ -293,7 +293,7 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .login-title {
   font-family: var(--font-d);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text);
   letter-spacing: 0.5px;
 }
