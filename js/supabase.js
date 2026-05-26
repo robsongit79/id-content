@@ -1,6 +1,8 @@
-// Supabase client
-const SUPABASE_URL = 'https://lznftylbukcbrciiwabg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6bmZ0eWxidWtjYnJjaWl3YWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MDI5NjQsImV4cCI6MjA5NDk3ODk2NH0.oSxTQzZHyOaKK4ENSnFayujKV5IB0KQpD0nITSLbo5M';
+const SUPABASE_URL = window.SUPABASE_URL || 'https://lznftylbukcbrciiwabg.supabase.co';
+const SUPABASE_KEY = window.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6bmZ0eWxidWtjYnJjaWl3YWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MDI5NjQsImV4cCI6MjA5NDk3ODk2NH0.oSxTQzZHyOaKK4ENSnFayujKV5IB0KQpD0nITSLbo5M';
+
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_KEY = SUPABASE_KEY;
 
 const supabase = {
   async query(table, method = 'GET', body = null, filter = '') {
@@ -60,3 +62,6 @@ const supabase = {
     return res.json();
   }
 };
+
+window.supabase = supabase;
+
