@@ -146,6 +146,7 @@ const app = {
       this.isDirty = false;
       switchTab('base');
       updatePreviews();
+      setTimeout(() => document.getElementById('bName')?.focus(), 150);
     } catch (e) {
       toast('Erro ao carregar marca: ' + e.message, 'error');
       setSaveStatus('error');
