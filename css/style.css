@@ -441,3 +441,54 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   background: rgba(255, 92, 92, 0.05) !important;
 }
 
+/* ══ RESPONSIVIDADE E ADAPTAÇÃO DO TOPBAR ══ */
+@media (max-width: 1180px) {
+  .topbar {
+    padding: 0 12px;
+  }
+  .active-brand-name {
+    max-width: 100px;
+    margin-left: 8px;
+    margin-right: 4px;
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  .tab-btn {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+  .tab-badge {
+    display: none; /* Oculta a badge em telas menores para economizar espaço */
+  }
+  .btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 920px) {
+  .topbar {
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    align-items: center;
+  }
+  .topbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+  .topbar-left, .topbar-right {
+    flex-shrink: 0;
+  }
+  .topbar-left {
+    gap: 8px;
+  }
+  .tabs {
+    height: 100%;
+    align-items: center;
+  }
+  .tab-btn {
+    height: 36px;
+    border-bottom: 2px solid transparent;
+  }
+}
+
