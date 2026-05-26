@@ -132,7 +132,14 @@ const app = {
 
     try {
       const { brand, carousel, post } = await db.loadFullBrand(id);
-      if (brand) this.fillBrand(brand);
+      if (brand) {
+        this.fillBrand(brand);
+        const activeBrandNameEl = document.getElementById('activeBrandName');
+        if (activeBrandNameEl) {
+          activeBrandNameEl.textContent = brand.name || 'Sem nome';
+          activeBrandNameEl.style.display = 'block';
+        }
+      }
       if (carousel) this.fillCarousel(carousel);
       if (post) this.fillPost(post);
       setSaveStatus('saved');
@@ -422,6 +429,11 @@ const app = {
     document.getElementById('pDynamic').style.display = 'none';
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
+    const activeBrandNameEl = document.getElementById('activeBrandName');
+    if (activeBrandNameEl) {
+      activeBrandNameEl.textContent = '';
+      activeBrandNameEl.style.display = 'none';
+    }
   },
 
 

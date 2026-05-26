@@ -118,6 +118,11 @@ function updatePreviews() {
   const pp = prompts.buildPost();
   document.getElementById('postOutput').innerHTML = pp ? prompts.highlight(pp, 'sec-post') : '<span class="empty">← Preencha a aba Base para gerar o prompt.</span>';
 
+  const activeBrandNameEl = document.getElementById('activeBrandName');
+  if (activeBrandNameEl && app.currentBrandId) {
+    activeBrandNameEl.textContent = f('bName') || 'Sem nome';
+  }
+
   updateProgress();
 }
 
