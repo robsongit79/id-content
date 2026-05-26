@@ -57,12 +57,13 @@ function loadFont(inputId, previewId, statusId) {
     if (fontCache[name] === 'ok') { preview.style.fontFamily = `'${name}',serif`; status.textContent = '✓'; status.style.color = 'var(--accent2)'; return; }
     if (fontCache[name] === 'err') { status.textContent = '✗'; status.style.color = 'var(--red)'; return; }
     try {
-      const slug = name.replace(/ /g, '+'), lid = `gf-${slug}`;
-      if (!document.getElementById(lid)) {
-        const l = document.createElement('link'); l.id = lid; l.rel = 'stylesheet';
-        l.href = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@0,400;0,700;1,400&display=swap`;
+      const slug = name.replace(/ /g, '+'), lid = `gf-link-${inputId}`;
+      let l = document.getElementById(lid);
+      if (!l) {
+        l = document.createElement('link'); l.id = lid; l.rel = 'stylesheet';
         document.head.appendChild(l);
       }
+      l.href = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@0,400;0,700;1,400&display=swap`;
       await Promise.race([document.fonts.load(`700 20px '${name}'`), new Promise(r => setTimeout(r, 3000))]);
       if (document.fonts.check(`400 20px '${name}'`) || document.fonts.check(`700 20px '${name}'`)) {
         fontCache[name] = 'ok'; preview.style.fontFamily = `'${name}',serif`;

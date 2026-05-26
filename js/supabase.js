@@ -19,8 +19,19 @@ const supabase = {
       body: body ? JSON.stringify(body) : null,
     });
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || 'Supabase error');
+      let errMsg = 'Erro de comunicação com o servidor';
+      try {
+        const err = await res.json();
+        errMsg = err.message || err.error_description || errMsg;
+      } catch (e) {
+        try {
+          const textErr = await res.text();
+          errMsg = textErr || res.statusText || errMsg;
+        } catch (innerErr) {
+          errMsg = res.statusText || errMsg;
+        }
+      }
+      throw new Error(errMsg);
     }
     const text = await res.text();
     return text ? JSON.parse(text) : [];

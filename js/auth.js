@@ -11,8 +11,19 @@ const auth = {
       body: JSON.stringify({ email, password })
     });
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error_description || err.message || 'Erro ao realizar login. Verifique e-mail e senha.');
+      let errMsg = 'Erro ao realizar login. Verifique e-mail e senha.';
+      try {
+        const err = await res.json();
+        errMsg = err.error_description || err.message || errMsg;
+      } catch (e) {
+        try {
+          const textErr = await res.text();
+          errMsg = textErr || res.statusText || errMsg;
+        } catch (innerErr) {
+          errMsg = res.statusText || errMsg;
+        }
+      }
+      throw new Error(errMsg);
     }
     const data = await res.json();
     this.setSession(data);

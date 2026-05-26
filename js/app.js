@@ -702,4 +702,12 @@ async function handleLoginSubmit() {
 }
 
 // ── START ──
-document.addEventListener('DOMContentLoaded', () => app.init());
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+  window.addEventListener('beforeunload', (e) => {
+    if (app.isDirty) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+});
