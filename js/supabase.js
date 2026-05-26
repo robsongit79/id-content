@@ -18,6 +18,16 @@ const supabase = {
       },
       body: body ? JSON.stringify(body) : null,
     });
+    if (res.status === 401 && localStorage.getItem('supabase_access_token') && window.auth) {
+      try {
+        const refreshedUser = await window.auth.checkSession();
+        if (refreshedUser) {
+          return this.query(table, method, body, filter);
+        }
+      } catch (authErr) {
+        console.error('Erro na renovação silenciosa de token:', authErr);
+      }
+    }
     if (!res.ok) {
       let errMsg = 'Erro de comunicação com o servidor';
       try {
@@ -66,11 +76,33 @@ const supabase = {
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || 'Supabase error');
+    if (res.status === 401 && localStorage.getItem('supabase_access_token') && window.auth) {
+      try {
+        const refreshedUser = await window.auth.checkSession();
+        if (refreshedUser) {
+          return this.upsert(table, data);
+        }
+      } catch (authErr) {
+        console.error('Erro na renovação silenciosa de token (upsert):', authErr);
+      }
     }
-    return res.json();
+    if (!res.ok) {
+      let errMsg = 'Erro de comunicação com o servidor';
+      try {
+        const err = await res.json();
+        errMsg = err.message || err.error_description || errMsg;
+      } catch (e) {
+        try {
+          const textErr = await res.text();
+          errMsg = textErr || res.statusText || errMsg;
+        } catch (innerErr) {
+          errMsg = res.statusText || errMsg;
+        }
+      }
+      throw new Error(errMsg);
+    }
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
   }
 };
 
