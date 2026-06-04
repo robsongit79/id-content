@@ -14,7 +14,7 @@ const auth = {
       let errMsg = 'Erro ao realizar login. Verifique e-mail e senha.';
       try {
         const err = await res.json();
-        errMsg = err.error_description || err.message || errMsg;
+        errMsg = err.error_description || err.msg || err.message || err.error || errMsg;
       } catch (e) {
         try {
           const textErr = await res.text();
