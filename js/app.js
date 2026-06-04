@@ -471,7 +471,7 @@ const app = {
     }
 
     try {
-      const saved = await db.savePreset(this.currentBrandId, { name, type, colors, fonts, layout });
+      const saved = await db.savePreset(this.currentBrandId, existing ? existing.id : null, { name, type, colors, fonts, layout });
       const idx = this.presets.findIndex(p => p.name === name && p.type === type);
       if (idx !== -1) { this.presets[idx] = saved; } else { this.presets.push(saved); }
       if (nameEl) nameEl.value = '';

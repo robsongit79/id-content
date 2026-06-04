@@ -64,10 +64,9 @@ const db = {
     return supabase.select('brand_presets', `?brand_id=eq.${brandId}&order=created_at.asc`);
   },
 
-  async savePreset(brandId, data) {
-    const existing = await supabase.select('brand_presets', `?brand_id=eq.${brandId}&name=eq.${encodeURIComponent(data.name)}&type=eq.${data.type}`);
-    if (existing && existing.length > 0) {
-      const rows = await supabase.update('brand_presets', existing[0].id, data);
+  async savePreset(brandId, presetId, data) {
+    if (presetId) {
+      const rows = await supabase.update('brand_presets', presetId, data);
       return rows[0];
     } else {
       const rows = await supabase.insert('brand_presets', { ...data, brand_id: brandId });
