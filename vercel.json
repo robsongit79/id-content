@@ -1,4 +1,4 @@
 {
-  "buildCommand": "echo \"window.SUPABASE_URL='$SUPABASE_URL';window.SUPABASE_KEY='$SUPABASE_KEY';\" > js/config.js",
-  "outputDirectory": "."
+  "buildCommand": "mkdir -p public && cp index.html public/ && cp -r css public/ && cp -r js public/ && echo \"window.SUPABASE_URL='$SUPABASE_URL';window.SUPABASE_KEY='$SUPABASE_KEY';\" > public/js/config.js",
+  "outputDirectory": "public"
 }
