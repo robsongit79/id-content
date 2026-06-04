@@ -3,7 +3,9 @@ const app = {
   currentBrandId: null,
   currentTab: 'base',
   isDirty: false,
-  chipData: { personality: [], goal: [], pItems: [] },
+  chipData: { personality: [], goal: [], pItems: [], hashtag: [], topic: [] },
+  presets: [],
+  allBrands: [],
   activeCarouselPresetIndex: null,
   activePostPresetIndex: null,
   isApplyingPreset: false,
@@ -81,30 +83,54 @@ const app = {
     const grid = document.getElementById('brandGrid');
     grid.innerHTML = '<div class="loading-state">Carregando marcas...</div>';
     try {
-      const brands = await db.listBrands();
-      if (brands.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <h3>Nenhuma marca cadastrada</h3>
-            <p>Clique em "+ Nova marca" para começar.</p>
-          </div>`;
-        return;
-      }
-      grid.innerHTML = brands.map(b => `
-        <div class="brand-card" onclick="app.openBrand('${b.id}')">
-          <div class="brand-card-name">${b.name}</div>
-          <div class="brand-card-meta">${b.handle || '—'}</div>
-          <div class="brand-card-colors">
-            <div class="color-dot" style="background:${b.color_primary || '#1E40AF'}" title="Primária"></div>
-            <div class="color-dot" style="background:${b.color_secondary || '#3B82F6'}" title="Secundária"></div>
-            <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
-          </div>
-          <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
-        </div>
-      `).join('');
+      this.allBrands = await db.listBrands();
+      this.renderBrandGrid(this.allBrands);
     } catch (e) {
       grid.innerHTML = `<div class="empty-state"><h3>Erro ao carregar</h3><p>${e.message}</p></div>`;
     }
+  },
+
+  renderBrandGrid(brands) {
+    const grid = document.getElementById('brandGrid');
+    if (brands.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <h3>Nenhuma marca encontrada</h3>
+          <p>Clique em "+ Nova marca" para começar ou ajuste a busca.</p>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = brands.map(b => `
+      <div class="brand-card" onclick="app.openBrand('${b.id}')">
+        <div class="brand-card-name">${b.name}</div>
+        <div class="brand-card-meta">${b.handle || '—'}${b.niche ? ' · ' + b.niche : ''}</div>
+        <div class="brand-card-colors">
+          <div class="color-dot" style="background:${b.color_primary || '#1E40AF'}" title="Primária"></div>
+          <div class="color-dot" style="background:${b.color_secondary || '#3B82F6'}" title="Secundária"></div>
+          <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
+        </div>
+        <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
+      </div>
+    `).join('');
+  },
+
+  filterBrands() {
+    const searchEl = document.getElementById('brandSearch');
+    const sortEl = document.getElementById('brandSort');
+    const q = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    const sort = sortEl ? sortEl.value : 'updated';
+
+    let filtered = this.allBrands.filter(b => {
+      if (!q) return true;
+      return (b.name || '').toLowerCase().includes(q) || (b.niche || '').toLowerCase().includes(q) || (b.handle || '').toLowerCase().includes(q);
+    });
+
+    filtered = [...filtered].sort((a, b) => {
+      if (sort === 'name') return (a.name || '').localeCompare(b.name || '', 'pt-BR');
+      return new Date(b.updated_at) - new Date(a.updated_at);
+    });
+
+    this.renderBrandGrid(filtered);
   },
 
   formatDate(iso) {
@@ -131,7 +157,7 @@ const app = {
     setSaveStatus('saving');
 
     try {
-      const { brand, carousel, post } = await db.loadFullBrand(id);
+      const { brand, carousel, post, presets } = await db.loadFullBrand(id);
       if (brand) {
         this.fillBrand(brand);
         const activeBrandNameEl = document.getElementById('activeBrandName');
@@ -140,16 +166,29 @@ const app = {
           activeBrandNameEl.style.display = 'block';
         }
       }
+      this.presets = presets || [];
       if (carousel) this.fillCarousel(carousel);
       if (post) this.fillPost(post);
       setSaveStatus('saved');
       this.isDirty = false;
       switchTab('base');
       updatePreviews();
+      renderPresets();
+      this.loadHistory();
       setTimeout(() => document.getElementById('bName')?.focus(), 150);
     } catch (e) {
       toast('Erro ao carregar marca: ' + e.message, 'error');
       setSaveStatus('error');
+    }
+  },
+
+  async loadHistory() {
+    if (!this.currentBrandId) return;
+    try {
+      const items = await db.listHistory(this.currentBrandId, 10);
+      renderHistoryList(items);
+    } catch (e) {
+      // Silencioso
     }
   },
 
@@ -161,7 +200,6 @@ const app = {
     set('cPrimaryHex', b.color_primary); set('cSecondaryHex', b.color_secondary);
     set('cAccentHex', b.color_accent); set('cDarkHex', b.color_dark);
     set('cLightHex', b.color_light); set('cTextHex', b.color_text);
-    // Sync color pickers
     ['Primary','Secondary','Accent','Dark','Light','Text'].forEach(n => {
       const hex = document.getElementById(`c${n}Hex`), picker = document.getElementById(`c${n}`);
       if (hex && picker) picker.value = hex.value;
@@ -177,38 +215,25 @@ const app = {
     set('bReferences', b.visual_references); set('bForbidden', b.forbidden);
     set('bCanonical', b.canonical); set('bFinalNotes', b.final_notes);
 
-    // Style visual radio
+    // Novos campos
+    set('bCompetitors', b.competitors);
+    set('bPostFrequency', b.post_frequency);
+
     if (b.style_visual) {
       document.querySelectorAll(`input[name="styleVisual"]`).forEach(r => {
         if (r.value === b.style_visual) { r.checked = true; r.closest('.radio-item')?.classList.add('selected'); }
       });
     }
-    // Chips
     if (b.personality) this.fillChips('personality', b.personality, 'personalityChips', 'personalityInput');
     if (b.goals) this.fillChips('goal', b.goals, 'goalChips', 'goalInput');
-    // Font previews
+    if (b.hashtags) this.fillChips('hashtag', b.hashtags, 'hashtagChips', 'hashtagInput');
+    if (b.topics) this.fillChips('topic', b.topics, 'topicChips', 'topicInput');
+
     if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
-    
-    let logoData = { active: false, presets: [] };
-    try {
-      if (b.logo_url && b.logo_url.startsWith('{')) {
-        logoData = JSON.parse(b.logo_url);
-      } else if (b.logo_url) {
-        logoData.active = b.logo_url !== 'Nenhuma' && b.logo_url !== '';
-      }
-    } catch(e) {
-      logoData.active = !!b.logo_url;
-    }
-    this.logoData = logoData;
-    if (!this.logoData.presets) this.logoData.presets = [];
-    
+
     const bActive = document.getElementById('bLogoActive');
-    if (bActive) bActive.checked = !!logoData.active;
-    
-    setTimeout(() => {
-      renderPresets();
-    }, 100);
+    if (bActive) bActive.checked = !!b.logo_active;
   },
 
   fillCarousel(c) {
@@ -216,36 +241,21 @@ const app = {
     set('cFormat', c.format); set('cSlideCount', c.slide_count);
     set('cSequence', c.sequence); set('cFixedEl', c.fixed_elements);
     set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta);
-    
-    let notes = '';
-    let forbidden = '';
-    let delivery_format = 'HTML standalone por formato';
-    let font_base64 = 'Embutir fontes em base64 no CSS';
-    let final_notes = '';
-    
+
+    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '';
     if (c.notes) {
       try {
         const parsed = JSON.parse(c.notes);
         if (parsed && typeof parsed === 'object') {
-          notes = parsed.notes || '';
-          forbidden = parsed.forbidden || '';
-          delivery_format = parsed.delivery_format || 'HTML standalone por formato';
-          font_base64 = parsed.font_base64 || 'Embutir fontes em base64 no CSS';
-          final_notes = parsed.final_notes || '';
-        } else {
-          notes = c.notes;
-        }
-      } catch (e) {
-        notes = c.notes;
-      }
+          notes = parsed.notes || ''; forbidden = parsed.forbidden || '';
+          delivery_format = parsed.delivery_format || delivery_format;
+          font_base64 = parsed.font_base64 || font_base64; final_notes = parsed.final_notes || '';
+        } else { notes = c.notes; }
+      } catch (e) { notes = c.notes; }
     }
-    
-    set('cNotes', notes);
-    set('cForbidden', forbidden);
-    set('cDelivery', delivery_format);
-    set('cFontB64', font_base64);
-    set('cFinalNotes', final_notes);
-    
+    set('cNotes', notes); set('cForbidden', forbidden); set('cDelivery', delivery_format);
+    set('cFontB64', font_base64); set('cFinalNotes', final_notes);
+
     if (c.logo_pos_hero) {
       document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => { if (r.value === c.logo_pos_hero) { r.checked = true; r.closest('.logo-pos-item')?.classList.add('selected'); } });
     }
@@ -293,16 +303,11 @@ const app = {
   },
 
   collectBrand() {
-    if (!this.logoData) this.logoData = { presets: [] };
-    this.logoData.active = document.getElementById('bLogoActive')?.checked || false;
-    delete this.logoData.primary;
-    delete this.logoData.secondary;
-    
     return {
       name: f('bName') || 'Sem nome',
       handle: f('bHandle'), tagline: f('bTagline'), niche: f('bNiche'),
       positioning: f('bPositioning'),
-      logo_url: JSON.stringify(this.logoData),
+      logo_active: document.getElementById('bLogoActive')?.checked || false,
       color_primary: document.getElementById('cPrimaryHex')?.value,
       color_secondary: document.getElementById('cSecondaryHex')?.value,
       color_accent: document.getElementById('cAccentHex')?.value,
@@ -322,16 +327,18 @@ const app = {
       audience: f('bAudience'), pain: f('bPain'), desire: f('bDesire'),
       visual_references: f('bReferences'), forbidden: f('bForbidden'),
       canonical: f('bCanonical'), final_notes: f('bFinalNotes'),
+      // Novos campos
+      hashtags: this.chipData.hashtag,
+      competitors: f('bCompetitors'),
+      topics: this.chipData.topic,
+      post_frequency: f('bPostFrequency'),
     };
   },
 
   collectCarousel() {
     const notesData = {
-      notes: f('cNotes'),
-      forbidden: f('cForbidden'),
-      delivery_format: f('cDelivery'),
-      font_base64: f('cFontB64'),
-      final_notes: f('cFinalNotes')
+      notes: f('cNotes'), forbidden: f('cForbidden'),
+      delivery_format: f('cDelivery'), font_base64: f('cFontB64'), final_notes: f('cFinalNotes')
     };
     return {
       logo_pos_hero: getRadio('carLogoPosHero'), logo_pos_cta: getRadio('carLogoPosCta'),
@@ -406,23 +413,23 @@ const app = {
   resetForm() {
     this.activeCarouselPresetIndex = null;
     this.activePostPresetIndex = null;
+    this.presets = [];
     document.querySelectorAll('#screenEditor input[type="text"],#screenEditor input[type="url"],#screenEditor textarea').forEach(e => e.value = '');
     document.querySelectorAll('#screenEditor select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
     document.querySelectorAll('.radio-item,.logo-pos-item,.type-card').forEach(e => e.classList.remove('selected'));
     document.querySelectorAll('#screenEditor input[type="radio"]').forEach(e => e.checked = false);
-    ['personality','goal','pItems'].forEach(k => {
+    ['personality','goal','pItems','hashtag','topic'].forEach(k => {
       this.chipData[k] = [];
-      const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips' };
-      document.querySelectorAll(`#${ids[k]} .chip`).forEach(c => c.remove());
+      const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips', hashtag:'hashtagChips', topic:'topicChips' };
+      if (ids[k]) document.querySelectorAll(`#${ids[k]} .chip`).forEach(c => c.remove());
     });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
-    Object.entries(defs).forEach(([id,v]) => { document.getElementById(id).value = v; document.getElementById(id+'Hex').value = v; });
-    this.logoData = { active: false, presets: [] };
+    Object.entries(defs).forEach(([id,v]) => { const el = document.getElementById(id); if(el)el.value=v; const hex = document.getElementById(id+'Hex'); if(hex)hex.value=v; });
     const bActive = document.getElementById('bLogoActive');
     if (bActive) bActive.checked = false;
     renderPresets();
-    ['bPreviewDisplay','bPreviewBody'].forEach(id => { document.getElementById(id).style.fontFamily = ''; });
-    ['bStatusDisplay','bStatusBody'].forEach(id => { document.getElementById(id).textContent = ''; });
+    ['bPreviewDisplay','bPreviewBody'].forEach(id => { const el = document.getElementById(id); if(el) el.style.fontFamily = ''; });
+    ['bStatusDisplay','bStatusBody'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = ''; });
     this.postType = '';
     this.postFmts.clear();
     ['1x1','4x5','9x16'].forEach(id => document.getElementById(`pFmt${id}`)?.classList.remove('checked'));
@@ -431,25 +438,17 @@ const app = {
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
     const activeBrandNameEl = document.getElementById('activeBrandName');
-    if (activeBrandNameEl) {
-      activeBrandNameEl.textContent = '';
-      activeBrandNameEl.style.display = 'none';
-    }
+    if (activeBrandNameEl) { activeBrandNameEl.textContent = ''; activeBrandNameEl.style.display = 'none'; }
+    renderHistoryList([]);
   },
 
-
-
   // ── PRESETS ──
-  savePreset(type) {
+  async savePreset(type) {
     const nameInputId = type === 'carousel' ? 'cPresetName' : 'pPresetName';
     const nameEl = document.getElementById(nameInputId);
     const name = nameEl ? nameEl.value.trim() : '';
-    
-    if (!name) {
-      toast('Por favor, digite um nome para o preset.', 'error');
-      return;
-    }
-    
+    if (!name) { toast('Por favor, digite um nome para o preset.', 'error'); return; }
+
     const colors = {
       color_primary: document.getElementById('cPrimaryHex')?.value,
       color_secondary: document.getElementById('cSecondaryHex')?.value,
@@ -459,218 +458,156 @@ const app = {
       color_text: document.getElementById('cTextHex')?.value,
       colors_notes: f('bColorsNotes')
     };
-    
     const fonts = {
-      font_display: f('bFontDisplay'),
-      font_body: f('bFontBody'),
-      size_title: f('bSizeTitle'),
-      size_subtitle: f('bSizeSubtitle'),
-      size_body: f('bSizeBody'),
-      weight_title: f('bWeightTitle'),
-      italic_use: f('bItalicUse'),
-      typo_notes: f('bTypoNotes')
+      font_display: f('bFontDisplay'), font_body: f('bFontBody'),
+      size_title: f('bSizeTitle'), size_subtitle: f('bSizeSubtitle'), size_body: f('bSizeBody'),
+      weight_title: f('bWeightTitle'), italic_use: f('bItalicUse'), typo_notes: f('bTypoNotes')
     };
-    
     const layout = type === 'carousel' ? this.collectCarousel() : this.collectPost();
-    
-    if (!this.logoData.presets) this.logoData.presets = [];
-    
-    const existingIndex = this.logoData.presets.findIndex(p => p.name === name && p.type === type);
-    
-    if (existingIndex !== -1) {
-      if (!confirm(`Já existe um preset de ${type === 'carousel' ? 'carrossel' : 'post'} com o nome "${name}". Deseja sobrescrevê-lo?`)) {
-        return;
-      }
-      this.logoData.presets[existingIndex] = { name, type, colors, fonts, layout };
-    } else {
-      this.logoData.presets.push({ name, type, colors, fonts, layout });
+
+    const existing = this.presets.find(p => p.name === name && p.type === type);
+    if (existing) {
+      if (!confirm(`Já existe um preset de ${type === 'carousel' ? 'carrossel' : 'post'} com o nome "${name}". Deseja sobrescrevê-lo?`)) return;
     }
-    
-    nameEl.value = ''; // Limpa o input
-    
-    markDirty();
-    this.save(); // Salva na nuvem imediatamente
-    renderPresets();
-    toast(`Preset "${name}" salvo com sucesso na nuvem!`, 'success');
+
+    try {
+      const saved = await db.savePreset(this.currentBrandId, { name, type, colors, fonts, layout });
+      const idx = this.presets.findIndex(p => p.name === name && p.type === type);
+      if (idx !== -1) { this.presets[idx] = saved; } else { this.presets.push(saved); }
+      if (nameEl) nameEl.value = '';
+      renderPresets();
+      toast(`Preset "${name}" salvo!`, 'success');
+    } catch (e) {
+      toast('Erro ao salvar preset: ' + e.message, 'error');
+    }
   },
-  
+
   applyPreset(index) {
     this.isApplyingPreset = true;
-    const preset = this.logoData.presets[index];
-    if (!preset) {
-      this.isApplyingPreset = false;
-      return;
-    }
-    
-    if (preset.type === 'carousel') {
-      this.activeCarouselPresetIndex = index;
-    } else if (preset.type === 'post') {
-      this.activePostPresetIndex = index;
-    }
-    
+    const preset = this.presets[index];
+    if (!preset) { this.isApplyingPreset = false; return; }
+
+    if (preset.type === 'carousel') { this.activeCarouselPresetIndex = index; }
+    else if (preset.type === 'post') { this.activePostPresetIndex = index; }
+
     const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
-    
-    // Cores
-    setVal('cPrimaryHex', preset.colors.color_primary);
-    setVal('cSecondaryHex', preset.colors.color_secondary);
-    setVal('cAccentHex', preset.colors.color_accent);
-    setVal('cDarkHex', preset.colors.color_dark);
-    setVal('cLightHex', preset.colors.color_light);
-    setVal('cTextHex', preset.colors.color_text);
+
+    setVal('cPrimaryHex', preset.colors.color_primary); setVal('cSecondaryHex', preset.colors.color_secondary);
+    setVal('cAccentHex', preset.colors.color_accent); setVal('cDarkHex', preset.colors.color_dark);
+    setVal('cLightHex', preset.colors.color_light); setVal('cTextHex', preset.colors.color_text);
     setVal('bColorsNotes', preset.colors.colors_notes);
-    
-    // Sincroniza color pickers
     ['Primary','Secondary','Accent','Dark','Light','Text'].forEach(n => {
       const hex = document.getElementById(`c${n}Hex`), picker = document.getElementById(`c${n}`);
       if (hex && picker) picker.value = hex.value;
     });
-    
-    // Fontes
-    setVal('bFontDisplay', preset.fonts.font_display);
-    setVal('bFontBody', preset.fonts.font_body);
-    setVal('bSizeTitle', preset.fonts.size_title);
-    setVal('bSizeSubtitle', preset.fonts.size_subtitle);
-    setVal('bSizeBody', preset.fonts.size_body);
-    setVal('bWeightTitle', preset.fonts.weight_title);
-    setVal('bItalicUse', preset.fonts.italic_use);
-    setVal('bTypoNotes', preset.fonts.typo_notes);
-    
-    // Previews de fontes
+
+    setVal('bFontDisplay', preset.fonts.font_display); setVal('bFontBody', preset.fonts.font_body);
+    setVal('bSizeTitle', preset.fonts.size_title); setVal('bSizeSubtitle', preset.fonts.size_subtitle);
+    setVal('bSizeBody', preset.fonts.size_body); setVal('bWeightTitle', preset.fonts.weight_title);
+    setVal('bItalicUse', preset.fonts.italic_use); setVal('bTypoNotes', preset.fonts.typo_notes);
     if (preset.fonts.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (preset.fonts.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
-    
-    // Layout específico
+
     if (preset.type === 'carousel') {
-      setVal('cFormat', preset.layout.format || preset.layout.cFormat);
-      setVal('cSlideCount', preset.layout.slide_count || preset.layout.cSlideCount);
-      setVal('cSequence', preset.layout.sequence || preset.layout.cSequence);
-      setVal('cFixedEl', preset.layout.fixed_elements || preset.layout.cFixedEl);
-      setVal('cSlide1', preset.layout.slide_hero || preset.layout.cSlide1);
-      setVal('cSlideCta', preset.layout.slide_cta || preset.layout.cSlideCta);
-      
-      const notesRaw = preset.layout.notes || preset.layout.cNotes;
-      let notes = '';
-      let forbidden = '';
-      let delivery_format = 'HTML standalone por formato';
-      let font_base64 = 'Embutir fontes em base64 no CSS';
-      let final_notes = '';
-      
-      if (notesRaw) {
+      setVal('cFormat', preset.layout.format); setVal('cSlideCount', preset.layout.slide_count);
+      setVal('cSequence', preset.layout.sequence); setVal('cFixedEl', preset.layout.fixed_elements);
+      setVal('cSlide1', preset.layout.slide_hero); setVal('cSlideCta', preset.layout.slide_cta);
+      let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '';
+      if (preset.layout.notes) {
         try {
-          const parsed = JSON.parse(notesRaw);
+          const parsed = JSON.parse(preset.layout.notes);
           if (parsed && typeof parsed === 'object') {
-            notes = parsed.notes || '';
-            forbidden = parsed.forbidden || '';
-            delivery_format = parsed.delivery_format || 'HTML standalone por formato';
-            font_base64 = parsed.font_base64 || 'Embutir fontes em base64 no CSS';
-            final_notes = parsed.final_notes || '';
-          } else {
-            notes = notesRaw;
-          }
-        } catch (e) {
-          notes = notesRaw;
-        }
+            notes = parsed.notes || ''; forbidden = parsed.forbidden || '';
+            delivery_format = parsed.delivery_format || delivery_format;
+            font_base64 = parsed.font_base64 || font_base64; final_notes = parsed.final_notes || '';
+          } else { notes = preset.layout.notes; }
+        } catch (e) { notes = preset.layout.notes; }
       }
-      
-      setVal('cNotes', notes);
-      setVal('cForbidden', forbidden);
-      setVal('cDelivery', delivery_format);
-      setVal('cFontB64', font_base64);
-      setVal('cFinalNotes', final_notes);
-      
-      const logoPosHero = preset.layout.logo_pos_hero || preset.layout.carLogoPosHero;
-      const logoPosCta = preset.layout.logo_pos_cta || preset.layout.carLogoPosCta;
-      if (logoPosHero) {
-        document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => {
-          const sel = r.value === logoPosHero; r.checked = sel;
-          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
-        });
-      }
-      if (logoPosCta) {
-        document.querySelectorAll(`input[name="carLogoPosCta"]`).forEach(r => {
-          const sel = r.value === logoPosCta; r.checked = sel;
-          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
-        });
-      }
+      setVal('cNotes', notes); setVal('cForbidden', forbidden); setVal('cDelivery', delivery_format);
+      setVal('cFontB64', font_base64); setVal('cFinalNotes', final_notes);
+      const lh = preset.layout.logo_pos_hero, lc = preset.layout.logo_pos_cta;
+      if (lh) document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => { const s = r.value === lh; r.checked = s; r.closest('.logo-pos-item')?.classList.toggle('selected', s); });
+      if (lc) document.querySelectorAll(`input[name="carLogoPosCta"]`).forEach(r => { const s = r.value === lc; r.checked = s; r.closest('.logo-pos-item')?.classList.toggle('selected', s); });
     } else if (preset.type === 'post') {
-      const logoPos = preset.layout.logo_pos || preset.layout.postLogoPos;
-      if (logoPos) {
-        document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => {
-          const sel = r.value === logoPos; r.checked = sel;
-          r.closest('.logo-pos-item')?.classList.toggle('selected', sel);
-        });
-      }
-      
-      if (preset.layout.post_type || preset.layout.pType) {
-        const type = preset.layout.post_type || preset.layout.pType;
-        const card = document.querySelector(`input[name="pType"][value="${type}"]`);
-        if (card) selectPostType(card.closest('.type-card'), type);
-      }
-      
-      if (preset.layout.formats) {
-        app.postFmts.clear();
-        document.querySelectorAll(`.post-fmt`).forEach(c => c.classList.remove('checked'));
-        preset.layout.formats.forEach(fmt => togglePostFmt(fmt));
-      }
-      
+      const lp = preset.layout.logo_pos;
+      if (lp) document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => { const s = r.value === lp; r.checked = s; r.closest('.logo-pos-item')?.classList.toggle('selected', s); });
+      if (preset.layout.post_type) { const card = document.querySelector(`input[name="pType"][value="${preset.layout.post_type}"]`); if (card) selectPostType(card.closest('.type-card'), preset.layout.post_type); }
+      if (preset.layout.formats) { app.postFmts.clear(); document.querySelectorAll(`.post-fmt`).forEach(c => c.classList.remove('checked')); preset.layout.formats.forEach(fmt => togglePostFmt(fmt)); }
       const pFields = {
-        pHeadline: preset.layout.headline || preset.layout.pHeadline,
-        pSubtitle: preset.layout.subtitle || preset.layout.pSubtitle,
-        pCta: preset.layout.cta || preset.layout.pCta,
-        pContentNotes: preset.layout.content_notes || preset.layout.pContentNotes,
-        pStatNum: preset.layout.stat_number || preset.layout.pStatNum,
-        pStatCtx: preset.layout.stat_context || preset.layout.pStatCtx,
-        pStatSrc: preset.layout.stat_source || preset.layout.pStatSrc,
-        pCompA: preset.layout.comp_a || preset.layout.pCompA,
-        pCompB: preset.layout.comp_b || preset.layout.pCompB,
-        pAnPrice: preset.layout.anuncio_price || preset.layout.pAnPrice,
-        pAnBenefit: preset.layout.anuncio_benefit || preset.layout.pAnBenefit,
-        pUrgPrazo: preset.layout.urgencia_prazo || preset.layout.pUrgPrazo,
-        pUrgOque: preset.layout.urgencia_oque || preset.layout.pUrgOque,
-        pQuoteText: preset.layout.quote_text || preset.layout.pQuoteText,
-        pQuoteAuthor: preset.layout.quote_author || preset.layout.pQuoteAuthor,
-        pQuoteRole: preset.layout.quote_role || preset.layout.pQuoteRole,
-        pArtBody: preset.layout.article_body || preset.layout.pArtBody,
-        pL1TextPos: preset.layout.layout_1x1_text_pos || preset.layout.pL1TextPos,
-        pL1Bg: preset.layout.layout_1x1_bg || preset.layout.pL1Bg,
-        pL1Notes: preset.layout.layout_1x1_notes || preset.layout.pL1Notes,
-        pL4TextPos: preset.layout.layout_4x5_text_pos || preset.layout.pL4TextPos,
-        pL4Bg: preset.layout.layout_4x5_bg || preset.layout.pL4Bg,
-        pL4Notes: preset.layout.layout_4x5_notes || preset.layout.pL4Notes,
-        pL9TextPos: preset.layout.layout_9x16_text_pos || preset.layout.pL9TextPos,
-        pL9Bg: preset.layout.layout_9x16_bg || preset.layout.pL9Bg,
-        pL9Notes: preset.layout.layout_9x16_notes || preset.layout.pL9Notes,
-        pForbidden: preset.layout.forbidden || preset.layout.pForbidden,
-        pDelivery: preset.layout.delivery_format || preset.layout.pDelivery,
-        pFontB64: preset.layout.font_base64 || preset.layout.pFontB64,
-        pFinalNotes: preset.layout.final_notes || preset.layout.pFinalNotes
+        pHeadline: preset.layout.headline, pSubtitle: preset.layout.subtitle, pCta: preset.layout.cta,
+        pContentNotes: preset.layout.content_notes, pStatNum: preset.layout.stat_number,
+        pStatCtx: preset.layout.stat_context, pStatSrc: preset.layout.stat_source,
+        pCompA: preset.layout.comp_a, pCompB: preset.layout.comp_b,
+        pAnPrice: preset.layout.anuncio_price, pAnBenefit: preset.layout.anuncio_benefit,
+        pUrgPrazo: preset.layout.urgencia_prazo, pUrgOque: preset.layout.urgencia_oque,
+        pQuoteText: preset.layout.quote_text, pQuoteAuthor: preset.layout.quote_author, pQuoteRole: preset.layout.quote_role,
+        pArtBody: preset.layout.article_body,
+        pL1TextPos: preset.layout.layout_1x1_text_pos, pL1Bg: preset.layout.layout_1x1_bg, pL1Notes: preset.layout.layout_1x1_notes,
+        pL4TextPos: preset.layout.layout_4x5_text_pos, pL4Bg: preset.layout.layout_4x5_bg, pL4Notes: preset.layout.layout_4x5_notes,
+        pL9TextPos: preset.layout.layout_9x16_text_pos, pL9Bg: preset.layout.layout_9x16_bg, pL9Notes: preset.layout.layout_9x16_notes,
+        pForbidden: preset.layout.forbidden, pDelivery: preset.layout.delivery_format,
+        pFontB64: preset.layout.font_base64, pFinalNotes: preset.layout.final_notes
       };
       Object.entries(pFields).forEach(([id, val]) => setVal(id, val));
-      
-      const items = preset.layout.items || preset.layout.pItems || [];
+      const items = preset.layout.items || [];
       this.fillChips('pItems', items, 'pItemsChips', 'pItemsInput');
     }
-    
+
     markDirty();
     this.isApplyingPreset = false;
     renderPresets();
     toast(`Preset "${preset.name}" aplicado!`, 'success');
   },
-  
-  deletePreset(index) {
-    const preset = this.logoData.presets[index];
+
+  // ── TEMPLATE MODAL ──
+  showTemplateModal() {
+    const grid = document.getElementById('templateGrid');
+    grid.innerHTML = Object.entries(BRAND_TEMPLATES).map(([key, tmpl]) => `
+      <div class="template-card" onclick="app.newBrandFromTemplate('${key}')">
+        <div class="template-icon">${tmpl.icon}</div>
+        <div class="template-name">${tmpl.label}</div>
+      </div>
+    `).join('');
+    document.getElementById('templateModal').style.display = 'flex';
+  },
+
+  closeTemplateModal() {
+    document.getElementById('templateModal').style.display = 'none';
+  },
+
+  async newBrandFromTemplate(key) {
+    this.closeTemplateModal();
+    const tmpl = BRAND_TEMPLATES[key];
+    if (!tmpl) return;
+    try {
+      const { personality, goals, topics, hashtags, ...baseData } = tmpl.data;
+      const brand = await db.createBrand({ ...baseData, color_dark: baseData.color_dark || '#0A0F1E', color_light: baseData.color_light || '#F0F4FF', color_text: baseData.color_text || '#F5F0E8' });
+      await this.openBrand(brand.id);
+      if (personality) this.fillChips('personality', personality, 'personalityChips', 'personalityInput');
+      if (goals) this.fillChips('goal', goals, 'goalChips', 'goalInput');
+      if (topics) this.fillChips('topic', topics, 'topicChips', 'topicInput');
+      if (hashtags) this.fillChips('hashtag', hashtags, 'hashtagChips', 'hashtagInput');
+      await this.save();
+      toast(`Template "${tmpl.label}" aplicado!`, 'success');
+    } catch (e) {
+      toast('Erro ao criar marca: ' + e.message, 'error');
+    }
+  },
+
+  async deletePreset(index) {
+    const preset = this.presets[index];
     if (!preset) return;
-    if (!confirm(`Excluir preset "${preset.name}" da nuvem?`)) return;
-    
-    this.logoData.presets.splice(index, 1);
-    
-    this.activeCarouselPresetIndex = null;
-    this.activePostPresetIndex = null;
-    
-    markDirty();
-    this.save(); // Salva na nuvem imediatamente
-    renderPresets();
-    toast(`Preset "${preset.name}" excluído.`, 'success');
+    if (!confirm(`Excluir preset "${preset.name}"?`)) return;
+    try {
+      await db.deletePreset(preset.id);
+      this.presets.splice(index, 1);
+      this.activeCarouselPresetIndex = null;
+      this.activePostPresetIndex = null;
+      renderPresets();
+      toast(`Preset "${preset.name}" excluído.`, 'success');
+    } catch (e) {
+      toast('Erro ao excluir preset: ' + e.message, 'error');
+    }
   }
 };
 
@@ -688,7 +625,6 @@ async function handleLoginSubmit() {
 
   errorEl.style.display = 'none';
   errorEl.textContent = '';
-  
   const originalBtnText = btnEl.innerHTML;
   btnEl.disabled = true;
   btnEl.innerHTML = '<span class="spinner"></span> <span>Entrando...</span>';
@@ -696,13 +632,8 @@ async function handleLoginSubmit() {
   try {
     const email = emailEl.value.trim();
     const password = passwordEl.value;
-    
     await auth.login(email, password);
-    
-    // Sucesso!
     app.showAuthenticatedApp();
-    
-    // Limpar campos
     emailEl.value = '';
     passwordEl.value = '';
   } catch (e) {
@@ -718,9 +649,6 @@ async function handleLoginSubmit() {
 document.addEventListener('DOMContentLoaded', () => {
   app.init();
   window.addEventListener('beforeunload', (e) => {
-    if (app.isDirty) {
-      e.preventDefault();
-      e.returnValue = '';
-    }
+    if (app.isDirty) { e.preventDefault(); e.returnValue = ''; }
   });
 });

@@ -492,3 +492,38 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   }
 }
 
+/* ══ BRAND LIST SEARCH ══ */
+.list-search-bar{display:flex;gap:10px;align-items:center;padding:0 32px;margin-bottom:16px;}
+.list-search-bar input,.list-search-bar select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-m);font-size:12px;padding:8px 12px;border-radius:3px;outline:none;}
+.list-search-bar input:focus,.list-search-bar select:focus{border-color:var(--border-hi);}
+.list-search-bar select{cursor:pointer;}
+
+/* ══ BRAND CARD NICHE ══ */
+.brand-card-meta{color:var(--muted);font-size:11px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ══ HISTORY PANEL ══ */
+.history-panel{border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+.history-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.history-list{display:flex;flex-direction:column;gap:6px;}
+.history-item{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:border-color 0.15s;}
+.history-item:hover{border-color:var(--border-hi);}
+.history-empty{font-size:11px;color:var(--muted);}
+.history-date{font-size:10px;color:var(--muted);margin-left:auto;}
+.history-badge{font-size:9px;padding:2px 6px;border-radius:2px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.history-badge-base{background:var(--acc-base);color:#0E0E0E;}
+.history-badge-carousel{background:var(--acc-car);color:#0E0E0E;}
+.history-badge-post{background:var(--acc-post);color:#fff;}
+
+/* ══ TEMPLATE MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;}
+.modal-card{background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;width:100%;max-width:640px;overflow:hidden;}
+.modal-header{padding:24px 28px 16px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal-subtitle{font-size:12px;color:var(--muted);}
+.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px 28px;}
+.template-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;border:1px solid var(--border);border-radius:4px;cursor:pointer;transition:all 0.15s;text-align:center;}
+.template-card:hover{border-color:var(--acc-base);background:rgba(180,130,255,0.06);}
+.template-icon{font-size:28px;line-height:1;}
+.template-name{font-size:11px;font-weight:600;color:var(--text);}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+

@@ -70,12 +70,16 @@ const prompts = {
     if (f('bPain'))     s6.push(`DOR:            ${f('bPain')}`);
     if (f('bDesire'))   s6.push(`DESEJO:         ${f('bDesire')}`);
     if (app.chipData.goal.length) s6.push(`OBJETIVOS:      ${app.chipData.goal.join(', ')}`);
+    if (app.chipData.topic.length) s6.push(`PAUTAS:         ${app.chipData.topic.join(', ')}`);
+    if (f('bPostFrequency')) s6.push(`FREQUÊNCIA:     ${f('bPostFrequency')}`);
     if (s6.length) s.push(`## 06 · AUDIÊNCIA\n${s6.join('\n')}`);
 
     const s7 = [];
     if (f('bReferences')) s7.push(`REFERÊNCIAS:    ${f('bReferences')}`);
     if (f('bForbidden'))  s7.push(`PROIBIDO:       ${f('bForbidden')}`);
     if (f('bCanonical'))  s7.push(`CANÔNICO:       ${f('bCanonical')}`);
+    if (app.chipData.hashtag.length) s7.push(`HASHTAGS:       ${app.chipData.hashtag.map(h => h.startsWith('#') ? h : '#' + h).join(' ')}`);
+    if (f('bCompetitors')) s7.push(`CONCORRENTES:   ${f('bCompetitors')}`);
     if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
     if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
 

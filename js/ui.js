@@ -94,17 +94,46 @@ function showCopied(id) {
 
 function baseCopy() {
   const p = prompts.buildBase(); if (!p) { toast('Preencha pelo menos o nome da marca.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => showCopied('baseCopyMsg'));
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('baseCopyMsg');
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'base', p).then(() => app.loadHistory()).catch(() => {});
+  });
 }
 
 function carCopy() {
   const p = prompts.buildCarousel(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => showCopied('carCopyMsg'));
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('carCopyMsg');
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'carousel', p).then(() => app.loadHistory()).catch(() => {});
+  });
 }
 
 function postCopy() {
   const p = prompts.buildPost(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => showCopied('postCopyMsg'));
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('postCopyMsg');
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'post', p).then(() => app.loadHistory()).catch(() => {});
+  });
+}
+
+function renderHistoryList(items) {
+  ['baseHistoryList','carHistoryList','postHistoryList'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!items || items.length === 0) {
+      el.innerHTML = '<span class="history-empty">Nenhuma cópia registrada ainda.</span>';
+      return;
+    }
+    const typeMap = { base: 'Base', carousel: 'Carrossel', post: 'Post' };
+    el.innerHTML = items.map(item => {
+      const d = new Date(item.created_at);
+      const label = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      return `<div class="history-item" onclick="navigator.clipboard.writeText(${JSON.stringify(item.prompt_text)}).then(()=>toast('Prompt copiado!'))">
+        <span class="history-badge history-badge-${item.type}">${typeMap[item.type] || item.type}</span>
+        <span class="history-date">${label}</span>
+      </div>`;
+    }).join('');
+  });
 }
 
 // ── UPDATE PREVIEWS ──
@@ -127,30 +156,45 @@ function updatePreviews() {
 }
 
 function updateProgress() {
-  const bIds = ['bName','bHandle','bTagline','bNiche','cPrimaryHex','cSecondaryHex','bFontDisplay','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bToneMain','bBgRhythm','bAudience','bReferences'];
-  let bf = bIds.filter(id => f(id)).length;
-  if (app.chipData.personality.length) bf++;
-  if (app.chipData.goal.length) bf++;
-  if (getRadio('styleVisual')) bf++;
-  const bPct = Math.round((bf / (bIds.length + 3)) * 100);
+  const bReq = ['bName','cPrimaryHex','bFontDisplay','bToneMain','bAudience'];
+  const bOpt = ['bHandle','bTagline','bNiche','cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm','bReferences'];
+  let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
+  bReq.forEach(id => { if (f(id)) bScore += 2; });
+  bOpt.forEach(id => { if (f(id)) bScore += 1; });
+  if (app.chipData.personality.length) bScore += 2;
+  if (app.chipData.goal.length) bScore += 1;
+  if (getRadio('styleVisual')) bScore += 1;
+  bMax += 3;
+  const bReqFilled = bReq.filter(id => f(id)).length + (app.chipData.personality.length ? 1 : 0);
+  const bPct = Math.round((bScore / bMax) * 100);
   document.getElementById('baseProgFill').style.width = bPct + '%';
-  document.getElementById('baseProgLabel').textContent = bf + ' campos';
+  document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length + 1} obrig.`;
   document.getElementById('baseProgPct').textContent = bPct + '%';
 
-  const cIds = ['cFormat','cSlideCount','cSequence','cDelivery','cFontB64'];
-  let cf = cIds.filter(id => f(id)).length;
-  if (getRadio('carLogoPosHero')) cf++; if (getRadio('carLogoPosCta')) cf++;
-  const cPct = Math.round((cf / (cIds.length + 2)) * 100);
+  const cReq = ['cFormat','cSlideCount','cSequence'];
+  const cOpt = ['cDelivery','cFontB64'];
+  let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
+  cReq.forEach(id => { if (f(id)) cScore += 2; });
+  cOpt.forEach(id => { if (f(id)) cScore += 1; });
+  if (getRadio('carLogoPosHero')) cScore += 1;
+  if (getRadio('carLogoPosCta')) cScore += 1;
+  const cReqFilled = cReq.filter(id => f(id)).length;
+  const cPct = Math.round((cScore / cMax) * 100);
   document.getElementById('carProgFill').style.width = cPct + '%';
-  document.getElementById('carProgLabel').textContent = cf + ' campos';
+  document.getElementById('carProgLabel').textContent = `${cReqFilled}/${cReq.length} obrig.`;
   document.getElementById('carProgPct').textContent = cPct + '%';
 
-  const pIds = ['pHeadline','pSubtitle','pCta'];
-  let pf = pIds.filter(id => f(id)).length;
-  if (app.postType) pf++; if (app.postFmts.size) pf++;
-  const pPct = Math.round((pf / (pIds.length + 2)) * 100);
+  const pReq = ['pHeadline'];
+  const pOpt = ['pSubtitle','pCta'];
+  let pScore = 0, pMax = pReq.length * 2 + pOpt.length + 2;
+  pReq.forEach(id => { if (f(id)) pScore += 2; });
+  pOpt.forEach(id => { if (f(id)) pScore += 1; });
+  if (app.postType) pScore += 2;
+  if (app.postFmts.size) pScore += 1;
+  const pReqFilled = pReq.filter(id => f(id)).length + (app.postType ? 1 : 0);
+  const pPct = Math.round((pScore / pMax) * 100);
   document.getElementById('postProgFill').style.width = pPct + '%';
-  document.getElementById('postProgLabel').textContent = pf + ' campos';
+  document.getElementById('postProgLabel').textContent = `${pReqFilled}/${pReq.length + 1} obrig.`;
   document.getElementById('postProgPct').textContent = pPct + '%';
 }
 
@@ -206,9 +250,8 @@ function markDirty() {
     renderPresets();
   }
   updatePreviews();
-  // Autosave after 2 seconds of inactivity
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { if (app.currentBrandId) app.save(); }, 2000);
+  saveTimer = setTimeout(() => { if (app.currentBrandId) { setSaveStatus('saving'); app.save(); } }, 3000);
 }
 
 function setSaveStatus(status) {
@@ -336,7 +379,7 @@ function renderPresets() {
   if (cList) cList.innerHTML = '';
   if (pList) pList.innerHTML = '';
   
-  const presets = (app.logoData && app.logoData.presets) ? app.logoData.presets : [];
+  const presets = app.presets || [];
   
   let cCount = 0;
   let pCount = 0;

@@ -37,7 +37,14 @@
       <h1 class="list-title">Suas Marcas</h1>
       <p class="list-subtitle">Selecione uma marca para editar ou crie uma nova.</p>
     </div>
-    <button class="btn btn-base" onclick="newBrand()">+ Nova marca</button>
+    <button class="btn btn-base" onclick="app.showTemplateModal()">+ Nova marca</button>
+  </div>
+  <div class="list-search-bar">
+    <input type="text" id="brandSearch" placeholder="Buscar por nome, nicho ou handle..." oninput="app.filterBrands()" style="flex:1;max-width:360px;">
+    <select id="brandSort" onchange="app.filterBrands()" style="width:180px;">
+      <option value="updated">Recentemente editadas</option>
+      <option value="name">Nome A–Z</option>
+    </select>
   </div>
   <div id="brandGrid" class="brand-grid">
     <div class="loading-state">Carregando marcas...</div>
@@ -160,6 +167,10 @@
           <div class="field"><label class="field-label">Principal desejo</label><textarea id="bDesire" style="min-height:66px;" placeholder="Ex: Ter controle total da escola sem depender de planilhas ou da memória." oninput="markDirty()"></textarea></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Objetivos de conteúdo</label><div class="chips-wrap" id="goalChips" onclick="document.getElementById('goalInput').focus()"><input class="chip-input" id="goalInput" placeholder="Ex: Gerar leads, Educar..." onkeydown="addChip(event,'goalChips','goal')"></div></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Temas / Pautas recorrentes</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="topicChips" onclick="document.getElementById('topicInput').focus()"><input class="chip-input" id="topicInput" placeholder="Ex: Gestão, Vendas, Legislação..." onkeydown="addChip(event,'topicChips','topic')"></div></div>
+          <div class="field"><label class="field-label">Frequência de postagem</label><select id="bPostFrequency" oninput="markDirty()"><option value="">Selecione</option><option>Diário</option><option>3× por semana</option><option>2× por semana</option><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
+        </div>
       </section>
 
       <section class="section" id="b7">
@@ -167,6 +178,10 @@
         <div class="field-group"><div class="field"><label class="field-label">Referências visuais</label><textarea id="bReferences" placeholder="Ex: @resultadosdigitais no Instagram, site linear.app, carrosséis da marca Nubank — todos usam tipografia grande, espaço generoso e paleta sóbria." oninput="markDirty()"></textarea></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Proibições globais</label><textarea id="bForbidden" placeholder="Ex: Nunca usar stock photos genéricas. Nunca fundo branco puro. Proibido emoji fora do contexto de checklist." oninput="markDirty()"></textarea></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Referência canônica aprovada</label><textarea id="bCanonical" placeholder="Ex: O carrossel 'Os 5 erros...' publicado em 12/03 é o padrão de qualidade aprovado pelo cliente — usar como régua." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Hashtags padrão</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="hashtagChips" onclick="document.getElementById('hashtagInput').focus()"><input class="chip-input" id="hashtagInput" placeholder="Ex: #autoescola, #gestao..." onkeydown="addChip(event,'hashtagChips','hashtag')"></div></div>
+          <div class="field"><label class="field-label">Concorrentes principais</label><textarea id="bCompetitors" placeholder="Ex: CFC Central, Escola de Trânsito XYZ — ambos focados em volume, não em qualidade de atendimento." oninput="markDirty()"></textarea></div>
+        </div>
         <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="bFinalNotes" placeholder="Ex: Cliente prefere variações com mais texto. Revisar sempre antes de entregar posts de campanha." oninput="markDirty()"></textarea></div></div>
       </section>
     </main>
@@ -174,6 +189,7 @@
       <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="baseCopy()">⌘ Copiar prompt base</button><div class="copy-success" id="baseCopyMsg">✓ Copiado</div></div>
       <div class="info-box">As abas Carrossel e Post combinam a Base com os dados específicos de cada formato.</div>
+      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="baseHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
     </aside>
   </div>
   </div>
@@ -269,6 +285,7 @@
       <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Carrossel. Cole no início de qualquer conversa.</div>
+      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="carHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
     </aside>
   </div>
   </div>
@@ -391,11 +408,27 @@
       <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Post. Cole no início de qualquer conversa.</div>
+      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="postHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
     </aside>
   </div>
   </div>
 
 </div><!-- /screenEditor -->
+
+<!-- ══ TEMPLATE MODAL ══ -->
+<div id="templateModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)app.closeTemplateModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Escolha um ponto de partida</div>
+      <div class="modal-subtitle">Selecione um template para pré-preencher os campos ou comece do zero.</div>
+    </div>
+    <div class="template-grid" id="templateGrid"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="app.closeTemplateModal()">Cancelar</button>
+      <button class="btn btn-base" onclick="app.newBrand();app.closeTemplateModal()">Começar do zero</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="screenLogin" class="login-screen" style="display:none;">
@@ -421,6 +454,7 @@
 <script src="js/db.js"></script>
 <script src="js/prompts.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/templates.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
