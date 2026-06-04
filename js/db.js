@@ -65,11 +65,12 @@ const db = {
   },
 
   async savePreset(brandId, presetId, data) {
+    const userId = auth.getUser()?.id;
     if (presetId) {
-      const rows = await supabase.update('brand_presets', presetId, data);
+      const rows = await supabase.update('brand_presets', presetId, { ...data, user_id: userId });
       return rows[0];
     } else {
-      const rows = await supabase.insert('brand_presets', { ...data, brand_id: brandId });
+      const rows = await supabase.insert('brand_presets', { ...data, brand_id: brandId, user_id: userId });
       return rows[0];
     }
   },
