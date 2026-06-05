@@ -68,13 +68,20 @@ const app = {
       el.innerHTML = '';
     } else {
       el.innerHTML = `
-        <button class="btn btn-ghost" onclick="app.confirmDelete()" style="display:inline-flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Excluir marca</button>
-        <button class="btn btn-ghost" onclick="app.goHome()" style="display:inline-flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Voltar</button>
-        <button class="btn btn-copy" onclick="baseCopy()">⌘ Copiar base</button>
-        <button class="btn btn-car" onclick="carCopy()">⌘ Copiar carrossel</button>
-        <button class="btn btn-post" onclick="postCopy()">⌘ Copiar post</button>
-        <button class="btn btn-ai" onclick="claudeGenerate.open(app.currentTab)" style="display:inline-flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/></svg>Gerar com IA</button>
-        <button class="btn btn-base" onclick="app.save()" style="display:inline-flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
+        <div class="topbar-menu-wrap">
+          <button class="btn btn-ghost topbar-menu-trigger" onclick="app.toggleMenu(event)" title="Mais ações"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+          <div class="topbar-menu" id="topbarMenu" style="display:none;">
+            <button class="topbar-menu-item" onclick="baseCopy();app.closeMenu()">⌘ Copiar prompt Base</button>
+            <button class="topbar-menu-item" onclick="carCopy();app.closeMenu()">⌘ Copiar prompt Carrossel</button>
+            <button class="topbar-menu-item" onclick="postCopy();app.closeMenu()">⌘ Copiar prompt Post</button>
+            <div class="topbar-menu-divider"></div>
+            <button class="topbar-menu-item topbar-menu-danger" onclick="app.confirmDelete();app.closeMenu()">Excluir marca</button>
+          </div>
+        </div>
+        <button class="btn btn-ghost topbar-back-btn" onclick="app.goHome()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span>Voltar</span></button>
+        <div class="topbar-divider-v"></div>
+        <button class="btn btn-ai btn-ai-primary" onclick="claudeGenerate.open(app.currentTab)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/></svg>Gerar com IA</button>
+        <button class="btn btn-ghost topbar-save-btn" onclick="app.save()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       `;
     }
   },
@@ -593,6 +600,22 @@ const app = {
     } catch (e) {
       toast('Erro ao criar marca: ' + e.message, 'error');
     }
+  },
+
+  toggleMenu(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('topbarMenu');
+    if (!menu) return;
+    const isOpen = menu.style.display !== 'none';
+    if (isOpen) { menu.style.display = 'none'; return; }
+    menu.style.display = 'block';
+    const close = () => { menu.style.display = 'none'; document.removeEventListener('click', close); };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  },
+
+  closeMenu() {
+    const menu = document.getElementById('topbarMenu');
+    if (menu) menu.style.display = 'none';
   },
 
   async deletePreset(index) {
