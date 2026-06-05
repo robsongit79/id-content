@@ -73,6 +73,7 @@ const app = {
         <button class="btn btn-copy" onclick="baseCopy()">⌘ Copiar base</button>
         <button class="btn btn-car" onclick="carCopy()">⌘ Copiar carrossel</button>
         <button class="btn btn-post" onclick="postCopy()">⌘ Copiar post</button>
+        <button class="btn btn-ai" onclick="claudeGenerate.open(app.currentTab)" style="display:inline-flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/></svg>Gerar com IA</button>
         <button class="btn btn-base" onclick="app.save()" style="display:inline-flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       `;
     }
