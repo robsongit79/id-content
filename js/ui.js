@@ -96,7 +96,7 @@ function baseCopy() {
   const p = prompts.buildBase(); if (!p) { toast('Preencha pelo menos o nome da marca.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('baseCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'base', p).then(() => app.loadHistory()).catch(() => {});
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'base', p).then(() => app.loadHistory()).catch(e => console.error('[History] base:', e.message));
   });
 }
 
@@ -104,7 +104,7 @@ function carCopy() {
   const p = prompts.buildCarousel(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('carCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'carousel', p).then(() => app.loadHistory()).catch(() => {});
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'carousel', p).then(() => app.loadHistory()).catch(e => console.error('[History] carousel:', e.message));
   });
 }
 
@@ -112,7 +112,7 @@ function postCopy() {
   const p = prompts.buildPost(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('postCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'post', p).then(() => app.loadHistory()).catch(() => {});
+    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'post', p).then(() => app.loadHistory()).catch(e => console.error('[History] post:', e.message));
   });
 }
 
