@@ -64,8 +64,8 @@ module.exports = async function handler(req, res) {
         throw new Error(err.message || 'Erro ao listar usuários do Supabase Auth');
       }
       const data = await usersRes.json();
-      // GoTrue retorna uma lista direta de usuários
-      return res.status(200).json({ users: data || [] });
+      const usersList = (data && data.users) || data || [];
+      return res.status(200).json({ users: usersList });
     }
 
     if (req.method === 'POST' && action === 'toggleAdmin') {

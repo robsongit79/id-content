@@ -697,7 +697,11 @@ const app = {
         throw new Error(err.error || 'Erro ao carregar usuários');
       }
       const data = await res.json();
-      const users = data.users || [];
+      const users = Array.isArray(data.users) 
+        ? data.users 
+        : (data.users && Array.isArray(data.users.users) 
+            ? data.users.users 
+            : (Array.isArray(data) ? data : []));
       
       if (users.length === 0) {
         listEl.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Nenhum usuário encontrado.</td></tr>';
