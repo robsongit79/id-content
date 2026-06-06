@@ -369,6 +369,16 @@ function initScrollNav() {
     entries.forEach(e => { if (e.isIntersecting) { document.querySelectorAll('[data-base]').forEach(n => n.classList.remove('active')); const m = document.querySelector(`[data-base="${e.target.id}"]`); if (m) m.classList.add('active'); }});
   }, { threshold: 0.3, root: document.getElementById('baseMain') });
   document.querySelectorAll('#panelBase .section').forEach(s => bObs.observe(s));
+
+  const cObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { document.querySelectorAll('[data-car]').forEach(n => n.classList.remove('active')); const m = document.querySelector(`[data-car="${e.target.id}"]`); if (m) m.classList.add('active'); }});
+  }, { threshold: 0.3, root: document.getElementById('carMain') });
+  document.querySelectorAll('#panelCar .section').forEach(s => cObs.observe(s));
+
+  const pObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { document.querySelectorAll('[data-post]').forEach(n => n.classList.remove('active')); const m = document.querySelector(`[data-post="${e.target.id}"]`); if (m) m.classList.add('active'); }});
+  }, { threshold: 0.3, root: document.getElementById('postMain') });
+  document.querySelectorAll('#panelPost .section').forEach(s => pObs.observe(s));
 }
 
 // ── RENDER PRESETS ──
