@@ -620,7 +620,7 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .user-welcome {
   font-size: 11px;
   color: var(--muted);
-  margin-right: 16px;
+  margin-left: 16px;
   display: inline-flex;
   align-items: center;
   gap: 4px;

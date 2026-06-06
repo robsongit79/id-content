@@ -50,19 +50,18 @@ const app = {
   async showAuthenticatedApp() {
     document.getElementById('screenLogin').style.display = 'none';
     document.getElementById('btnLogout').style.display = 'inline-flex';
+
+    // 1. Configurar mensagem de boas-vindas com e-mail do usuário
+    const user = auth.getUser();
+    const userEmail = document.getElementById('userEmail');
+    if (user && user.email && userEmail) {
+      userEmail.textContent = user.email;
+    }
+
     this.showScreen('list');
     this.loadBrandList();
     initScrollNav();
     initTooltips();
-
-    // 1. Exibir mensagem de boas-vindas com e-mail do usuário
-    const user = auth.getUser();
-    const userWelcome = document.getElementById('userWelcome');
-    const userEmail = document.getElementById('userEmail');
-    if (user && user.email) {
-      if (userEmail) userEmail.textContent = user.email;
-      if (userWelcome) userWelcome.style.display = 'inline-flex';
-    }
 
     // 2. Exibe ou oculta o botão do Painel Admin
     const btnAdmin = document.getElementById('btnAdminPanel');
@@ -107,6 +106,23 @@ const app = {
     document.getElementById('screenEditor').style.display = screen === 'editor' ? 'block' : 'none';
     document.getElementById('screenAdmin').style.display = screen === 'admin' ? 'block' : 'none';
     document.getElementById('tabs').style.display = screen === 'editor' ? 'flex' : 'none';
+    
+    // Controla visibilidade de boas-vindas e selo da marca na topbar
+    const activeBrandNameEl = document.getElementById('activeBrandName');
+    const userWelcomeEl = document.getElementById('userWelcome');
+    
+    if (screen === 'editor') {
+      if (activeBrandNameEl) activeBrandNameEl.style.display = 'inline-block';
+      if (userWelcomeEl) userWelcomeEl.style.display = 'none';
+    } else {
+      if (activeBrandNameEl) activeBrandNameEl.style.display = 'none';
+      if (userWelcomeEl && auth.isAuthenticated()) {
+        userWelcomeEl.style.display = 'inline-flex';
+      } else if (userWelcomeEl) {
+        userWelcomeEl.style.display = 'none';
+      }
+    }
+
     this.renderTopbar(screen);
     if (screen === 'admin') {
       this.loadAdminUsers();
