@@ -96,7 +96,6 @@ function baseCopy() {
   const p = prompts.buildBase(); if (!p) { toast('Preencha pelo menos o nome da marca.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('baseCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'base', p).then(() => app.loadHistory()).catch(e => console.error('[History] base:', e.message));
   });
 }
 
@@ -104,7 +103,6 @@ function carCopy() {
   const p = prompts.buildCarousel(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('carCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'carousel', p).then(() => app.loadHistory()).catch(e => console.error('[History] carousel:', e.message));
   });
 }
 
@@ -112,27 +110,6 @@ function postCopy() {
   const p = prompts.buildPost(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
   navigator.clipboard.writeText(p).then(() => {
     showCopied('postCopyMsg');
-    if (app.currentBrandId) db.addHistory(app.currentBrandId, 'post', p).then(() => app.loadHistory()).catch(e => console.error('[History] post:', e.message));
-  });
-}
-
-function renderHistoryList(items) {
-  ['baseHistoryList','carHistoryList','postHistoryList'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (!items || items.length === 0) {
-      el.innerHTML = '<span class="history-empty">Nenhuma cópia registrada ainda.</span>';
-      return;
-    }
-    const typeMap = { base: 'Base', carousel: 'Carrossel', post: 'Post' };
-    el.innerHTML = items.map(item => {
-      const d = new Date(item.created_at);
-      const label = d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-      return `<div class="history-item" onclick="navigator.clipboard.writeText(${JSON.stringify(item.prompt_text)}).then(()=>toast('Prompt copiado!'))">
-        <span class="history-badge history-badge-${item.type}">${typeMap[item.type] || item.type}</span>
-        <span class="history-date">${label}</span>
-      </div>`;
-    }).join('');
   });
 }
 
@@ -336,6 +313,9 @@ const FIELD_TIPS = {
   pQuoteAuthor:'Nome de quem disse ou escreveu.',
   pQuoteRole:  'Cargo, empresa ou contexto de quem falou.',
   pArtBody:    'Corpo do mini artigo. Máximo de 3–4 linhas para caber no post.',
+  // Novos campos de conteúdo
+  cContent:    'Conteúdo bruto (texto, tópicos ou roteiro) que servirá de base para a geração dos slides do carrossel.',
+  pFreeText:   'Caso prefira colar a copy direta do post em formato livre, cole aqui. Esse texto será enviado no prompt.',
   // Post — Entrega
   pForbidden:  'Restrições visuais ou de conteúdo específicas para este post.',
   pDelivery:   'Como o código HTML do post será estruturado na entrega.',

@@ -79,15 +79,6 @@ const db = {
     await supabase.delete('brand_presets', presetId);
   },
 
-  // ── PROMPT HISTORY ──
-  async addHistory(brandId, type, promptText) {
-    const rows = await supabase.insert('prompt_history', { brand_id: brandId, type, prompt_text: promptText });
-    return rows[0];
-  },
-
-  async listHistory(brandId, limit = 10) {
-    return supabase.select('prompt_history', `?brand_id=eq.${brandId}&order=created_at.desc&limit=${limit}`);
-  },
 
   // ── FULL BRAND LOAD ──
   async loadFullBrand(id) {

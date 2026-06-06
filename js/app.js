@@ -52,20 +52,36 @@ const app = {
     this.loadBrandList();
     initScrollNav();
     initTooltips();
+
+    // Exibe ou oculta o botão do Painel Admin baseado nas app_metadata ou user_metadata
+    const user = auth.getUser();
+    const btnAdmin = document.getElementById('btnAdminPanel');
+    if (btnAdmin) {
+      const isAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
+      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+    }
   },
 
   // ── SCREENS ──
   showScreen(screen) {
     document.getElementById('screenList').style.display = screen === 'list' ? 'block' : 'none';
     document.getElementById('screenEditor').style.display = screen === 'editor' ? 'block' : 'none';
+    document.getElementById('screenAdmin').style.display = screen === 'admin' ? 'block' : 'none';
     document.getElementById('tabs').style.display = screen === 'editor' ? 'flex' : 'none';
     this.renderTopbar(screen);
+    if (screen === 'admin') {
+      this.loadAdminUsers();
+    }
   },
 
   renderTopbar(screen) {
     const el = document.getElementById('topbarActions');
     if (screen === 'list') {
       el.innerHTML = '';
+    } else if (screen === 'admin') {
+      el.innerHTML = `
+        <button class="btn btn-ghost topbar-back-btn" onclick="app.goHome()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span>Voltar</span></button>
+      `;
     } else {
       el.innerHTML = `
         <div class="topbar-menu-wrap">
@@ -79,8 +95,6 @@ const app = {
           </div>
         </div>
         <button class="btn btn-ghost topbar-back-btn" onclick="app.goHome()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span>Voltar</span></button>
-        <div class="topbar-divider-v"></div>
-        <button class="btn btn-ai btn-ai-primary" onclick="claudeGenerate.open(app.currentTab)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/></svg>Montar prompt</button>
         <button class="btn btn-ghost topbar-save-btn" onclick="app.save()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       `;
     }
@@ -182,21 +196,10 @@ const app = {
       switchTab('base');
       updatePreviews();
       renderPresets();
-      this.loadHistory();
       setTimeout(() => document.getElementById('bName')?.focus(), 150);
     } catch (e) {
       toast('Erro ao carregar marca: ' + e.message, 'error');
       setSaveStatus('error');
-    }
-  },
-
-  async loadHistory() {
-    if (!this.currentBrandId) return;
-    try {
-      const items = await db.listHistory(this.currentBrandId, 10);
-      renderHistoryList(items);
-    } catch (e) {
-      // Silencioso
     }
   },
 
@@ -250,7 +253,7 @@ const app = {
     set('cSequence', c.sequence); set('cFixedEl', c.fixed_elements);
     set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta);
 
-    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '';
+    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '', content = '';
     if (c.notes) {
       try {
         const parsed = JSON.parse(c.notes);
@@ -258,11 +261,12 @@ const app = {
           notes = parsed.notes || ''; forbidden = parsed.forbidden || '';
           delivery_format = parsed.delivery_format || delivery_format;
           font_base64 = parsed.font_base64 || font_base64; final_notes = parsed.final_notes || '';
+          content = parsed.content || '';
         } else { notes = c.notes; }
       } catch (e) { notes = c.notes; }
     }
     set('cNotes', notes); set('cForbidden', forbidden); set('cDelivery', delivery_format);
-    set('cFontB64', font_base64); set('cFinalNotes', final_notes);
+    set('cFontB64', font_base64); set('cFinalNotes', final_notes); set('cContent', content);
 
     if (c.logo_pos_hero) {
       document.querySelectorAll(`input[name="carLogoPosHero"]`).forEach(r => { if (r.value === c.logo_pos_hero) { r.checked = true; r.closest('.logo-pos-item')?.classList.add('selected'); } });
@@ -283,7 +287,22 @@ const app = {
     }
     if (p.formats) p.formats.forEach(fmt => { if (!this.postFmts.has(fmt)) togglePostFmt(fmt); });
     set('pHeadline', p.headline); set('pSubtitle', p.subtitle); set('pCta', p.cta);
-    set('pContentNotes', p.content_notes);
+    let content_notes = '', free_text = '';
+    if (p.content_notes) {
+      try {
+        const parsed = JSON.parse(p.content_notes);
+        if (parsed && typeof parsed === 'object') {
+          content_notes = parsed.content_notes || '';
+          free_text = parsed.free_text || '';
+        } else {
+          content_notes = p.content_notes;
+        }
+      } catch (e) {
+        content_notes = p.content_notes;
+      }
+    }
+    set('pContentNotes', content_notes);
+    set('pFreeText', free_text);
     set('pStatNum', p.stat_number); set('pStatCtx', p.stat_context); set('pStatSrc', p.stat_source);
     set('pCompA', p.comp_a); set('pCompB', p.comp_b);
     set('pAnPrice', p.anuncio_price); set('pAnBenefit', p.anuncio_benefit);
@@ -346,7 +365,8 @@ const app = {
   collectCarousel() {
     const notesData = {
       notes: f('cNotes'), forbidden: f('cForbidden'),
-      delivery_format: f('cDelivery'), font_base64: f('cFontB64'), final_notes: f('cFinalNotes')
+      delivery_format: f('cDelivery'), font_base64: f('cFontB64'), final_notes: f('cFinalNotes'),
+      content: f('cContent')
     };
     return {
       logo_pos_hero: getRadio('carLogoPosHero'), logo_pos_cta: getRadio('carLogoPosCta'),
@@ -358,12 +378,16 @@ const app = {
   },
 
   collectPost() {
+    const contentNotesData = {
+      content_notes: f('pContentNotes'),
+      free_text: f('pFreeText')
+    };
     return {
       logo_pos: getRadio('postLogoPos'),
       post_type: this.postType,
       formats: [...this.postFmts],
       headline: f('pHeadline'), subtitle: f('pSubtitle'), cta: f('pCta'),
-      content_notes: f('pContentNotes'),
+      content_notes: JSON.stringify(contentNotesData),
       items: this.chipData.pItems,
       stat_number: f('pStatNum'), stat_context: f('pStatCtx'), stat_source: f('pStatSrc'),
       comp_a: f('pCompA'), comp_b: f('pCompB'),
@@ -447,7 +471,6 @@ const app = {
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
     const activeBrandNameEl = document.getElementById('activeBrandName');
     if (activeBrandNameEl) { activeBrandNameEl.textContent = ''; activeBrandNameEl.style.display = 'none'; }
-    renderHistoryList([]);
   },
 
   // ── PRESETS ──
@@ -632,6 +655,110 @@ const app = {
     } catch (e) {
       toast('Erro ao excluir preset: ' + e.message, 'error');
     }
+  },
+
+  async loadAdminUsers() {
+    const listEl = document.getElementById('adminUserList');
+    if (!listEl) return;
+    listEl.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Carregando usuários...</td></tr>';
+    
+    try {
+      const token = localStorage.getItem('supabase_access_token');
+      const res = await fetch('/api/admin?action=listUsers', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erro ao carregar usuários');
+      }
+      const data = await res.json();
+      const users = data.users || [];
+      
+      if (users.length === 0) {
+        listEl.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Nenhum usuário encontrado.</td></tr>';
+        return;
+      }
+      
+      listEl.innerHTML = users.map(u => {
+        const created = new Date(u.created_at).toLocaleDateString('pt-BR') + ' ' + new Date(u.created_at).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+        const lastSignIn = u.last_sign_in_at 
+          ? new Date(u.last_sign_in_at).toLocaleDateString('pt-BR') + ' ' + new Date(u.last_sign_in_at).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
+          : '—';
+        const role = u.app_metadata?.role === 'admin' || u.user_metadata?.role === 'admin' ? 'admin' : 'user';
+        const roleLabel = role === 'admin' ? '<span class="admin-badge admin-badge-admin">Admin</span>' : '<span class="admin-badge admin-badge-user">Usuário</span>';
+        const toggleBtnLabel = role === 'admin' ? 'Remover Admin' : 'Tornar Admin';
+        const isSelf = u.id === auth.getUser()?.id;
+        
+        return `
+          <tr>
+            <td data-label="E-mail">${u.email}</td>
+            <td data-label="Função">${roleLabel}</td>
+            <td data-label="Criado em">${created}</td>
+            <td data-label="Último acesso">${lastSignIn}</td>
+            <td data-label="Ações" style="display:flex;gap:8px;">
+              ${isSelf ? '<span style="color:var(--muted);font-size:11px;padding:6px 0;">Você</span>' : `
+                <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;" onclick="app.toggleAdminStatus('${u.id}', '${role}')">${toggleBtnLabel}</button>
+                <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="app.deleteAdminUser('${u.id}', '${u.email}')">Excluir</button>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      listEl.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--red);">Erro: ${e.message}</td></tr>`;
+    }
+  },
+
+  async toggleAdminStatus(userId, currentRole) {
+    const newRole = currentRole === 'admin' ? 'user' : 'admin';
+    const msg = currentRole === 'admin' 
+      ? 'Deseja remover as permissões de administrador deste usuário?' 
+      : 'Deseja promover este usuário a administrador?';
+    if (!confirm(msg)) return;
+    
+    try {
+      const token = localStorage.getItem('supabase_access_token');
+      const res = await fetch('/api/admin?action=toggleAdmin', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, role: newRole })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erro ao alterar cargo');
+      }
+      toast('Cargo atualizado com sucesso!', 'success');
+      this.loadAdminUsers();
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    }
+  },
+
+  async deleteAdminUser(userId, email) {
+    if (!confirm(`Tem certeza que deseja excluir o usuário "${email}" permanentemente? Todas as marcas e configurações vinculadas a ele serão excluídas pelo banco.`)) return;
+    
+    try {
+      const token = localStorage.getItem('supabase_access_token');
+      const res = await fetch('/api/admin?action=deleteUser', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erro ao excluir usuário');
+      }
+      toast('Usuário excluído com sucesso!', 'success');
+      this.loadAdminUsers();
+    } catch (e) {
+      toast('Erro: ' + e.message, 'error');
+    }
   }
 };
 
@@ -640,6 +767,36 @@ function newBrand() { app.newBrand(); }
 function savePreset(type) { app.savePreset(type); }
 function applyPreset(index) { app.applyPreset(index); }
 function deletePreset(index) { app.deletePreset(index); }
+
+window.authMode = 'login';
+
+function toggleAuthMode() {
+  const authTitle = document.getElementById('authTitle');
+  const authSubtitle = document.getElementById('authSubtitle');
+  const authBtnText = document.getElementById('authBtnText');
+  const authSwitchText = document.getElementById('authSwitchText');
+  const authSwitchLink = document.getElementById('authSwitchLink');
+  const errorEl = document.getElementById('loginError');
+
+  errorEl.style.display = 'none';
+  errorEl.textContent = '';
+
+  if (window.authMode === 'login') {
+    window.authMode = 'signup';
+    authTitle.textContent = 'Criar Conta';
+    authSubtitle.textContent = 'Crie sua conta para começar a gerenciar suas marcas e gerar conteúdos.';
+    authBtnText.textContent = 'Cadastrar';
+    authSwitchText.textContent = 'Já tem uma conta?';
+    authSwitchLink.textContent = 'Fazer Login';
+  } else {
+    window.authMode = 'login';
+    authTitle.textContent = 'Acesso Restrito';
+    authSubtitle.textContent = 'Entre com suas credenciais do Supabase para gerenciar suas marcas.';
+    authBtnText.textContent = 'Entrar';
+    authSwitchText.textContent = 'Não tem uma conta?';
+    authSwitchLink.textContent = 'Criar conta';
+  }
+}
 
 async function handleLoginSubmit() {
   const emailEl = document.getElementById('loginEmail');
@@ -651,15 +808,34 @@ async function handleLoginSubmit() {
   errorEl.textContent = '';
   const originalBtnText = btnEl.innerHTML;
   btnEl.disabled = true;
-  btnEl.innerHTML = '<span class="spinner"></span> <span>Entrando...</span>';
+
+  if (window.authMode === 'signup') {
+    btnEl.innerHTML = '<span class="spinner"></span> <span>Cadastrando...</span>';
+  } else {
+    btnEl.innerHTML = '<span class="spinner"></span> <span>Entrando...</span>';
+  }
 
   try {
     const email = emailEl.value.trim();
     const password = passwordEl.value;
-    await auth.login(email, password);
-    app.showAuthenticatedApp();
-    emailEl.value = '';
-    passwordEl.value = '';
+
+    if (window.authMode === 'signup') {
+      const data = await auth.signup(email, password);
+      if (data.user && !data.access_token) {
+        toast('Cadastro realizado! Verifique seu e-mail para confirmação.', 'success');
+        toggleAuthMode();
+      } else {
+        toast('Cadastro e login realizados com sucesso!', 'success');
+        app.showAuthenticatedApp();
+        emailEl.value = '';
+        passwordEl.value = '';
+      }
+    } else {
+      await auth.login(email, password);
+      app.showAuthenticatedApp();
+      emailEl.value = '';
+      passwordEl.value = '';
+    }
   } catch (e) {
     errorEl.textContent = e.message;
     errorEl.style.display = 'block';

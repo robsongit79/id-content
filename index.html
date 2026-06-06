@@ -37,7 +37,10 @@
       <h1 class="list-title">Suas Marcas</h1>
       <p class="list-subtitle">Selecione uma marca para editar ou crie uma nova.</p>
     </div>
-    <button class="btn btn-base" onclick="app.showTemplateModal()">+ Nova marca</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" id="btnAdminPanel" onclick="app.showScreen('admin')" style="display:none;color:var(--acc-base);border-color:rgba(180,130,255,0.3);">Painel Admin</button>
+      <button class="btn btn-base" onclick="app.showTemplateModal()">+ Nova marca</button>
+    </div>
   </div>
   <div class="list-search-bar">
     <input type="text" id="brandSearch" placeholder="Buscar por nome, nicho ou handle..." oninput="app.filterBrands()" style="flex:1;max-width:360px;">
@@ -189,7 +192,6 @@
       <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="baseCopy()">⌘ Copiar prompt base</button><div class="copy-success" id="baseCopyMsg">✓ Copiado</div></div>
       <div class="info-box">As abas Carrossel e Post combinam a Base com os dados específicos de cada formato.</div>
-      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="baseHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
     </aside>
   </div>
   </div>
@@ -204,6 +206,7 @@
         <a href="#c2" class="nav-item" data-car="c2"><span class="nav-dot"></span> 02 · Estrutura</a>
         <a href="#c3" class="nav-item" data-car="c3"><span class="nav-dot"></span> 03 · Slides</a>
         <a href="#c4" class="nav-item" data-car="c4"><span class="nav-dot"></span> 04 · Entrega</a>
+        <a href="#c5" class="nav-item" data-car="c5"><span class="nav-dot"></span> 05 · Conteúdo</a>
       </div>
       <div class="sidebar-section car-prog">
         <div class="sidebar-label">Progresso</div>
@@ -265,8 +268,13 @@
           <div class="field"><label class="field-label">Fontes</label><select id="cFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="cFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
-        <div class="divider"></div>
-        <div class="field-group" style="margin-top:16px;">
+      </section>
+
+      <section class="section" id="c5">
+        <div class="section-header"><div><div class="section-num car-num">05</div><h2 class="section-title">Conteúdo</h2><p class="section-desc">Conteúdo bruto que servirá de base para a geração dos slides do carrossel.</p></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Conteúdo do carrossel</label><textarea id="cContent" placeholder="Cole o conteúdo bruto (roteiro, tópicos, ideias) aqui..." oninput="markDirty()" style="min-height:120px;"></textarea></div></div>
+        
+        <div class="preset-section">
           <div class="field">
             <label class="field-label">Presets de Layout para Carrossel</label>
             <div class="field-hint">Salve a combinação atual de cores, tipografia e estrutura de slides como um preset exclusivo desta marca.</div>
@@ -284,8 +292,7 @@
     <aside class="preview-panel">
       <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
-      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Carrossel. Cole no início de qualquer conversa.</div>
-      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="carHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o carrossel, cole este prompt unificado no Claude.</div>
     </aside>
   </div>
   </div>
@@ -299,9 +306,9 @@
         <a href="#p1" class="nav-item active" data-post="p1"><span class="nav-dot"></span> 01 · Logo</a>
         <a href="#p2" class="nav-item" data-post="p2"><span class="nav-dot"></span> 02 · Tipo</a>
         <a href="#p3" class="nav-item" data-post="p3"><span class="nav-dot"></span> 03 · Formatos</a>
-        <a href="#p4" class="nav-item" data-post="p4"><span class="nav-dot"></span> 04 · Conteúdo</a>
-        <a href="#p5" class="nav-item" data-post="p5"><span class="nav-dot"></span> 05 · Layout</a>
-        <a href="#p6" class="nav-item" data-post="p6"><span class="nav-dot"></span> 06 · Entrega</a>
+        <a href="#p4" class="nav-item" data-post="p4"><span class="nav-dot"></span> 04 · Layout</a>
+        <a href="#p5" class="nav-item" data-post="p5"><span class="nav-dot"></span> 05 · Entrega</a>
+        <a href="#p6" class="nav-item" data-post="p6"><span class="nav-dot"></span> 06 · Conteúdo</a>
       </div>
       <div class="sidebar-section post-prog">
         <div class="sidebar-label">Progresso</div>
@@ -356,9 +363,28 @@
         </div>
       </section>
       <section class="section" id="p4">
-        <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Conteúdo</h2></div></div>
+        <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Layout por Formato</h2></div></div>
+        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 03</div>
+      </section>
+
+      <section class="section" id="p5">
+        <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" placeholder="Ex: Não usar fundo branco neste post. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group cols-2">
+          <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
+          <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
+        </div>
+        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
+      </section>
+
+      <section class="section" id="p6">
+        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Conteúdo</h2></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Headline <span class="required">*</span></label><input type="text" id="pHeadline" placeholder="Ex: Você perde alunos sem saber por quê." oninput="markDirty()"></div></div>
         <div class="field-group cols-2"><div class="field"><label class="field-label">Subtítulo</label><input type="text" id="pSubtitle" placeholder="Ex: Veja como o CFC Produtivo resolve isso." oninput="markDirty()"></div><div class="field"><label class="field-label">CTA</label><input type="text" id="pCta" placeholder="Ex: Teste grátis por 14 dias →" oninput="markDirty()"></div></div>
+        
         <div id="pDynamic" style="display:none;">
           <div class="dynamic-fields">
             <div class="dynamic-label" id="pDynLabel">Campos específicos</div>
@@ -371,25 +397,18 @@
             <div id="pFieldArt" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Corpo</label><textarea id="pArtBody" placeholder="Ex: Gestão eficiente não começa com tecnologia — começa com processo. Quando você define o fluxo de atendimento antes de automatizar, o resultado é 3× mais rápido." oninput="markDirty()" style="min-height:90px;"></textarea></div></div></div>
           </div>
         </div>
-        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
-      </section>
-      <section class="section" id="p5">
-        <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Layout por Formato</h2></div></div>
-        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 03</div>
-      </section>
-      <section class="section" id="p6">
-        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" placeholder="Ex: Não usar fundo branco neste post. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
-          <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
+
+        <div class="field-group" style="margin-top:14px;">
+          <div class="field">
+            <label class="field-label">Texto livre / Copy do Post (Opcional)</label>
+            <div class="field-hint">Se preferir colar a copy pronta em vez de preencher os campos acima, use este campo.</div>
+            <textarea id="pFreeText" placeholder="Cole sua copy aqui..." oninput="markDirty()" style="min-height:100px;"></textarea>
+          </div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
-        <div class="divider"></div>
-        <div class="field-group" style="margin-top:16px;">
+
+        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
+
+        <div class="preset-section">
           <div class="field">
             <label class="field-label">Presets de Layout para Post</label>
             <div class="field-hint">Salve a combinação atual de cores, tipografia e posicionamento do post como um preset exclusivo desta marca.</div>
@@ -407,8 +426,7 @@
     <aside class="preview-panel">
       <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
-      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Inclui Base + Post. Cole no início de qualquer conversa.</div>
-      <div class="history-panel"><div class="history-label">Histórico de cópias</div><div id="postHistoryList" class="history-list"><span class="history-empty">Nenhuma cópia registrada ainda.</span></div></div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o post, cole este prompt unificado no Claude.</div>
     </aside>
   </div>
   </div>
@@ -459,21 +477,53 @@
   </div>
 </div>
 
+<!-- ══ ADMINISTRATIVE SCREEN ══ -->
+<div id="screenAdmin" class="screen" style="display:none;">
+  <div class="admin-header">
+    <div>
+      <h1 class="list-title">Painel Administrativo</h1>
+      <p class="list-subtitle">Gerencie as contas de usuários cadastrados e controle os privilégios de acesso.</p>
+    </div>
+  </div>
+  <div class="admin-container">
+    <div class="admin-table-card">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>E-mail</th>
+            <th>Função</th>
+            <th>Criado em</th>
+            <th>Último acesso</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserList">
+          <!-- Preenchido dinamicamente via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="screenLogin" class="login-screen" style="display:none;">
   <div class="login-card">
     <div class="login-header">
       <div class="login-logo">ID<span>Content</span></div>
-      <div class="login-title">Acesso Restrito</div>
-      <div class="login-subtitle">Entre com suas credenciais do Supabase para gerenciar suas marcas.</div>
+      <div class="login-title" id="authTitle">Acesso Restrito</div>
+      <div class="login-subtitle" id="authSubtitle">Entre com suas credenciais do Supabase para gerenciar suas marcas.</div>
     </div>
     <form class="login-form" id="loginForm" onsubmit="event.preventDefault(); handleLoginSubmit();">
       <input type="email" id="loginEmail" placeholder="E-mail" required autocomplete="username">
       <input type="password" id="loginPassword" placeholder="Senha" required autocomplete="current-password">
       <div id="loginError" class="login-error" style="display:none;"></div>
       <button type="submit" class="login-btn" id="loginBtn">
-        <span>Entrar</span>
+        <span id="authBtnText">Entrar</span>
       </button>
+      <div style="text-align:center;margin-top:10px;font-size:11px;">
+        <span id="authSwitchText" style="color:var(--muted);">Não tem uma conta?</span>
+        <a href="javascript:void(0)" id="authSwitchLink" onclick="toggleAuthMode()" style="color:var(--acc-base);font-weight:600;margin-left:4px;">Criar conta</a>
+      </div>
     </form>
   </div>
 </div>

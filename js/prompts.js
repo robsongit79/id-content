@@ -126,6 +126,18 @@ const prompts = {
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
     if (c4.length) s.push(`## ENTREGA\n${c4.join('\n')}`);
 
+    const content = f('cContent');
+    if (content) {
+      s.push(`---
+
+## CONTEÚDO DO CARROSSEL (TEXTO BRUTO / ROTEIRO)
+${content}
+
+---
+
+Com base na configuração acima, crie o carrossel completo em HTML usando o conteúdo fornecido.`);
+    }
+
     s.push(`---\nFIM — ${f('bName') || 'MARCA'} · CARROSSEL`);
     return s.join('\n\n');
   },
@@ -166,6 +178,7 @@ const prompts = {
       if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
     }
     if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
+    if (f('pFreeText'))     p4.push(`TEXTO LIVRE / COPY DIRETA:\n${f('pFreeText')}`);
     if (p4.length) s.push(`## CONTEÚDO\n${p4.join('\n')}`);
 
     const p5 = [];

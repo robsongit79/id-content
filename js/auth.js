@@ -1,5 +1,37 @@
 // Authentication management
 const auth = {
+  async signup(email, password) {
+    const url = `${SUPABASE_URL}/auth/v1/signup`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) {
+      let errMsg = 'Erro ao realizar cadastro.';
+      try {
+        const err = await res.json();
+        errMsg = err.error_description || err.msg || err.message || err.error || errMsg;
+      } catch (e) {
+        try {
+          const textErr = await res.text();
+          errMsg = textErr || res.statusText || errMsg;
+        } catch (innerErr) {
+          errMsg = res.statusText || errMsg;
+        }
+      }
+      throw new Error(errMsg);
+    }
+    const data = await res.json();
+    if (data.access_token) {
+      this.setSession(data);
+    }
+    return data;
+  },
+
   async login(email, password) {
     const url = `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
     const res = await fetch(url, {
