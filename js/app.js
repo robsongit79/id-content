@@ -3,6 +3,8 @@ const app = {
   currentBrandId: null,
   currentTab: 'base',
   isDirty: false,
+  isAdminUser: false,
+  currentBrandOriginalLogoUrl: null,
   chipData: { personality: [], goal: [], pItems: [], hashtag: [], topic: [] },
   presets: [],
   allBrands: [],
@@ -53,15 +55,24 @@ const app = {
     initScrollNav();
     initTooltips();
 
-    // Exibe ou oculta o botão do Painel Admin
+    // 1. Exibir mensagem de boas-vindas com e-mail do usuário
+    const user = auth.getUser();
+    const userWelcome = document.getElementById('userWelcome');
+    const userEmail = document.getElementById('userEmail');
+    if (user && user.email) {
+      if (userEmail) userEmail.textContent = user.email;
+      if (userWelcome) userWelcome.style.display = 'inline-flex';
+    }
+
+    // 2. Exibe ou oculta o botão do Painel Admin
     const btnAdmin = document.getElementById('btnAdminPanel');
     if (btnAdmin) {
-      // 1. Fallback imediato: verifica metadados locais do JWT
-      const user = auth.getUser();
+      // Fallback imediato: verifica metadados locais do JWT
       const isLocalAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
+      app.isAdminUser = !!isLocalAdmin;
       btnAdmin.style.display = isLocalAdmin ? 'inline-flex' : 'none';
 
-      // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
+      // Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
       try {
         const token = localStorage.getItem('supabase_access_token');
         if (token) {
@@ -73,11 +84,14 @@ const app = {
           if (res.ok) {
             const data = await res.json();
             if (data.isAdmin) {
+              app.isAdminUser = true;
               btnAdmin.style.display = 'inline-flex';
             } else {
+              app.isAdminUser = false;
               btnAdmin.style.display = 'none';
             }
           } else if (res.status === 403 || res.status === 401) {
+            app.isAdminUser = false;
             btnAdmin.style.display = 'none';
           }
         }
@@ -166,8 +180,28 @@ const app = {
     const sortEl = document.getElementById('brandSort');
     const q = searchEl ? searchEl.value.toLowerCase().trim() : '';
     const sort = sortEl ? sortEl.value : 'updated';
+    const user = auth.getUser();
 
     let filtered = this.allBrands.filter(b => {
+      // 1. Controle de Privacidade / Compartilhamento
+      if (user && !app.isAdminUser) {
+        let meta = null;
+        if (b.logo_url) {
+          try {
+            meta = JSON.parse(b.logo_url);
+          } catch(e) {}
+        }
+        
+        // Se houver um user_id registrado nos metadados, aplicamos a regra de visibilidade
+        if (meta && meta.user_id) {
+          const isOwner = meta.user_id === user.id;
+          const isShared = !!meta.is_shared;
+          if (!isOwner && !isShared) return false;
+        }
+        // Marcas sem meta ou sem user_id são públicas/legadas e aparecem para todos
+      }
+
+      // 2. Busca por texto
       if (!q) return true;
       return (b.name || '').toLowerCase().includes(q) || (b.niche || '').toLowerCase().includes(q) || (b.handle || '').toLowerCase().includes(q);
     });
@@ -189,7 +223,22 @@ const app = {
   // ── NEW BRAND ──
   async newBrand() {
     try {
-      const brand = await db.createBrand({ name: 'Nova marca', color_primary: '#1E40AF', color_secondary: '#3B82F6', color_accent: '#FFFFFF', color_dark: '#0A0F1E', color_light: '#F0F4FF', color_text: '#F5F0E8' });
+      const user = auth.getUser();
+      const meta = {
+        user_id: user ? user.id : null,
+        created_by: user ? user.email : null,
+        is_shared: false
+      };
+      const brand = await db.createBrand({ 
+        name: 'Nova marca', 
+        color_primary: '#1E40AF', 
+        color_secondary: '#3B82F6', 
+        color_accent: '#FFFFFF', 
+        color_dark: '#0A0F1E', 
+        color_light: '#F0F4FF', 
+        color_text: '#F5F0E8',
+        logo_url: JSON.stringify(meta)
+      });
       await this.openBrand(brand.id);
     } catch (e) {
       toast('Erro ao criar marca: ' + e.message, 'error');
@@ -206,6 +255,7 @@ const app = {
     try {
       const { brand, carousel, post, presets } = await db.loadFullBrand(id);
       if (brand) {
+        app.currentBrandOriginalLogoUrl = brand.logo_url;
         this.fillBrand(brand);
         const activeBrandNameEl = document.getElementById('activeBrandName');
         if (activeBrandNameEl) {
@@ -270,6 +320,26 @@ const app = {
 
     const bActive = document.getElementById('bLogoActive');
     if (bActive) bActive.checked = !!b.logo_active;
+
+    // Configura o checkbox de compartilhamento (apenas para Admin)
+    const adminShareSection = document.getElementById('adminShareSection');
+    const bIsShared = document.getElementById('bIsShared');
+    if (adminShareSection && bIsShared) {
+      if (app.isAdminUser) {
+        adminShareSection.style.display = 'block';
+      } else {
+        adminShareSection.style.display = 'none';
+      }
+      
+      let isShared = false;
+      if (b.logo_url) {
+        try {
+          const meta = JSON.parse(b.logo_url);
+          isShared = !!meta.is_shared;
+        } catch(e) {}
+      }
+      bIsShared.checked = isShared;
+    }
   },
 
   fillCarousel(c) {
@@ -355,11 +425,36 @@ const app = {
   },
 
   collectBrand() {
+    const user = auth.getUser();
+    
+    // Tenta carregar metadados anteriores do cache original para preservar dono
+    let meta = { user_id: null, is_shared: false, created_by: null };
+    if (app.currentBrandOriginalLogoUrl) {
+      try {
+        meta = JSON.parse(app.currentBrandOriginalLogoUrl);
+      } catch(e) {}
+    }
+    
+    // Se a marca não tiver user_id e o usuário atual existir, associamos
+    if (!meta.user_id && user) {
+      meta.user_id = user.id;
+      meta.created_by = user.email;
+    }
+    
+    // Se for admin, lemos o checkbox bIsShared
+    if (app.isAdminUser) {
+      const bIsShared = document.getElementById('bIsShared');
+      if (bIsShared) {
+        meta.is_shared = bIsShared.checked;
+      }
+    }
+
     return {
       name: f('bName') || 'Sem nome',
       handle: f('bHandle'), tagline: f('bTagline'), niche: f('bNiche'),
       positioning: f('bPositioning'),
       logo_active: document.getElementById('bLogoActive')?.checked || false,
+      logo_url: JSON.stringify(meta),
       color_primary: document.getElementById('cPrimaryHex')?.value,
       color_secondary: document.getElementById('cSecondaryHex')?.value,
       color_accent: document.getElementById('cAccentHex')?.value,
@@ -637,7 +732,19 @@ const app = {
     if (!tmpl) return;
     try {
       const { personality, goals, topics, hashtags, ...baseData } = tmpl.data;
-      const brand = await db.createBrand({ ...baseData, color_dark: baseData.color_dark || '#0A0F1E', color_light: baseData.color_light || '#F0F4FF', color_text: baseData.color_text || '#F5F0E8' });
+      const user = auth.getUser();
+      const meta = {
+        user_id: user ? user.id : null,
+        created_by: user ? user.email : null,
+        is_shared: false
+      };
+      const brand = await db.createBrand({ 
+        ...baseData, 
+        color_dark: baseData.color_dark || '#0A0F1E', 
+        color_light: baseData.color_light || '#F0F4FF', 
+        color_text: baseData.color_text || '#F5F0E8',
+        logo_url: JSON.stringify(meta)
+      });
       await this.openBrand(brand.id);
       if (personality) this.fillChips('personality', personality, 'personalityChips', 'personalityInput');
       if (goals) this.fillChips('goal', goals, 'goalChips', 'goalInput');

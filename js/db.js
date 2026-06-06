@@ -3,7 +3,7 @@ const db = {
 
   // ── BRANDS ──
   async listBrands() {
-    return supabase.select('brands', '?select=id,name,handle,niche,color_primary,color_secondary,color_accent,updated_at&order=updated_at.desc');
+    return supabase.select('brands', '?select=id,name,handle,niche,color_primary,color_secondary,color_accent,updated_at,logo_url&order=updated_at.desc');
   },
 
   async getBrand(id) {

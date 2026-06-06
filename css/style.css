@@ -616,3 +616,17 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .template-name{font-size:11px;font-weight:600;color:var(--text);}
 .modal-footer{padding:16px 28px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
 
+/* ══ USER WELCOME ══ */
+.user-welcome {
+  font-size: 11px;
+  color: var(--muted);
+  margin-right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.user-email {
+  color: var(--text-hi);
+  font-weight: 500;
+}
+
