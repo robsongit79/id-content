@@ -40,12 +40,16 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem acessar esta área.' });
   }
 
+  const { action } = req.query;
+
+  if (req.method === 'GET' && action === 'checkAdmin') {
+    return res.status(200).json({ isAdmin: true });
+  }
+
   // 3. Executar as ações com a Service Role Key
   if (!SUPABASE_SERVICE_ROLE_KEY) {
     return res.status(500).json({ error: 'SUPABASE_SERVICE_ROLE_KEY não configurada no servidor.' });
   }
-
-  const { action } = req.query;
 
   try {
     if (req.method === 'GET' && action === 'listUsers') {

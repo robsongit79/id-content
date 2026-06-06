@@ -45,7 +45,7 @@ const app = {
     document.getElementById('screenLogin').style.display = 'flex';
   },
 
-  showAuthenticatedApp() {
+  async showAuthenticatedApp() {
     document.getElementById('screenLogin').style.display = 'none';
     document.getElementById('btnLogout').style.display = 'inline-flex';
     this.showScreen('list');
@@ -53,12 +53,37 @@ const app = {
     initScrollNav();
     initTooltips();
 
-    // Exibe ou oculta o botão do Painel Admin baseado nas app_metadata ou user_metadata
-    const user = auth.getUser();
+    // Exibe ou oculta o botão do Painel Admin
     const btnAdmin = document.getElementById('btnAdminPanel');
     if (btnAdmin) {
-      const isAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
-      btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+      // 1. Fallback imediato: verifica metadados locais do JWT
+      const user = auth.getUser();
+      const isLocalAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
+      btnAdmin.style.display = isLocalAdmin ? 'inline-flex' : 'none';
+
+      // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
+      try {
+        const token = localStorage.getItem('supabase_access_token');
+        if (token) {
+          const res = await fetch('/api/admin?action=checkAdmin', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.isAdmin) {
+              btnAdmin.style.display = 'inline-flex';
+            } else {
+              btnAdmin.style.display = 'none';
+            }
+          } else if (res.status === 403 || res.status === 401) {
+            btnAdmin.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.warn('[Admin Check] Não foi possível validar permissões admin na API:', e.message);
+      }
     }
   },
 
