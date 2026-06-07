@@ -2,16 +2,26 @@
 const prompts = {
 
   highlight(text, sc) {
-    return text
+    // 1. Escapar caracteres HTML para que apareçam literalmente na tela
+    let escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // 2. Aplicar a colorização usando classes CSS
+    return escaped
       .replace(/^(# .*)/gm, `<span class="${sc}">$1</span>`)
       .replace(/^(## .*)/gm, `<span class="${sc}">$1</span>`)
       .replace(/^(---.*)/gm, '<span class="sep">$1</span>')
       .replace(/^([A-ZÀ-Ú\. \/&º:N]+:)\s+(.+)/gm, '<span class="key">$1</span> <span class="val">$2</span>')
+      // Adicionar destaque para as tags XML escapadas
+      .replace(/(&lt;\/?[a-z_]+&gt;)/g, '<span class="key" style="color:var(--accent2); font-weight:bold;">$1</span>')
       .replace(/\n/g, '<br>');
   },
 
   buildBase() {
     const s = [];
+    s.push(`<diretrizes_marca>`);
     s.push(`# BASE — ${f('bName') || 'MARCA'}\n# Identidade visual e tom de voz. Usada em todos os conteúdos.`);
 
     const s1 = [];
@@ -83,15 +93,21 @@ const prompts = {
     if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
     if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
 
-    if (s.length <= 1) return null;
+    s.push(`</diretrizes_marca>`);
+    if (s.length <= 3) return null;
     return s.join('\n\n');
   },
 
   buildCarousel() {
     const base = this.buildBase();
     if (!base) return null;
-    const s = [base];
-    s.push(`# CARROSSEL — ${f('bName') || 'MARCA'}\n# Combinar com a Base acima.`);
+    const s = [];
+    s.push(`# PROMPT UNIFICADO PARA CLAUDE / LLM\nUse as especificações abaixo para gerar o código do carrossel.`);
+    s.push(base);
+
+    const c = [];
+    c.push(`<configuracao_formato>`);
+    c.push(`# CARROSSEL — ${f('bName') || 'MARCA'}\n# Configurações do formato.`);
 
     const c1 = [];
     const lh = getRadio('carLogoPosHero'), lc = getRadio('carLogoPosCta');
@@ -104,49 +120,57 @@ const prompts = {
     } else {
       c1.push(`LOGO:           Nenhuma — não exibir placeholder nos slides de capa e CTA. O carrossel deve ser criado sem nenhum tipo de logo.`);
     }
-    if (c1.length) s.push(`## LOGO\n${c1.join('\n')}`);
+    if (c1.length) c.push(`## LOGO\n${c1.join('\n')}`);
 
     const c2 = [];
     if (f('cFormat'))    c2.push(`FORMATO:        ${f('cFormat')}`);
     if (f('cSlideCount'))c2.push(`Nº SLIDES:      ${f('cSlideCount')}`);
     if (f('cSequence'))  c2.push(`SEQUÊNCIA:      ${f('cSequence')}`);
     if (f('cFixedEl'))   c2.push(`FIXOS:          ${f('cFixedEl')}`);
-    if (c2.length) s.push(`## ESTRUTURA\n${c2.join('\n')}`);
+    if (c2.length) c.push(`## ESTRUTURA\n${c2.join('\n')}`);
 
     const c3 = [];
     if (f('cSlide1'))   c3.push(`SLIDE HERO:     ${f('cSlide1')}`);
     if (f('cSlideCta')) c3.push(`SLIDE CTA:      ${f('cSlideCta')}`);
     if (f('cNotes'))    c3.push(`NOTAS:          ${f('cNotes')}`);
-    if (c3.length) s.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
+    if (c3.length) c.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
 
     const c4 = [];
     if (f('cForbidden')) c4.push(`PROIBIDO:       ${f('cForbidden')}`);
     if (f('cDelivery'))  c4.push(`ENTREGA:        ${f('cDelivery')}`);
     if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
-    if (c4.length) s.push(`## ENTREGA\n${c4.join('\n')}`);
+    if (c4.length) c.push(`## ENTREGA\n${c4.join('\n')}`);
+    c.push(`</configuracao_formato>`);
+    s.push(c.join('\n\n'));
 
     const content = f('cContent');
     if (content) {
-      s.push(`---
-
-## CONTEÚDO DO CARROSSEL (TEXTO BRUTO / ROTEIRO)
-${content}
-
----
-
-Com base na configuração acima, crie o carrossel completo em HTML usando o conteúdo fornecido.`);
+      s.push(`<conteudo_bruto>\n${content}\n</conteudo_bruto>`);
     }
 
-    s.push(`---\nFIM — ${f('bName') || 'MARCA'} · CARROSSEL`);
+    s.push(`<instrucoes_saida>
+1. Atue como um desenvolvedor frontend sênior e web designer especialista em conversão.
+2. Crie o carrossel em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia e diretrizes visuais especificadas em <diretrizes_marca> e <configuracao_formato>.
+3. Utilize o roteiro e textos fornecidos em <conteudo_bruto> distribuindo-os harmonicamente entre os slides de conteúdo, capa e CTA.
+4. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+   - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
+   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.
+</instrucoes_saida>`);
+
     return s.join('\n\n');
   },
 
   buildPost() {
     const base = this.buildBase();
     if (!base) return null;
-    const s = [base];
-    s.push(`# POST — ${f('bName') || 'MARCA'}\n# Combinar com a Base acima.`);
+    const s = [];
+    s.push(`# PROMPT UNIFICADO PARA CLAUDE / LLM\nUse as especificações abaixo para gerar o código do post.`);
+    s.push(base);
+
+    const p = [];
+    p.push(`<configuracao_formato>`);
+    p.push(`# POST — ${f('bName') || 'MARCA'}\n# Configurações do formato.`);
 
     const p1 = [];
     const lp = getRadio('postLogoPos');
@@ -157,10 +181,10 @@ Com base na configuração acima, crie o carrossel completo em HTML usando o con
       p1.push(`LOGO DISPLAY:   Sempre exibir a logo em tamanho e proporção originais, com object-fit: contain. Nunca aplicar border-radius, overflow: hidden, recorte circular ou qualquer máscara de forma. O container deve se adaptar à logo, não o contrário.`);
     }
     else p1.push(`LOGO:           Nenhuma — não exibir placeholder. O post deve ser criado sem nenhum tipo de logo.`);
-    if (p1.length) s.push(`## LOGO\n${p1.join('\n')}`);
+    if (p1.length) p.push(`## LOGO\n${p1.join('\n')}`);
 
-    if (app.postType) s.push(`## TIPO\nTIPO:           ${app.postTypeConfig[app.postType].label}`);
-    if (app.postFmts.size) s.push(`## FORMATOS\nFORMATOS:       ${[...app.postFmts].join(', ')}\nGerar uma versão de layout adaptada para cada formato.`);
+    if (app.postType) p.push(`## TIPO\nTIPO:           ${app.postTypeConfig[app.postType].label}`);
+    if (app.postFmts.size) p.push(`## FORMATOS\nFORMATOS:       ${[...app.postFmts].join(', ')}\nGerar uma versão de layout adaptada para cada formato.`);
 
     const p4 = [];
     if (f('pHeadline')) p4.push(`HEADLINE:       ${f('pHeadline')}`);
@@ -178,23 +202,34 @@ Com base na configuração acima, crie o carrossel completo em HTML usando o con
       if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
     }
     if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
-    if (f('pFreeText'))     p4.push(`TEXTO LIVRE / COPY DIRETA:\n${f('pFreeText')}`);
-    if (p4.length) s.push(`## CONTEÚDO\n${p4.join('\n')}`);
+    const freeText = f('pFreeText');
+    if (freeText) p4.push(`TEXTO LIVRE / COPY DIRETA:\n${freeText}`);
+    if (p4.length) p.push(`## CONTEÚDO\n${p4.join('\n')}`);
 
     const p5 = [];
     if (app.postFmts.has('1x1')) { const l=[]; if(f('pL1TextPos'))l.push(`  TEXTO: ${f('pL1TextPos')}`); if(f('pL1Bg'))l.push(`  FUNDO: ${f('pL1Bg')}`); if(f('pL1Notes'))l.push(`  NOTAS: ${f('pL1Notes')}`); if(l.length)p5.push(`LAYOUT 1:1:\n${l.join('\n')}`); }
     if (app.postFmts.has('4x5')) { const l=[]; if(f('pL4TextPos'))l.push(`  TEXTO: ${f('pL4TextPos')}`); if(f('pL4Bg'))l.push(`  FUNDO: ${f('pL4Bg')}`); if(f('pL4Notes'))l.push(`  NOTAS: ${f('pL4Notes')}`); if(l.length)p5.push(`LAYOUT 4:5:\n${l.join('\n')}`); }
     if (app.postFmts.has('9x16')) { const l=[]; if(f('pL9TextPos'))l.push(`  TEXTO: ${f('pL9TextPos')}`); if(f('pL9Bg'))l.push(`  FUNDO: ${f('pL9Bg')}`); if(f('pL9Notes'))l.push(`  NOTAS: ${f('pL9Notes')}`); if(l.length)p5.push(`LAYOUT 9:16:\n${l.join('\n')}`); }
-    if (p5.length) s.push(`## LAYOUT\n${p5.join('\n\n')}`);
+    if (p5.length) p.push(`## LAYOUT\n${p5.join('\n\n')}`);
 
     const p6 = [];
     if (f('pForbidden')) p6.push(`PROIBIDO:       ${f('pForbidden')}`);
     if (f('pDelivery'))  p6.push(`ENTREGA:        ${f('pDelivery')}`);
     if (f('pFontB64'))   p6.push(`FONTES:         ${f('pFontB64')}`);
     if (f('pFinalNotes'))p6.push(`NOTAS:          ${f('pFinalNotes')}`);
-    if (p6.length) s.push(`## ENTREGA\n${p6.join('\n')}`);
+    if (p6.length) p.push(`## ENTREGA\n${p6.join('\n')}`);
+    p.push(`</configuracao_formato>`);
+    s.push(p.join('\n\n'));
 
-    s.push(`---\nFIM — ${f('bName') || 'MARCA'} · POST`);
+    s.push(`<instrucoes_saida>
+1. Atue como um desenvolvedor frontend sênior e designer especialista em conversão.
+2. Crie o layout do post em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia, formatos e regras visuais especificadas em <diretrizes_marca> e <configuracao_formato>.
+3. Utilize o conteúdo textual (Headline, Subtítulo, CTA, Citações ou Itens) fornecido em <configuracao_formato> ou <conteudo_bruto>.
+4. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+   - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\$).
+   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.
+</instrucoes_saida>`);
+
     return s.join('\n\n');
   }
 };
