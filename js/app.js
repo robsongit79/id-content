@@ -163,7 +163,7 @@ const app = {
     grid.innerHTML = '<div class="loading-state">Carregando marcas...</div>';
     try {
       this.allBrands = await db.listBrands();
-      this.renderBrandGrid(this.allBrands);
+      this.filterBrands();
     } catch (e) {
       grid.innerHTML = `<div class="empty-state"><h3>Erro ao carregar</h3><p>${e.message}</p></div>`;
     }
@@ -179,31 +179,48 @@ const app = {
         </div>`;
       return;
     }
-    grid.innerHTML = brands.map(b => `
-      <div class="brand-card" onclick="app.openBrand('${b.id}')">
-        <div class="brand-card-name">${b.name}</div>
-        <div class="brand-card-meta">${b.handle || '—'}${b.niche ? ' · ' + b.niche : ''}</div>
-        <div class="brand-card-colors">
-          <div class="color-dot" style="background:${b.color_primary || '#1E40AF'}" title="Primária"></div>
-          <div class="color-dot" style="background:${b.color_secondary || '#3B82F6'}" title="Secundária"></div>
-          <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
+    grid.innerHTML = brands.map(b => {
+      let meta = { is_shared: false };
+      if (b.logo_url) {
+        try {
+          meta = JSON.parse(b.logo_url) || meta;
+        } catch(e) {}
+      }
+      const isShared = !!meta.is_shared;
+      const shareBtnHtml = app.isAdminUser ? `
+        <button class="btn ${isShared ? 'btn-copy' : 'btn-ghost'}" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;${isShared ? 'border-color:var(--accent2);color:var(--accent2);' : ''}" onclick="event.stopPropagation(); app.toggleShareBrand('${b.id}')" title="Compartilhar com todos">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          <span>${isShared ? 'Compartilhado' : 'Compartilhar'}</span>
+        </button>
+      ` : '';
+
+      return `
+        <div class="brand-card" onclick="app.openBrand('${b.id}')">
+          <div class="brand-card-name">${b.name}</div>
+          <div class="brand-card-meta">${b.handle || '—'}${b.niche ? ' · ' + b.niche : ''}</div>
+          <div class="brand-card-colors">
+            <div class="color-dot" style="background:${b.color_primary || '#1E40AF'}" title="Primária"></div>
+            <div class="color-dot" style="background:${b.color_secondary || '#3B82F6'}" title="Secundária"></div>
+            <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
+          </div>
+          <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
+          <div class="brand-card-actions" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+            ${shareBtnHtml}
+            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.downloadBrandConfigById('${b.id}')" title="Baixar configuração">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Baixar</span>
+            </button>
+            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.duplicateBrand('${b.id}')" title="Duplicar marca">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Duplicar</span>
+            </button>
+            <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;justify-content:center;gap:0;width:30px;" onclick="event.stopPropagation(); app.deleteBrandById('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="Excluir marca">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
-        <div class="brand-card-actions" style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
-          <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.downloadBrandConfigById('${b.id}')" title="Baixar configuração">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span>Baixar</span>
-          </button>
-          <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.duplicateBrand('${b.id}')" title="Duplicar marca">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span>Duplicar</span>
-          </button>
-          <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;justify-content:center;gap:0;width:30px;" onclick="event.stopPropagation(); app.deleteBrandById('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="Excluir marca">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          </button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   },
 
   filterBrands() {
@@ -216,20 +233,16 @@ const app = {
     let filtered = this.allBrands.filter(b => {
       // 1. Controle de Privacidade / Compartilhamento
       if (user && !app.isAdminUser) {
-        let meta = null;
+        let meta = { user_id: null, is_shared: false };
         if (b.logo_url) {
           try {
-            meta = JSON.parse(b.logo_url);
+            meta = JSON.parse(b.logo_url) || meta;
           } catch(e) {}
         }
         
-        // Se houver um user_id registrado nos metadados, aplicamos a regra de visibilidade
-        if (meta && meta.user_id) {
-          const isOwner = meta.user_id === user.id;
-          const isShared = !!meta.is_shared;
-          if (!isOwner && !isShared) return false;
-        }
-        // Marcas sem meta ou sem user_id são públicas/legadas e aparecem para todos
+        const isOwner = meta.user_id === user.id;
+        const isShared = !!meta.is_shared;
+        if (!isOwner && !isShared) return false;
       }
 
       // 2. Busca por texto
@@ -1074,6 +1087,31 @@ const app = {
       await this.loadBrandList();
     } catch (e) {
       toast('Erro ao excluir: ' + e.message, 'error');
+    }
+  },
+
+  async toggleShareBrand(id) {
+    try {
+      const brand = this.allBrands.find(b => b.id === id);
+      if (!brand) return;
+
+      let meta = { user_id: null, is_shared: false, created_by: null };
+      if (brand.logo_url) {
+        try {
+          meta = JSON.parse(brand.logo_url) || meta;
+        } catch(e) {}
+      }
+
+      meta.is_shared = !meta.is_shared;
+      const updatedLogoUrl = JSON.stringify(meta);
+
+      await db.updateBrand(id, { logo_url: updatedLogoUrl });
+      toast(meta.is_shared ? 'Marca compartilhada com todos!' : 'Compartilhamento removido.', 'success');
+      
+      brand.logo_url = updatedLogoUrl;
+      this.filterBrands();
+    } catch (e) {
+      toast('Erro ao alterar compartilhamento: ' + e.message, 'error');
     }
   },
 
