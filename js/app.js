@@ -146,6 +146,8 @@ const app = {
             <button class="topbar-menu-item" onclick="carCopy();app.closeMenu()">⌘ Copiar prompt Carrossel</button>
             <button class="topbar-menu-item" onclick="postCopy();app.closeMenu()">⌘ Copiar prompt Post</button>
             <div class="topbar-menu-divider"></div>
+            <button class="topbar-menu-item" onclick="app.downloadBrandConfig();app.closeMenu()">Baixar configuração (.json)</button>
+            <div class="topbar-menu-divider"></div>
             <button class="topbar-menu-item topbar-menu-danger" onclick="app.confirmDelete();app.closeMenu()">Excluir marca</button>
           </div>
         </div>
@@ -187,6 +189,19 @@ const app = {
           <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
         </div>
         <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
+        <div class="brand-card-actions" style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.downloadBrandConfigById('${b.id}')" title="Baixar configuração">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Baixar</span>
+          </button>
+          <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.duplicateBrand('${b.id}')" title="Duplicar marca">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Duplicar</span>
+          </button>
+          <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;justify-content:center;gap:0;width:30px;" onclick="event.stopPropagation(); app.deleteBrandById('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="Excluir marca">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </button>
+        </div>
       </div>
     `).join('');
   },
@@ -728,13 +743,6 @@ const app = {
 
   // ── TEMPLATE MODAL ──
   showTemplateModal() {
-    const grid = document.getElementById('templateGrid');
-    grid.innerHTML = Object.entries(BRAND_TEMPLATES).map(([key, tmpl]) => `
-      <div class="template-card" onclick="app.newBrandFromTemplate('${key}')">
-        <div class="template-icon">${tmpl.icon}</div>
-        <div class="template-name">${tmpl.label}</div>
-      </div>
-    `).join('');
     document.getElementById('templateModal').style.display = 'flex';
   },
 
@@ -910,6 +918,262 @@ const app = {
       this.loadAdminUsers();
     } catch (e) {
       toast('Erro: ' + e.message, 'error');
+    }
+  },
+
+  async downloadBrandConfig() {
+    if (!this.currentBrandId) return;
+    try {
+      const brandData = this.collectBrand();
+      const carData = this.collectCarousel();
+      const postData = this.collectPost();
+      
+      const presetsData = this.presets.map(p => ({
+        name: p.name,
+        type: p.type,
+        colors: p.colors,
+        fonts: p.fonts,
+        layout: p.layout
+      }));
+
+      const config = {
+        version: "1.0",
+        brand: brandData,
+        carousel: carData,
+        post: postData,
+        presets: presetsData
+      };
+
+      const name = brandData.name || 'marca';
+      const filename = `marca_${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_config.json`;
+
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('Configuração baixada com sucesso!', 'success');
+    } catch (e) {
+      toast('Erro ao baixar configuração: ' + e.message, 'error');
+    }
+  },
+
+  async downloadBrandConfigById(id) {
+    try {
+      const configData = await db.loadFullBrand(id);
+      if (!configData || !configData.brand) {
+        throw new Error('Configuração da marca não encontrada.');
+      }
+      
+      const brandData = { ...configData.brand };
+      const carData = configData.carousel ? { ...configData.carousel } : null;
+      const postData = configData.post ? { ...configData.post } : null;
+      const presetsData = (configData.presets || []).map(p => ({
+        name: p.name,
+        type: p.type,
+        colors: p.colors,
+        fonts: p.fonts,
+        layout: p.layout
+      }));
+
+      const config = {
+        version: "1.0",
+        brand: brandData,
+        carousel: carData,
+        post: postData,
+        presets: presetsData
+      };
+
+      const name = brandData.name || 'marca';
+      const filename = `marca_${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_config.json`;
+
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('Configuração baixada com sucesso!', 'success');
+    } catch (e) {
+      toast('Erro ao baixar configuração: ' + e.message, 'error');
+    }
+  },
+
+  async duplicateBrand(id) {
+    try {
+      const configData = await db.loadFullBrand(id);
+      if (!configData || !configData.brand) {
+        throw new Error('Marca não encontrada para duplicação.');
+      }
+      
+      const user = auth.getUser();
+      const meta = {
+        user_id: user ? user.id : null,
+        created_by: user ? user.email : null,
+        is_shared: false
+      };
+
+      const newBrandData = { ...configData.brand };
+      delete newBrandData.id;
+      delete newBrandData.created_at;
+      delete newBrandData.updated_at;
+      newBrandData.name = `${newBrandData.name} (Cópia)`;
+      newBrandData.logo_url = JSON.stringify(meta);
+
+      const createdBrand = await db.createBrand(newBrandData);
+      if (!createdBrand || !createdBrand.id) {
+        throw new Error('Falha ao duplicar registro de marca.');
+      }
+
+      if (configData.carousel) {
+        const newCarData = { ...configData.carousel };
+        delete newCarData.id;
+        delete newCarData.brand_id;
+        await db.saveCarouselConfig(createdBrand.id, newCarData);
+      }
+
+      if (configData.post) {
+        const newPostData = { ...configData.post };
+        delete newPostData.id;
+        delete newPostData.brand_id;
+        await db.savePostConfig(createdBrand.id, newPostData);
+      }
+
+      if (Array.isArray(configData.presets)) {
+        for (const preset of configData.presets) {
+          const newPresetData = {
+            name: preset.name,
+            type: preset.type,
+            colors: preset.colors,
+            fonts: preset.fonts,
+            layout: preset.layout
+          };
+          await db.savePreset(createdBrand.id, null, newPresetData);
+        }
+      }
+
+      toast(`Marca duplicada com sucesso!`, 'success');
+      await this.loadBrandList();
+    } catch (e) {
+      toast('Erro ao duplicar marca: ' + e.message, 'error');
+    }
+  },
+
+  async deleteBrandById(id, name) {
+    if (!confirm(`Excluir "${name}"? Esta ação não pode ser desfeita.`)) return;
+    try {
+      await db.deleteBrand(id);
+      toast('Marca excluída com sucesso.', 'success');
+      await this.loadBrandList();
+    } catch (e) {
+      toast('Erro ao excluir: ' + e.message, 'error');
+    }
+  },
+
+  handleBrandImportFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    this.readAndImportBrandFile(file);
+  },
+
+  handleBrandImportDrop(e) {
+    e.preventDefault();
+    const area = document.getElementById('importArea');
+    if (area) {
+      area.style.borderColor = 'var(--border-hi)';
+      area.style.background = 'rgba(255, 255, 255, 0.01)';
+    }
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    this.readAndImportBrandFile(file);
+  },
+
+  readAndImportBrandFile(file) {
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      toast('Por favor, envie apenas arquivos no formato JSON (.json).', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const configData = JSON.parse(event.target.result);
+        await this.importBrandConfig(configData);
+      } catch (err) {
+        toast('Erro ao processar JSON: ' + err.message, 'error');
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  async importBrandConfig(configData) {
+    if (!configData || !configData.brand) {
+      toast('Arquivo JSON inválido. A propriedade "brand" é obrigatória.', 'error');
+      return;
+    }
+
+    const user = auth.getUser();
+    const meta = {
+      user_id: user ? user.id : null,
+      created_by: user ? user.email : null,
+      is_shared: false
+    };
+
+    setSaveStatus('saving');
+    try {
+      const newBrandData = { ...configData.brand };
+      
+      delete newBrandData.id;
+      delete newBrandData.created_at;
+      delete newBrandData.updated_at;
+      
+      newBrandData.logo_url = JSON.stringify(meta);
+
+      const createdBrand = await db.createBrand(newBrandData);
+      if (!createdBrand || !createdBrand.id) {
+        throw new Error('Falha ao criar o registro de marca.');
+      }
+
+      if (configData.carousel) {
+        const newCarData = { ...configData.carousel };
+        delete newCarData.id;
+        delete newCarData.brand_id;
+        await db.saveCarouselConfig(createdBrand.id, newCarData);
+      }
+
+      if (configData.post) {
+        const newPostData = { ...configData.post };
+        delete newPostData.id;
+        delete newPostData.brand_id;
+        await db.savePostConfig(createdBrand.id, newPostData);
+      }
+
+      if (Array.isArray(configData.presets)) {
+        for (const preset of configData.presets) {
+          const newPresetData = {
+            name: preset.name,
+            type: preset.type,
+            colors: preset.colors,
+            fonts: preset.fonts,
+            layout: preset.layout
+          };
+          await db.savePreset(createdBrand.id, null, newPresetData);
+        }
+      }
+
+      await this.loadBrandList();
+      await this.openBrand(createdBrand.id);
+      this.closeTemplateModal();
+      toast(`Marca "${createdBrand.name}" importada com sucesso!`, 'success');
+    } catch (e) {
+      setSaveStatus('error');
+      toast('Erro ao importar marca: ' + e.message, 'error');
     }
   }
 };
