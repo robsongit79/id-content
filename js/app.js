@@ -58,20 +58,22 @@ const app = {
       userEmail.textContent = user.email;
     }
 
+    // Fallback imediato: verifica metadados locais do JWT antes de carregar marcas
+    const isLocalAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
+    app.isAdminUser = !!isLocalAdmin;
+
+    const btnAdmin = document.getElementById('btnAdminPanel');
+    if (btnAdmin) {
+      btnAdmin.style.display = isLocalAdmin ? 'inline-flex' : 'none';
+    }
+
     this.showScreen('list');
     this.loadBrandList();
     initScrollNav();
     initTooltips();
 
-    // 2. Exibe ou oculta o botão do Painel Admin
-    const btnAdmin = document.getElementById('btnAdminPanel');
+    // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
     if (btnAdmin) {
-      // Fallback imediato: verifica metadados locais do JWT
-      const isLocalAdmin = user && (user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin');
-      app.isAdminUser = !!isLocalAdmin;
-      btnAdmin.style.display = isLocalAdmin ? 'inline-flex' : 'none';
-
-      // Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
       try {
         const token = localStorage.getItem('supabase_access_token');
         if (token) {
@@ -82,6 +84,7 @@ const app = {
           });
           if (res.ok) {
             const data = await res.json();
+            const originalAdminState = app.isAdminUser;
             if (data.isAdmin) {
               app.isAdminUser = true;
               btnAdmin.style.display = 'inline-flex';
@@ -89,9 +92,17 @@ const app = {
               app.isAdminUser = false;
               btnAdmin.style.display = 'none';
             }
+            // Se o estado de administrador mudou após a checagem da API, re-renderiza o grid
+            if (originalAdminState !== app.isAdminUser) {
+              this.filterBrands();
+            }
           } else if (res.status === 403 || res.status === 401) {
+            const originalAdminState = app.isAdminUser;
             app.isAdminUser = false;
             btnAdmin.style.display = 'none';
+            if (originalAdminState !== app.isAdminUser) {
+              this.filterBrands();
+            }
           }
         }
       } catch (e) {
