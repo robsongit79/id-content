@@ -263,6 +263,20 @@ function togglePostAdvanced() {
   }
 }
 
+function toggleCarAdvanced() {
+  const adv = document.getElementById('cAdvancedOptions');
+  const btn = document.getElementById('cToggleAdvancedBtn');
+  if (!adv || !btn) return;
+  
+  if (adv.style.display === 'none') {
+    adv.style.display = 'block';
+    btn.querySelector('span').textContent = 'Ocultar Configurações Avançadas';
+  } else {
+    adv.style.display = 'none';
+    btn.querySelector('span').textContent = 'Mostrar Configurações Avançadas de Exportação';
+  }
+}
+
 // ── DIRTY / SAVE STATUS ──
 let saveTimer = null;
 
