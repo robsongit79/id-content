@@ -14,14 +14,11 @@ const prompts = {
       .replace(/^(## .*)/gm, `<span class="${sc}">$1</span>`)
       .replace(/^(---.*)/gm, '<span class="sep">$1</span>')
       .replace(/^([A-ZÀ-Ú\. \/&º:N]+:)\s+(.+)/gm, '<span class="key">$1</span> <span class="val">$2</span>')
-      // Adicionar destaque para as tags XML escapadas
-      .replace(/(&lt;\/?[a-z_]+&gt;)/g, '<span class="key" style="color:var(--accent2); font-weight:bold;">$1</span>')
       .replace(/\n/g, '<br>');
   },
 
   buildBase() {
     const s = [];
-    s.push(`<diretrizes_marca>`);
     s.push(`# BASE — ${f('bName') || 'MARCA'}\n# Identidade visual e tom de voz. Usada em todos os conteúdos.`);
 
     const s1 = [];
@@ -93,8 +90,7 @@ const prompts = {
     if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
     if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
 
-    s.push(`</diretrizes_marca>`);
-    if (s.length <= 3) return null;
+    if (s.length <= 1) return null;
     return s.join('\n\n');
   },
 
@@ -106,7 +102,6 @@ const prompts = {
     s.push(base);
 
     const c = [];
-    c.push(`<configuracao_formato>`);
     c.push(`# CARROSSEL — ${f('bName') || 'MARCA'}\n# Configurações do formato.`);
 
     const c1 = [];
@@ -141,22 +136,26 @@ const prompts = {
     if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
     if (c4.length) c.push(`## ENTREGA\n${c4.join('\n')}`);
-    c.push(`</configuracao_formato>`);
     s.push(c.join('\n\n'));
 
     const content = f('cContent');
     if (content) {
-      s.push(`<conteudo_bruto>\n${content}\n</conteudo_bruto>`);
+      s.push(`# CONTEÚDO BRUTO\n${content}`);
     }
 
-    s.push(`<instrucoes_saida>
+    s.push(`# INSTRUÇÕES DE SAÍDA
 1. Atue como um desenvolvedor frontend sênior e web designer especialista em conversão.
-2. Crie o carrossel em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia e diretrizes visuais especificadas em <diretrizes_marca> e <configuracao_formato>.
-3. Utilize o roteiro e textos fornecidos em <conteudo_bruto> distribuindo-os harmonicamente entre os slides de conteúdo, capa e CTA.
-4. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+2. Crie o carrossel em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia e diretrizes visuais especificadas nas seções anteriores.
+3. Utilize o roteiro e textos fornecidos em CONTEÚDO BRUTO distribuindo-os harmonicamente entre os slides de conteúdo, capa e CTA.
+4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
+   - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
+   - Certifique-se de incluir a tag `<meta charset="UTF-8">` na seção `<head>` do HTML.
+5. **VISUAL DAS FONTES (CRÍTICO):**
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando `@import` no topo da tag `<style>` ou links `<link>` no `<head>` para garantir que o visual do carrossel seja mantido.
+6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
-   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.
-</instrucoes_saida>`);
+   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
     return s.join('\n\n');
   },
@@ -169,7 +168,6 @@ const prompts = {
     s.push(base);
 
     const p = [];
-    p.push(`<configuracao_formato>`);
     p.push(`# POST — ${f('bName') || 'MARCA'}\n# Configurações do formato.`);
 
     const p1 = [];
@@ -218,17 +216,21 @@ const prompts = {
     if (f('pFontB64'))   p6.push(`FONTES:         ${f('pFontB64')}`);
     if (f('pFinalNotes'))p6.push(`NOTAS:          ${f('pFinalNotes')}`);
     if (p6.length) p.push(`## ENTREGA\n${p6.join('\n')}`);
-    p.push(`</configuracao_formato>`);
     s.push(p.join('\n\n'));
 
-    s.push(`<instrucoes_saida>
+    s.push(`# INSTRUÇÕES DE SAÍDA
 1. Atue como um desenvolvedor frontend sênior e designer especialista em conversão.
-2. Crie o layout do post em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia, formatos e regras visuais especificadas em <diretrizes_marca> e <configuracao_formato>.
-3. Utilize o conteúdo textual (Headline, Subtítulo, CTA, Citações ou Itens) fornecido em <configuracao_formato> ou <conteudo_bruto>.
-4. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
-   - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\$).
-   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.
-</instrucoes_saida>`);
+2. Crie o layout do post em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia, formatos e regras visuais especificadas nas seções anteriores.
+3. Utilize o conteúdo textual (Headline, Subtítulo, CTA, Citações ou Itens) fornecido nas especificações de conteúdo.
+4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
+   - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
+   - Certifique-se de incluir a tag `<meta charset="UTF-8">` na seção `<head>` do HTML.
+5. **VISUAL DAS FONTES (CRÍTICO):**
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando `@import` no topo da tag `<style>` ou links `<link>` no `<head>` para garantir que o visual do post seja mantido.
+6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+   - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
+   - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
     return s.join('\n\n');
   }
