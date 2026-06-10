@@ -1278,7 +1278,6 @@ const app = {
 };
 
 // ── GLOBAL SHORTCUTS ──
-function newBrand() { app.newBrand(); }
 function savePreset(type) { app.savePreset(type); }
 function applyPreset(index) { app.applyPreset(index); }
 function deletePreset(index) { app.deletePreset(index); }
