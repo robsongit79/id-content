@@ -437,13 +437,14 @@ const app = {
     }
     if (p.formats) p.formats.forEach(fmt => { if (!this.postFmts.has(fmt)) togglePostFmt(fmt); });
     set('pHeadline', p.headline); set('pSubtitle', p.subtitle); set('pCta', p.cta);
-    let content_notes = '', free_text = '';
+    let content_notes = '', free_text = '', unified_layout = false;
     if (p.content_notes) {
       try {
         const parsed = JSON.parse(p.content_notes);
         if (parsed && typeof parsed === 'object') {
           content_notes = parsed.content_notes || '';
           free_text = parsed.free_text || '';
+          unified_layout = !!parsed.unified_layout;
         } else {
           content_notes = p.content_notes;
         }
@@ -453,6 +454,17 @@ const app = {
     }
     set('pContentNotes', content_notes);
     set('pFreeText', free_text);
+
+    const pUnified = document.getElementById('pUnifiedLayout');
+    if (pUnified) {
+      pUnified.checked = unified_layout;
+    }
+    if (unified_layout) {
+      set('pUnifiedTextPos', p.layout_1x1_text_pos || '');
+      set('pUnifiedBg', p.layout_1x1_bg || '');
+      set('pUnifiedNotes', p.layout_1x1_notes || '');
+    }
+
     set('pStatNum', p.stat_number); set('pStatCtx', p.stat_context); set('pStatSrc', p.stat_source);
     set('pCompA', p.comp_a); set('pCompB', p.comp_b);
     set('pAnPrice', p.anuncio_price); set('pAnBenefit', p.anuncio_benefit);
@@ -465,6 +477,10 @@ const app = {
     set('pForbidden', p.forbidden); set('pDelivery', p.delivery_format); set('pFontB64', p.font_base64);
     set('pFinalNotes', p.final_notes);
     if (p.items) this.fillChips('pItems', p.items, 'pItemsChips', 'pItemsInput');
+    
+    if (typeof syncUnifiedLayout === 'function') {
+      syncUnifiedLayout();
+    }
   },
 
   fillChips(key, values, wrapId, inputId) {
@@ -555,7 +571,8 @@ const app = {
   collectPost() {
     const contentNotesData = {
       content_notes: f('pContentNotes'),
-      free_text: f('pFreeText')
+      free_text: f('pFreeText'),
+      unified_layout: document.getElementById('pUnifiedLayout')?.checked || false
     };
     return {
       logo_pos: getRadio('postLogoPos'),
@@ -739,9 +756,38 @@ const app = {
       if (lp) document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => { const s = r.value === lp; r.checked = s; r.closest('.logo-pos-item')?.classList.toggle('selected', s); });
       if (preset.layout.post_type) { const card = document.querySelector(`input[name="pType"][value="${preset.layout.post_type}"]`); if (card) selectPostType(card.closest('.type-card'), preset.layout.post_type); }
       if (preset.layout.formats) { app.postFmts.clear(); document.querySelectorAll(`.post-fmt`).forEach(c => c.classList.remove('checked')); preset.layout.formats.forEach(fmt => togglePostFmt(fmt)); }
+      
+      let content_notes = '', free_text = '', unified_layout = false;
+      if (preset.layout.content_notes) {
+        try {
+          const parsed = JSON.parse(preset.layout.content_notes);
+          if (parsed && typeof parsed === 'object') {
+            content_notes = parsed.content_notes || '';
+            free_text = parsed.free_text || '';
+            unified_layout = !!parsed.unified_layout;
+          } else {
+            content_notes = preset.layout.content_notes;
+          }
+        } catch (e) {
+          content_notes = preset.layout.content_notes;
+        }
+      }
+
+      const pUnified = document.getElementById('pUnifiedLayout');
+      if (pUnified) {
+        pUnified.checked = unified_layout;
+      }
+      if (unified_layout) {
+        setVal('pUnifiedTextPos', preset.layout.layout_1x1_text_pos || '');
+        setVal('pUnifiedBg', preset.layout.layout_1x1_bg || '');
+        setVal('pUnifiedNotes', preset.layout.layout_1x1_notes || '');
+      }
+
       const pFields = {
         pHeadline: preset.layout.headline, pSubtitle: preset.layout.subtitle, pCta: preset.layout.cta,
-        pContentNotes: preset.layout.content_notes, pStatNum: preset.layout.stat_number,
+        pContentNotes: content_notes,
+        pFreeText: free_text,
+        pStatNum: preset.layout.stat_number,
         pStatCtx: preset.layout.stat_context, pStatSrc: preset.layout.stat_source,
         pCompA: preset.layout.comp_a, pCompB: preset.layout.comp_b,
         pAnPrice: preset.layout.anuncio_price, pAnBenefit: preset.layout.anuncio_benefit,
@@ -757,6 +803,10 @@ const app = {
       Object.entries(pFields).forEach(([id, val]) => setVal(id, val));
       const items = preset.layout.items || [];
       this.fillChips('pItems', items, 'pItemsChips', 'pItemsInput');
+      
+      if (typeof syncUnifiedLayout === 'function') {
+        syncUnifiedLayout();
+      }
     }
 
     markDirty();

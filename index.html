@@ -314,11 +314,11 @@
       <div class="sidebar-section post-nav">
         <div class="sidebar-label">Seções</div>
         <a href="#p1" class="nav-item active" data-post="p1"><span class="nav-dot"></span> 01 · Logo</a>
-        <a href="#p2" class="nav-item" data-post="p2"><span class="nav-dot"></span> 02 · Tipo</a>
-        <a href="#p3" class="nav-item" data-post="p3"><span class="nav-dot"></span> 03 · Formatos</a>
-        <a href="#p4" class="nav-item" data-post="p4"><span class="nav-dot"></span> 04 · Layout</a>
-        <a href="#p5" class="nav-item" data-post="p5"><span class="nav-dot"></span> 05 · Entrega</a>
-        <a href="#p6" class="nav-item" data-post="p6"><span class="nav-dot"></span> 06 · Conteúdo</a>
+        <a href="#p2" class="nav-item" data-post="p2"><span class="nav-dot"></span> 02 · Tipo de Post</a>
+        <a href="#p6" class="nav-item" data-post="p6"><span class="nav-dot"></span> 03 · Conteúdo</a>
+        <a href="#p3" class="nav-item" data-post="p3"><span class="nav-dot"></span> 04 · Formatos</a>
+        <a href="#p4" class="nav-item" data-post="p4"><span class="nav-dot"></span> 05 · Layout</a>
+        <a href="#p5" class="nav-item" data-post="p5"><span class="nav-dot"></span> 06 · Entrega</a>
       </div>
       <div class="sidebar-section post-prog">
         <div class="sidebar-label">Progresso</div>
@@ -330,6 +330,21 @@
       </div>
     </nav>
     <main class="main" id="postMain">
+      <!-- Presets de Post no Topo -->
+      <div class="preset-section">
+        <div class="field">
+          <label class="field-label">Presets de Layout para Post</label>
+          <div class="field-hint">Carregue ou salve uma combinação de cores, tipografia e posicionamento como um modelo rápido.</div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <input type="text" id="pPresetName" placeholder="Nome do preset (ex: Post de Citação)..." style="flex:1;">
+            <button type="button" class="btn btn-post" onclick="savePreset('post')">Salvar Preset</button>
+          </div>
+          <div id="pPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
+            <!-- Injetado dinamicamente via JS -->
+          </div>
+        </div>
+      </div>
+
       <section class="section" id="p1">
         <div class="section-header"><div><div class="section-num post-num">01</div><h2 class="section-title">Posicionamento da Logo</h2></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Posição da logo no post</label>
@@ -363,39 +378,9 @@
           <div class="type-card" onclick="selectPostType(this,'mini-artigo')"><input type="radio" name="pType" value="mini-artigo"><div class="type-category">Autoridade</div><span class="type-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span class="type-name">Mini artigo</span><span class="type-desc">Conteúdo conceitual mais denso, composto por título, introdução e corpo, focado em educar e elevar consciência.</span></div>
         </div>
         <div id="pTypeInfo" style="display:none;margin-top:10px;padding:10px 14px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:6px;font-size:12px;color:var(--acc-post);">✓ Tipo: <strong id="pTypeLabel"></strong></div>
-      </section>
-      <section class="section" id="p3">
-        <div class="section-header"><div><div class="section-num post-num">03</div><h2 class="section-title">Formatos</h2></div></div>
-        <div class="format-row">
-          <div class="format-card post-fmt" id="pFmt1x1" onclick="togglePostFmt('1x1')"><div class="format-visual format-sq"></div><div><div class="format-label">Feed Quadrado</div><div class="format-ratio">1080×1080 · 1:1</div></div><div class="format-check" id="pCheck1x1">✓</div></div>
-          <div class="format-card post-fmt" id="pFmt4x5" onclick="togglePostFmt('4x5')"><div class="format-visual format-port"></div><div><div class="format-label">Feed Retrato</div><div class="format-ratio">1080×1350 · 4:5</div></div><div class="format-check" id="pCheck4x5">✓</div></div>
-          <div class="format-card post-fmt" id="pFmt9x16" onclick="togglePostFmt('9x16')"><div class="format-visual format-stor"></div><div><div class="format-label">Stories / Reels</div><div class="format-ratio">1080×1920 · 9:16</div></div><div class="format-check" id="pCheck9x16">✓</div></div>
-        </div>
-      </section>
-      <section class="section" id="p4">
-        <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Layout por Formato</h2></div></div>
-        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 03</div>
-      </section>
 
-      <section class="section" id="p5">
-        <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" placeholder="Ex: Não usar fundo branco neste post. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
-          <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
-      </section>
-
-      <section class="section" id="p6">
-        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Conteúdo</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Headline <span class="required">*</span></label><input type="text" id="pHeadline" placeholder="Ex: Você perde alunos sem saber por quê." oninput="markDirty()"></div></div>
-        <div class="field-group cols-2"><div class="field"><label class="field-label">Subtítulo</label><input type="text" id="pSubtitle" placeholder="Ex: Veja como o CFC Produtivo resolve isso." oninput="markDirty()"></div><div class="field"><label class="field-label">CTA</label><input type="text" id="pCta" placeholder="Ex: Teste grátis por 14 dias →" oninput="markDirty()"></div></div>
-        
-        <div id="pDynamic" style="display:none;">
+        <!-- Campos Dinâmicos do Tipo de Post Integrados no Fluxo -->
+        <div id="pDynamic" style="display:none; margin-top:14px;">
           <div class="dynamic-fields">
             <div class="dynamic-label" id="pDynLabel">Campos específicos</div>
             <div id="pFieldItems" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Itens</label><div class="chips-wrap" id="pItemsChips" onclick="document.getElementById('pItemsInput').focus()"><input class="chip-input" id="pItemsInput" placeholder="Item e Enter" onkeydown="addChip(event,'pItemsChips','pItems')"></div></div></div></div>
@@ -407,6 +392,12 @@
             <div id="pFieldArt" style="display:none;"><div class="field-group"><div class="field"><label class="field-label">Corpo</label><textarea id="pArtBody" placeholder="Ex: Gestão eficiente não começa com tecnologia — começa com processo. Quando você define o fluxo de atendimento antes de automatizar, o resultado é 3× mais rápido." oninput="markDirty()" style="min-height:90px;"></textarea></div></div></div>
           </div>
         </div>
+      </section>
+
+      <section class="section" id="p6">
+        <div class="section-header"><div><div class="section-num post-num">03</div><h2 class="section-title">Conteúdo do Post</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">Headline <span class="required">*</span></label><input type="text" id="pHeadline" placeholder="Ex: Você perde alunos sem saber por quê." oninput="markDirty()"></div></div>
+        <div class="field-group cols-2"><div class="field"><label class="field-label">Subtítulo</label><input type="text" id="pSubtitle" placeholder="Ex: Veja como o CFC Produtivo resolve isso." oninput="markDirty()"></div><div class="field"><label class="field-label">CTA</label><input type="text" id="pCta" placeholder="Ex: Teste grátis por 14 dias →" oninput="markDirty()"></div></div>
 
         <div class="field-group" style="margin-top:14px;">
           <div class="field">
@@ -417,23 +408,117 @@
         </div>
 
         <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
+      </section>
 
-        <div class="preset-section">
+      <section class="section" id="p3">
+        <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Formatos</h2></div></div>
+        <div class="format-row">
+          <div class="format-card post-fmt" id="pFmt1x1" onclick="togglePostFmt('1x1')"><div class="format-visual format-sq"></div><div><div class="format-label">Feed Quadrado</div><div class="format-ratio">1080×1080 · 1:1</div></div><div class="format-check" id="pCheck1x1">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt4x5" onclick="togglePostFmt('4x5')"><div class="format-visual format-port"></div><div><div class="format-label">Feed Retrato</div><div class="format-ratio">1080×1350 · 4:5</div></div><div class="format-check" id="pCheck4x5">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt9x16" onclick="togglePostFmt('9x16')"><div class="format-visual format-stor"></div><div><div class="format-label">Stories / Reels</div><div class="format-ratio">1080×1920 · 9:16</div></div><div class="format-check" id="pCheck9x16">✓</div></div>
+        </div>
+      </section>
+
+      <section class="section" id="p4">
+        <div class="section-header"><div><div class="section-num post-num">05</div><h2 class="section-title">Layout do Post</h2></div></div>
+        
+        <!-- Opção de Unificar Layout -->
+        <div class="field-group" style="margin-bottom:14px;">
           <div class="field">
-            <label class="field-label">Presets de Layout para Post</label>
-            <div class="field-hint">Salve a combinação atual de cores, tipografia e posicionamento do post como um preset exclusivo desta marca.</div>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <input type="text" id="pPresetName" placeholder="Nome do preset (ex: Post de Citação)..." style="flex:1;">
-              <button type="button" class="btn btn-post" onclick="savePreset('post')">Salvar Preset</button>
+            <label class="field-label" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+              <input type="checkbox" id="pUnifiedLayout" onchange="syncUnifiedLayout();markDirty()" style="width:16px;height:16px;cursor:pointer;">
+              <span style="font-weight:600;color:var(--acc-post);">Mesmo layout para todos os formatos</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Layout Unificado (Exibido se checkbox marcada) -->
+        <div id="pLayoutUnified" style="display:none;" class="format-layout-group">
+          <div class="format-layout-title"><span class="format-badge" style="background:rgba(255,107,53,0.1);color:var(--acc-post);">Unificado</span> Todos os Formatos</div>
+          <div class="field-group cols-2">
+            <div class="field">
+              <label class="field-label">Posição do texto</label>
+              <select id="pUnifiedTextPos" oninput="syncUnifiedLayout();markDirty()">
+                <option value="">Claude decide</option>
+                <option>Centralizado</option>
+                <option>Alinhado à esquerda</option>
+                <option>Canto inferior esquerdo</option>
+                <option>Dividido — topo e base</option>
+              </select>
             </div>
-            <div id="pPresetsList" class="preset-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
-              <!-- Injetado dinamicamente via JS -->
+            <div class="field">
+              <label class="field-label">Fundo</label>
+              <select id="pUnifiedBg" oninput="syncUnifiedLayout();markDirty()">
+                <option value="">Claude decide</option>
+                <option>Cor sólida da marca</option>
+                <option>Gradiente da marca</option>
+                <option>Foto com overlay</option>
+                <option>Padrão / textura</option>
+                <option>Branco / claro</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label">Notas</label>
+              <textarea id="pUnifiedNotes" style="min-height:56px;" oninput="syncUnifiedLayout();markDirty()"></textarea>
             </div>
           </div>
         </div>
+
+        <!-- Layouts Independentes (Padrão antigo) -->
+        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 04</div>
+      </section>
+
+      <section class="section" id="p5">
+        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
+        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" placeholder="Ex: Não usar fundo branco neste post. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
+        
+        <!-- Toggle de Configurações Avançadas -->
+        <button type="button" class="btn btn-ghost" id="pToggleAdvancedBtn" onclick="togglePostAdvanced()" style="margin-bottom:14px; width:100%; justify-content:center;">
+          <span>Mostrar Configurações Avançadas de Exportação</span>
+        </button>
+
+        <div id="pAdvancedOptions" class="advanced-options-group" style="display:none; margin-bottom:14px;">
+          <div class="field-group cols-2">
+            <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
+            <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Embutir fontes em base64 no CSS">Embutir em base64</option><option value="Carregar via Google Fonts link">Via Google Fonts link</option></select></div>
+          </div>
+        </div>
+
+        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="pFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
       </section>
     </main>
     <aside class="preview-panel">
+      <!-- Simulador Visual do Post -->
+      <div class="post-preview-container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;width:100%;">
+          <div class="preview-label" style="margin:0;">Simulador Visual</div>
+          <div class="post-preview-toggle-wrap" id="postPreviewToggles">
+            <button type="button" class="btn btn-ghost active" onclick="setPreviewRatio('1x1')">1:1</button>
+            <button type="button" class="btn btn-ghost" onclick="setPreviewRatio('4x5')">4:5</button>
+            <button type="button" class="btn btn-ghost" onclick="setPreviewRatio('9x16')">9:16</button>
+          </div>
+        </div>
+        <div class="post-preview-card-wrap">
+          <div class="post-preview-card" id="postPreviewCard">
+            <div class="post-preview-logo" id="postPreviewLogo">logo</div>
+            <div class="post-preview-content">
+              <div class="post-preview-headline" id="postPreviewHeadline">Título do Post</div>
+              <div class="post-preview-subtitle" id="postPreviewSubtitle">Subtítulo</div>
+              <div class="post-preview-body" id="postPreviewBody"></div>
+            </div>
+            <div class="post-preview-footer">
+              <span class="post-preview-handle" id="postPreviewHandle">@handle</span>
+              <span class="post-preview-cta" id="postPreviewCta">CTA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o post, cole este prompt unificado no Claude.</div>

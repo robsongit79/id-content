@@ -130,6 +130,7 @@ function updatePreviews() {
   }
 
   updateProgress();
+  updateVisualPreview();
 }
 
 function updateProgress() {
@@ -208,8 +209,58 @@ function togglePostFmt(fmt) {
   else { app.postFmts.add(fmt); card.classList.add('checked'); }
   const has = app.postFmts.size > 0;
   document.getElementById('pLayoutPlaceholder').style.display = has ? 'none' : 'block';
-  ['1x1','4x5','9x16'].forEach(id => document.getElementById(`pLayout${id}`).style.display = app.postFmts.has(id) ? 'block' : 'none');
+  
+  syncUnifiedLayout();
   markDirty(); updatePreviews();
+}
+
+function syncUnifiedLayout() {
+  const isUnified = document.getElementById('pUnifiedLayout')?.checked;
+  const layoutUnified = document.getElementById('pLayoutUnified');
+  const hasFormats = app.postFmts.size > 0;
+  
+  if (layoutUnified) {
+    layoutUnified.style.display = (isUnified && hasFormats) ? 'block' : 'none';
+  }
+  
+  // Mostrar/ocultar layouts individuais com base no estado unificado e seleção de formato
+  ['1x1','4x5','9x16'].forEach(id => {
+    const el = document.getElementById(`pLayout${id}`);
+    if (el) {
+      el.style.display = (!isUnified && app.postFmts.has(id) && hasFormats) ? 'block' : 'none';
+    }
+  });
+
+  if (!isUnified) return;
+
+  const textPos = document.getElementById('pUnifiedTextPos')?.value || '';
+  const bg = document.getElementById('pUnifiedBg')?.value || '';
+  const notes = document.getElementById('pUnifiedNotes')?.value || '';
+
+  // Propagar os valores para os inputs reais dos formatos selecionados
+  ['1', '4', '9'].forEach(num => {
+    const textPosEl = document.getElementById(`pL${num}TextPos`);
+    const bgEl = document.getElementById(`pL${num}Bg`);
+    const notesEl = document.getElementById(`pL${num}Notes`);
+    
+    if (textPosEl) textPosEl.value = textPos;
+    if (bgEl) bgEl.value = bg;
+    if (notesEl) notesEl.value = notes;
+  });
+}
+
+function togglePostAdvanced() {
+  const adv = document.getElementById('pAdvancedOptions');
+  const btn = document.getElementById('pToggleAdvancedBtn');
+  if (!adv || !btn) return;
+  
+  if (adv.style.display === 'none') {
+    adv.style.display = 'block';
+    btn.querySelector('span').textContent = 'Ocultar Configurações Avançadas';
+  } else {
+    adv.style.display = 'none';
+    btn.querySelector('span').textContent = 'Mostrar Configurações Avançadas de Exportação';
+  }
 }
 
 // ── DIRTY / SAVE STATUS ──
@@ -411,11 +462,244 @@ function renderPresets() {
     }
   });
   
-  // Mensagens vazias se não houver presets
-  if (cCount === 0 && cList) {
-    cList.innerHTML = '<span style="font-size:11px;color:var(--muted);grid-column:span 3;text-align:center;padding:12px 0;">Nenhum preset de carrossel salvo para esta marca.</span>';
-  }
   if (pCount === 0 && pList) {
     pList.innerHTML = '<span style="font-size:11px;color:var(--muted);grid-column:span 3;text-align:center;padding:12px 0;">Nenhum preset de post salvo para esta marca.</span>';
   }
+}
+
+function updateVisualPreview() {
+  const card = document.getElementById('postPreviewCard');
+  if (!card) return;
+
+  const primaryColor = document.getElementById('cPrimaryHex')?.value || '#1E40AF';
+  const secondaryColor = document.getElementById('cSecondaryHex')?.value || '#3B82F6';
+  const darkBgColor = document.getElementById('cDarkHex')?.value || '#0A0F1E';
+  const lightBgColor = document.getElementById('cLightHex')?.value || '#F0F4FF';
+  const textColor = document.getElementById('cTextHex')?.value || '#F5F0E8';
+  
+  const displayFont = f('bFontDisplay') || 'Montserrat';
+  const bodyFont = f('bFontBody') || 'sans-serif';
+
+  card.style.fontFamily = `'${bodyFont}', sans-serif`;
+  const headlineEl = document.getElementById('postPreviewHeadline');
+  if (headlineEl) {
+    headlineEl.style.fontFamily = `'${displayFont}', sans-serif`;
+    headlineEl.style.color = textColor;
+  }
+
+  const previewRatio = window.currentPreviewRatio || '1x1';
+  let textPos = '';
+  let bgType = '';
+  
+  if (previewRatio === '1x1') {
+    textPos = document.getElementById('pL1TextPos')?.value || '';
+    bgType = document.getElementById('pL1Bg')?.value || '';
+  } else if (previewRatio === '4x5') {
+    textPos = document.getElementById('pL4TextPos')?.value || '';
+    bgType = document.getElementById('pL4Bg')?.value || '';
+  } else if (previewRatio === '9x16') {
+    textPos = document.getElementById('pL9TextPos')?.value || '';
+    bgType = document.getElementById('pL9Bg')?.value || '';
+  }
+
+  if (bgType === 'Branco / claro') {
+    card.style.background = lightBgColor;
+    card.style.color = '#1A1A1A';
+    if (headlineEl) headlineEl.style.color = '#1A1A1A';
+  } else if (bgType === 'Cor sólida da marca') {
+    card.style.background = primaryColor;
+    card.style.color = textColor;
+  } else if (bgType === 'Gradiente da marca' || bgType === 'Gradiente vertical') {
+    card.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor || primaryColor})`;
+    card.style.color = textColor;
+  } else {
+    card.style.background = darkBgColor;
+    card.style.color = textColor;
+  }
+
+  const contentEl = card.querySelector('.post-preview-content');
+  if (contentEl) {
+    if (textPos === 'Alinhado à esquerda' || textPos === 'Canto inferior esquerdo' || textPos === 'Terço inferior (safe zone)' || textPos === 'Terço inferior') {
+      contentEl.style.textAlign = 'left';
+      contentEl.style.alignItems = 'flex-start';
+    } else if (textPos === 'Dividido — topo e base' || textPos === 'Full screen empilhado') {
+      contentEl.style.textAlign = 'center';
+      contentEl.style.alignItems = 'stretch';
+    } else {
+      contentEl.style.textAlign = 'center';
+      contentEl.style.alignItems = 'center';
+    }
+  }
+
+  const logoActive = document.getElementById('bLogoActive')?.checked || false;
+  const logoPos = getRadio('postLogoPos') || 'não exibir';
+  const logoEl = document.getElementById('postPreviewLogo');
+  
+  if (logoEl) {
+    if (logoActive && logoPos !== 'não exibir') {
+      logoEl.style.display = 'block';
+      logoEl.textContent = 'logo';
+      if (logoPos.includes('esquerdo')) {
+        logoEl.style.alignSelf = 'flex-start';
+      } else if (logoPos.includes('direito')) {
+        logoEl.style.alignSelf = 'flex-end';
+      } else {
+        logoEl.style.alignSelf = 'center';
+      }
+    } else {
+      logoEl.style.display = 'none';
+    }
+  }
+
+  const handleEl = document.getElementById('postPreviewHandle');
+  if (handleEl) {
+    const handleText = f('bHandle');
+    handleEl.textContent = handleText ? (handleText.startsWith('@') ? handleText : '@' + handleText) : '';
+  }
+
+  if (headlineEl) {
+    headlineEl.textContent = f('pHeadline') || 'Título do Post';
+  }
+  const subtitleEl = document.getElementById('postPreviewSubtitle');
+  if (subtitleEl) {
+    const text = f('pSubtitle');
+    subtitleEl.textContent = text;
+    subtitleEl.style.display = text ? 'block' : 'none';
+  }
+  const ctaEl = document.getElementById('postPreviewCta');
+  if (ctaEl) {
+    const text = f('pCta');
+    ctaEl.textContent = text || 'Ação';
+    ctaEl.style.display = text ? 'inline-block' : 'none';
+  }
+
+  const bodyArea = document.getElementById('postPreviewBody');
+  if (bodyArea) {
+    bodyArea.innerHTML = '';
+    bodyArea.style.display = 'block';
+    
+    if (app.postType === 'checklist' || app.postType === 'passo-a-passo') {
+      if (app.chipData.pItems.length) {
+        const ul = document.createElement('ul');
+        ul.style.listStyleType = app.postType === 'checklist' ? 'none' : 'decimal';
+        ul.style.paddingLeft = app.postType === 'checklist' ? '0' : '15px';
+        ul.style.margin = '4px 0';
+        ul.style.textAlign = 'left';
+        app.chipData.pItems.slice(0, 4).forEach(item => {
+          const li = document.createElement('li');
+          li.style.marginBottom = '2px';
+          li.textContent = (app.postType === 'checklist' ? '✓ ' : '') + item;
+          ul.appendChild(li);
+        });
+        bodyArea.appendChild(ul);
+      }
+    } else if (app.postType === 'estatistica') {
+      const num = f('pStatNum');
+      const ctx = f('pStatCtx');
+      if (num || ctx) {
+        const divNum = document.createElement('div');
+        divNum.style.fontSize = '26px';
+        divNum.style.fontWeight = '900';
+        divNum.style.lineHeight = '1';
+        divNum.style.color = secondaryColor || primaryColor;
+        divNum.textContent = num || '73%';
+        
+        const divCtx = document.createElement('div');
+        divCtx.style.fontSize = '10px';
+        divCtx.style.opacity = '0.9';
+        divCtx.style.marginTop = '4px';
+        divCtx.textContent = ctx || 'das pessoas preferem posts visuais.';
+        
+        bodyArea.appendChild(divNum);
+        bodyArea.appendChild(divCtx);
+      }
+    } else if (app.postType === 'antes-depois' || app.postType === 'comparativo') {
+      const compA = f('pCompA');
+      const compB = f('pCompB');
+      if (compA || compB) {
+        const div = document.createElement('div');
+        div.style.display = 'grid';
+        div.style.gridTemplateColumns = '1fr 1fr';
+        div.style.gap = '8px';
+        div.style.fontSize = '9px';
+        div.style.textAlign = 'left';
+        div.style.marginTop = '4px';
+        
+        const colA = document.createElement('div');
+        colA.style.background = 'rgba(255,255,255,0.05)';
+        colA.style.padding = '6px';
+        colA.style.borderRadius = '4px';
+        colA.innerHTML = `<strong>Antes:</strong><br>${compA || 'Estado A'}`;
+        
+        const colB = document.createElement('div');
+        colB.style.background = 'rgba(71,255,212,0.05)';
+        colB.style.padding = '6px';
+        colB.style.borderRadius = '4px';
+        colB.innerHTML = `<strong>Depois:</strong><br>${compB || 'Estado B'}`;
+        
+        div.appendChild(colA);
+        div.appendChild(colB);
+        bodyArea.appendChild(div);
+      }
+    } else if (app.postType === 'depoimento' || app.postType === 'citacao') {
+      const text = f('pQuoteText');
+      const author = f('pQuoteAuthor');
+      const role = f('pQuoteRole');
+      if (text || author) {
+        const div = document.createElement('div');
+        div.style.fontStyle = 'italic';
+        div.style.padding = '6px 8px';
+        div.style.borderLeft = `2px solid ${primaryColor}`;
+        div.style.background = 'rgba(255,255,255,0.02)';
+        div.style.textAlign = 'left';
+        div.textContent = `"${text || 'Frase de citação ou depoimento...'}"`;
+        
+        const divAuthor = document.createElement('div');
+        divAuthor.style.fontSize = '9px';
+        divAuthor.style.fontWeight = 'bold';
+        divAuthor.style.marginTop = '4px';
+        divAuthor.style.fontStyle = 'normal';
+        divAuthor.textContent = `- ${author || 'Autor'} ${role ? `(${role})` : ''}`;
+        
+        bodyArea.appendChild(div);
+        bodyArea.appendChild(divAuthor);
+      }
+    } else if (app.postType === 'mini-artigo') {
+      const text = f('pArtBody');
+      if (text) {
+        const div = document.createElement('div');
+        div.style.fontSize = '9.5px';
+        div.style.textAlign = 'left';
+        div.style.lineHeight = '1.3';
+        div.textContent = text.length > 150 ? text.substring(0, 150) + '...' : text;
+        bodyArea.appendChild(div);
+      }
+    } else {
+      bodyArea.style.display = 'none';
+    }
+  }
+}
+
+function setPreviewRatio(ratio) {
+  window.currentPreviewRatio = ratio;
+  const card = document.getElementById('postPreviewCard');
+  if (!card) return;
+  
+  if (ratio === '1x1') {
+    card.style.aspectRatio = '1 / 1';
+  } else if (ratio === '4x5') {
+    card.style.aspectRatio = '4 / 5';
+  } else if (ratio === '9x16') {
+    card.style.aspectRatio = '9 / 16';
+  }
+
+  const toggles = document.getElementById('postPreviewToggles');
+  if (toggles) {
+    toggles.querySelectorAll('button').forEach(btn => {
+      const active = btn.textContent.trim().replace(':', 'x') === ratio;
+      btn.classList.toggle('active', active);
+    });
+  }
+  
+  updateVisualPreview();
 }
