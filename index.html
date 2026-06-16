@@ -70,7 +70,6 @@
         <a href="#b2" class="nav-item" data-base="b2"><span class="nav-dot"></span> 04 · Cores</a>
         <a href="#b3" class="nav-item" data-base="b3"><span class="nav-dot"></span> 05 · Tipografia</a>
         <a href="#b5" class="nav-item" data-base="b5"><span class="nav-dot"></span> 06 · Estilo visual</a>
-        <a href="#b7" class="nav-item" data-base="b7"><span class="nav-dot"></span> 07 · Restrições</a>
       </div>
       <div class="sidebar-section base-prog">
         <div class="sidebar-label">Progresso</div>
@@ -84,15 +83,9 @@
     <main class="main" id="baseMain">
       <section class="section" id="b1">
         <div class="section-header"><div><div class="section-num base-num">01</div><h2 class="section-title">Identidade da Marca</h2><p class="section-desc">Informações base usadas em todos os tipos de conteúdo.</p></div></div>
-        <div class="field-group cols-2">
+        <div class="field-group">
           <div class="field"><label class="field-label">Nome da marca <span class="required">*</span></label><input type="text" id="bName" placeholder="Ex: CFC Produtivo" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Handle Instagram</label><input type="text" id="bHandle" placeholder="@cfcprodutivo" oninput="markDirty()"></div>
         </div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Tagline</label><input type="text" id="bTagline" placeholder="Ex: Gestão para autoescolas" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Segmento / Nicho</label><input type="text" id="bNiche" placeholder="Ex: Autoescolas" oninput="markDirty()"></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Posicionamento</label><textarea id="bPositioning" placeholder="Como a marca quer ser percebida..." oninput="markDirty()"></textarea></div></div>
         <div class="divider"></div>
         <div class="field-group" style="margin-top:14px;">
           <div class="field">
@@ -121,9 +114,8 @@
           <div class="field"><label class="field-label">Tom principal</label><select id="bToneMain" oninput="markDirty()"><option value="">Selecione</option><option>Autoritário e direto</option><option>Consultivo e educativo</option><option>Provocativo e agressivo</option><option>Inspiracional e motivacional</option><option>Premium e sofisticado</option><option>Técnico e objetivo</option><option>Próximo e conversacional</option><option>Editorial e jornalístico</option></select></div>
           <div class="field"><label class="field-label">Tratamento</label><select id="bToneReader" oninput="markDirty()"><option value="">Selecione</option><option>Você (informal)</option><option>Você (formal)</option><option>Tu</option><option>Gestor / Profissional (3ª pessoa)</option></select></div>
         </div>
-        <div class="field-group cols-2">
+        <div class="field-group">
           <div class="field"><label class="field-label">Nunca fazer</label><textarea id="bToneNever" placeholder="Ex: Nunca usar gírias. Nunca diminutivos. Evitar exclamações em excesso." oninput="markDirty()"></textarea></div>
-          <div class="field"><label class="field-label">Exemplo de headline</label><textarea id="bToneExample" placeholder="Ex: 'Você está gerenciando sua autoescola no improviso — e isso tem custo.'" oninput="markDirty()"></textarea></div>
         </div>
       </section>
 
@@ -135,10 +127,6 @@
           <div class="field"><label class="field-label">Principal desejo</label><textarea id="bDesire" style="min-height:66px;" placeholder="Ex: Ter controle total da escola sem depender de planilhas ou da memória." oninput="markDirty()"></textarea></div>
         </div>
         <div class="field-group"><div class="field"><label class="field-label">Objetivos de conteúdo</label><div class="chips-wrap" id="goalChips" onclick="document.getElementById('goalInput').focus()"><input class="chip-input" id="goalInput" placeholder="Ex: Gerar leads, Educar..." onkeydown="addChip(event,'goalChips','goal')"></div></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Temas / Pautas recorrentes</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="topicChips" onclick="document.getElementById('topicInput').focus()"><input class="chip-input" id="topicInput" placeholder="Ex: Gestão, Vendas, Legislação..." onkeydown="addChip(event,'topicChips','topic')"></div></div>
-          <div class="field"><label class="field-label">Frequência de postagem</label><select id="bPostFrequency" oninput="markDirty()"><option value="">Selecione</option><option>Diário</option><option>3× por semana</option><option>2× por semana</option><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
-        </div>
       </section>
 
       <section class="section" id="b2">
@@ -151,7 +139,6 @@
           <div class="field"><div class="field-label">Fundo claro</div><div class="palette-swatch-row"><input type="color" id="cLight" value="#F0F4FF" oninput="document.getElementById('cLightHex').value=this.value;markDirty()"><input type="text" id="cLightHex" value="#F0F4FF" oninput="syncColor('cLight','cLightHex')" style="flex:1;"></div></div>
           <div class="field"><div class="field-label">Texto</div><div class="palette-swatch-row"><input type="color" id="cText" value="#F5F0E8" oninput="document.getElementById('cTextHex').value=this.value;markDirty()"><input type="text" id="cTextHex" value="#F5F0E8" oninput="syncColor('cText','cTextHex')" style="flex:1;"></div></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="bColorsNotes" placeholder="Ex: Nunca usar o azul primário sobre o fundo claro. Gradiente permitido apenas no CTA." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="b3">
@@ -169,7 +156,6 @@
           <div class="field"><label class="field-label">Peso dos títulos</label><select id="bWeightTitle" oninput="markDirty()"><option value="">Selecione</option><option>300 — Light</option><option>400 — Regular</option><option>500 — Medium</option><option>600 — SemiBold</option><option>700 — Bold</option><option>800 — ExtraBold</option><option>900 — Black</option></select></div>
           <div class="field"><label class="field-label">Itálico</label><select id="bItalicUse" oninput="markDirty()"><option value="">Selecione</option><option>Nunca usar itálico</option><option>Itálico apenas em palavras-chave dos títulos</option><option>Itálico em citações e pull quotes</option><option>Itálico usado livremente para ênfase</option></select></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas tipográficas</label><textarea id="bTypoNotes" placeholder="Ex: Sempre usar caixa alta nos títulos de capa. Nunca misturar mais de 2 fontes no mesmo slide." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="b5">
@@ -186,17 +172,6 @@
         <div class="field-group"><div class="field"><label class="field-label">Assinatura visual</label><textarea id="bVisualSig" placeholder="Ex: Linha fina na base de cada slide. Número do slide em destaque no canto superior direito. Ícone geométrico como marcador de seção." oninput="markDirty()"></textarea></div></div>
       </section>
 
-      <section class="section" id="b7">
-        <div class="section-header"><div><div class="section-num base-num">07</div><h2 class="section-title">Referências & Restrições</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Referências visuais</label><textarea id="bReferences" placeholder="Ex: @resultadosdigitais no Instagram, site linear.app, carrosséis da marca Nubank — todos usam tipografia grande, espaço generoso e paleta sóbria." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Proibições globais</label><textarea id="bForbidden" placeholder="Ex: Nunca usar stock photos genéricas. Nunca fundo branco puro. Proibido emoji fora do contexto de checklist." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Referência canônica aprovada</label><textarea id="bCanonical" placeholder="Ex: O carrossel 'Os 5 erros...' publicado em 12/03 é o padrão de qualidade aprovado pelo cliente — usar como régua." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Hashtags padrão</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="hashtagChips" onclick="document.getElementById('hashtagInput').focus()"><input class="chip-input" id="hashtagInput" placeholder="Ex: #autoescola, #gestao..." onkeydown="addChip(event,'hashtagChips','hashtag')"></div></div>
-          <div class="field"><label class="field-label">Concorrentes principais</label><textarea id="bCompetitors" placeholder="Ex: CFC Central, Escola de Trânsito XYZ — ambos focados em volume, não em qualidade de atendimento." oninput="markDirty()"></textarea></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="bFinalNotes" placeholder="Ex: Cliente prefere variações com mais texto. Revisar sempre antes de entregar posts de campanha." oninput="markDirty()"></textarea></div></div>
-      </section>
     </main>
     <aside class="preview-panel">
       <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>
@@ -290,13 +265,11 @@
           <div class="field"><label class="field-label">Slide hero — estrutura</label><textarea id="cSlide1" style="min-height:80px;" placeholder="Ex: Headline em caixa alta ocupando 60% da área. Subtítulo em corpo abaixo. Logo no topo esq. Fundo escuro." oninput="markDirty()"></textarea></div>
           <div class="field"><label class="field-label">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" placeholder="Ex: Logo centralizada. Frase de ação abaixo. Handle do Instagram. Fundo com gradiente da marca." oninput="markDirty()"></textarea></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas de carrossel</label><textarea id="cNotes" placeholder="Ex: Manter ritmo de leitura progressivo — do problema (slide 1) para a solução (slide final). Não ultrapassar 30 palavras por slide de conteúdo." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="c4">
-        <div class="section-header"><div><div class="section-num car-num">05</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="cForbidden" placeholder="Ex: Não usar fundo branco neste carrossel. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
-        
+        <div class="section-header"><div><div class="section-num car-num">05</div><h2 class="section-title">Entrega</h2></div></div>
+
         <!-- Toggle de Configurações Avançadas -->
         <button type="button" class="btn btn-ghost" id="cToggleAdvancedBtn" onclick="toggleCarAdvanced()" style="margin-bottom:14px; width:100%; justify-content:center;">
           <span>Mostrar Configurações Avançadas de Exportação</span>
@@ -313,6 +286,31 @@
       </section>
     </main>
     <aside class="preview-panel">
+      <!-- Simulador Visual do Carrossel -->
+      <div class="post-preview-container" style="margin-bottom: 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;width:100%;">
+          <div class="preview-label" style="margin:0;">Simulador Visual</div>
+          <div class="post-preview-toggle-wrap" style="align-items: center; gap: 6px;">
+            <button type="button" class="btn btn-ghost" id="btnCarPrev" onclick="prevCarouselSlide()" style="padding:2px 6px !important;">←</button>
+            <span id="carSlideIndicator" style="font-size:10px;font-family:var(--font-m);color:var(--muted);min-width:35px;text-align:center;">1 / 1</span>
+            <button type="button" class="btn btn-ghost" id="btnCarNext" onclick="nextCarouselSlide()" style="padding:2px 6px !important;">→</button>
+          </div>
+        </div>
+        <div class="post-preview-card-wrap">
+          <div class="post-preview-card" id="carPreviewCard">
+            <div class="post-preview-logo" id="carPreviewLogo">logo</div>
+            <div class="post-preview-content">
+              <div class="post-preview-headline" id="carPreviewTitle">Título do Slide</div>
+              <div class="post-preview-body" id="carPreviewBody"></div>
+            </div>
+            <div class="post-preview-footer">
+              <span class="post-preview-handle" id="carPreviewHandle">@handle</span>
+              <span id="carPreviewPageNum" style="font-size:8.5px;font-weight:500;opacity:0.75;">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o carrossel, cole este prompt unificado no Claude.</div>
@@ -419,8 +417,6 @@
             <textarea id="pFreeText" placeholder="Cole sua copy aqui..." oninput="markDirty()" style="min-height:100px;"></textarea>
           </div>
         </div>
-
-        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="p3">
@@ -487,9 +483,8 @@
       </section>
 
       <section class="section" id="p5">
-        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="pForbidden" placeholder="Ex: Não usar fundo branco neste post. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
-        
+        <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Entrega</h2></div></div>
+
         <!-- Toggle de Configurações Avançadas -->
         <button type="button" class="btn btn-ghost" id="pToggleAdvancedBtn" onclick="togglePostAdvanced()" style="margin-bottom:14px; width:100%; justify-content:center;">
           <span>Mostrar Configurações Avançadas de Exportação</span>

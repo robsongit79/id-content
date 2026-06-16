@@ -22,11 +22,6 @@ const prompts = {
     s.push(`# BASE — ${f('bName') || 'MARCA'}\n# Identidade visual e tom de voz. Usada em todos os conteúdos.`);
 
     const s1 = [];
-    if (f('bName'))        s1.push(`MARCA:          ${f('bName')}`);
-    if (f('bHandle'))      s1.push(`HANDLE:         ${f('bHandle')}`);
-    if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
-    if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
-    if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
     if (activeLogo) {
       s1.push("LOGO:           Ativa — Solicite o envio do link da logo ao usuário.");
@@ -41,7 +36,6 @@ const prompts = {
       const v = document.getElementById(id)?.value;
       if (v) s2.push(`${label}:${' '.repeat(Math.max(1, 16 - label.length))}${v}`);
     });
-    if (f('bColorsNotes')) s2.push(`NOTAS:          ${f('bColorsNotes')}`);
     if (s2.length) s.push(`## 02 · PALETA\n${s2.join('\n')}`);
 
     const s3 = [];
@@ -52,7 +46,6 @@ const prompts = {
     if (f('bSizeBody'))     s3.push(`TAMANHO CORPO:  ${f('bSizeBody')}`);
     if (f('bWeightTitle'))  s3.push(`PESO TÍTULO:    ${f('bWeightTitle')}`);
     if (f('bItalicUse'))    s3.push(`ITÁLICO:        ${f('bItalicUse')}`);
-    if (f('bTypoNotes'))    s3.push(`NOTAS:          ${f('bTypoNotes')}`);
     if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
 
     const s4 = [];
@@ -60,7 +53,6 @@ const prompts = {
     if (f('bToneMain'))    s4.push(`TOM:            ${f('bToneMain')}`);
     if (f('bToneReader'))  s4.push(`TRATAMENTO:     ${f('bToneReader')}`);
     if (f('bToneNever'))   s4.push(`NUNCA:          ${f('bToneNever')}`);
-    if (f('bToneExample')) s4.push(`EXEMPLO:        "${f('bToneExample')}"`);
     if (s4.length) s.push(`## 04 · TOM DE VOZ\n${s4.join('\n')}`);
 
     const s5 = [], sv = getRadio('styleVisual');
@@ -77,18 +69,7 @@ const prompts = {
     if (f('bPain'))     s6.push(`DOR:            ${f('bPain')}`);
     if (f('bDesire'))   s6.push(`DESEJO:         ${f('bDesire')}`);
     if (app.chipData.goal.length) s6.push(`OBJETIVOS:      ${app.chipData.goal.join(', ')}`);
-    if (app.chipData.topic.length) s6.push(`PAUTAS:         ${app.chipData.topic.join(', ')}`);
-    if (f('bPostFrequency')) s6.push(`FREQUÊNCIA:     ${f('bPostFrequency')}`);
     if (s6.length) s.push(`## 06 · AUDIÊNCIA\n${s6.join('\n')}`);
-
-    const s7 = [];
-    if (f('bReferences')) s7.push(`REFERÊNCIAS:    ${f('bReferences')}`);
-    if (f('bForbidden'))  s7.push(`PROIBIDO:       ${f('bForbidden')}`);
-    if (f('bCanonical'))  s7.push(`CANÔNICO:       ${f('bCanonical')}`);
-    if (app.chipData.hashtag.length) s7.push(`HASHTAGS:       ${app.chipData.hashtag.map(h => h.startsWith('#') ? h : '#' + h).join(' ')}`);
-    if (f('bCompetitors')) s7.push(`CONCORRENTES:   ${f('bCompetitors')}`);
-    if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
-    if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
 
     if (s.length <= 1) return null;
     return s.join('\n\n');
@@ -127,11 +108,9 @@ const prompts = {
     const c3 = [];
     if (f('cSlide1'))   c3.push(`SLIDE HERO:     ${f('cSlide1')}`);
     if (f('cSlideCta')) c3.push(`SLIDE CTA:      ${f('cSlideCta')}`);
-    if (f('cNotes'))    c3.push(`NOTAS:          ${f('cNotes')}`);
     if (c3.length) c.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
 
     const c4 = [];
-    if (f('cForbidden')) c4.push(`PROIBIDO:       ${f('cForbidden')}`);
     if (f('cDelivery'))  c4.push(`ENTREGA:        ${f('cDelivery')}`);
     if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
@@ -199,7 +178,6 @@ const prompts = {
       if (['depoimento','citacao'].includes(app.postType)) { if(f('pQuoteText'))p4.push(`CITAÇÃO:        "${f('pQuoteText')}"`); if(f('pQuoteAuthor'))p4.push(`AUTOR:          ${f('pQuoteAuthor')}`); if(f('pQuoteRole'))p4.push(`CARGO:          ${f('pQuoteRole')}`); }
       if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
     }
-    if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
     const freeText = f('pFreeText');
     if (freeText) p4.push(`TEXTO LIVRE / COPY DIRETA:\n${freeText}`);
     if (p4.length) p.push(`## CONTEÚDO\n${p4.join('\n')}`);
@@ -211,7 +189,6 @@ const prompts = {
     if (p5.length) p.push(`## LAYOUT\n${p5.join('\n\n')}`);
 
     const p6 = [];
-    if (f('pForbidden')) p6.push(`PROIBIDO:       ${f('pForbidden')}`);
     if (f('pDelivery'))  p6.push(`ENTREGA:        ${f('pDelivery')}`);
     if (f('pFontB64'))   p6.push(`FONTES:         ${f('pFontB64')}`);
     if (f('pFinalNotes'))p6.push(`NOTAS:          ${f('pFinalNotes')}`);
