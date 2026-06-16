@@ -175,8 +175,15 @@
     </main>
     <aside class="preview-panel">
       <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>
-      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="baseCopy()">⌘ Copiar prompt base</button><div class="copy-success" id="baseCopyMsg">✓ Copiado</div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="baseCopy()">⌘ Copiar prompt base</button><div class="copy-success" id="baseCopyMsg">✓ Copiado</div><div class="shortcut-hint">⌘ + Enter</div></div>
       <div class="info-box">As abas Carrossel e Post combinam a Base com os dados específicos de cada formato.</div>
+      <div class="history-section" id="baseHistorySection">
+        <button class="history-toggle" onclick="this.closest('.history-section').classList.toggle('open')">
+          <span>Histórico</span>
+          <svg class="htarrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="baseHistoryList" class="history-list"><span class="history-empty">Nenhum prompt copiado ainda.</span></div>
+      </div>
     </aside>
   </div>
   </div>
@@ -286,9 +293,16 @@
       </section>
     </main>
     <aside class="preview-panel">
-<div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
-      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
-      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o carrossel, cole este prompt unificado no Claude.</div>
+      <div id="brandSummaryCar" class="brand-summary" data-empty="true"></div>
+      <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div><div class="shortcut-hint">⌘ + Enter</div></div>
+      <div class="history-section" id="carHistorySection">
+        <button class="history-toggle" onclick="this.closest('.history-section').classList.toggle('open')">
+          <span>Histórico</span>
+          <svg class="htarrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="carHistoryList" class="history-list"><span class="history-empty">Nenhum prompt copiado ainda.</span></div>
+      </div>
     </aside>
   </div>
   </div>
@@ -348,6 +362,13 @@
       </section>
       <section class="section" id="p2">
         <div class="section-header"><div><div class="section-num post-num">02</div><h2 class="section-title">Tipo de Post</h2></div></div>
+        <div class="type-filter">
+          <button class="type-filter-btn active" data-cat="todos" onclick="filterPostTypes('todos')">Todos</button>
+          <button class="type-filter-btn" data-cat="educacao" onclick="filterPostTypes('educacao')">Educação</button>
+          <button class="type-filter-btn" data-cat="conversao" onclick="filterPostTypes('conversao')">Conversão</button>
+          <button class="type-filter-btn" data-cat="autoridade" onclick="filterPostTypes('autoridade')">Autoridade</button>
+          <button class="type-filter-btn" data-cat="disruptivo" onclick="filterPostTypes('disruptivo')">Disruptivo</button>
+        </div>
         <div class="type-grid">
           <div class="type-card" onclick="selectPostType(this,'frase-impacto')"><input type="radio" name="pType" value="frase-impacto"><span class="type-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span class="type-name">Frase de impacto</span><span class="type-desc">Frase marcante ou provocativa em destaque para gerar identificação rápida e compartilhamentos.</span></div>
           <div class="type-card" onclick="selectPostType(this,'checklist')"><input type="radio" name="pType" value="checklist"><span class="type-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="type-name">Checklist</span><span class="type-desc">Lista escaneável de itens, dicas ou erros comuns para facilitar a leitura rápida e incentivar salvamentos.</span></div>
@@ -524,9 +545,16 @@
       </section>
     </main>
     <aside class="preview-panel">
-<div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
-      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
-      <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o post, cole este prompt unificado no Claude.</div>
+      <div id="brandSummaryPost" class="brand-summary" data-empty="true"></div>
+      <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
+      <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div><div class="shortcut-hint">⌘ + Enter</div></div>
+      <div class="history-section" id="postHistorySection">
+        <button class="history-toggle" onclick="this.closest('.history-section').classList.toggle('open')">
+          <span>Histórico</span>
+          <svg class="htarrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="postHistoryList" class="history-list"><span class="history-empty">Nenhum prompt copiado ainda.</span></div>
+      </div>
     </aside>
   </div>
   </div>

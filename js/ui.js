@@ -94,23 +94,17 @@ function showCopied(id) {
 
 function baseCopy() {
   const p = prompts.buildBase(); if (!p) { toast('Preencha pelo menos o nome da marca.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => {
-    showCopied('baseCopyMsg');
-  });
+  navigator.clipboard.writeText(p).then(() => { showCopied('baseCopyMsg'); savePromptHistory('base', p); });
 }
 
 function carCopy() {
   const p = prompts.buildCarousel(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => {
-    showCopied('carCopyMsg');
-  });
+  navigator.clipboard.writeText(p).then(() => { showCopied('carCopyMsg'); savePromptHistory('car', p); });
 }
 
 function postCopy() {
   const p = prompts.buildPost(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => {
-    showCopied('postCopyMsg');
-  });
+  navigator.clipboard.writeText(p).then(() => { showCopied('postCopyMsg'); savePromptHistory('post', p); });
 }
 
 // ── UPDATE PREVIEWS ──
@@ -129,6 +123,7 @@ function updatePreviews() {
     activeBrandNameEl.textContent = f('bName') || 'Sem nome';
   }
 
+  updateBrandSummary();
   updateProgress();
 }
 
@@ -453,7 +448,31 @@ function renderPresets() {
     title.className = 'preset-title';
     title.textContent = preset.name;
     card.appendChild(title);
-    
+
+    // Color swatches
+    if (preset.colors) {
+      const swatches = document.createElement('div');
+      swatches.className = 'preset-swatches';
+      ['color_primary','color_secondary','color_accent'].forEach(k => {
+        if (preset.colors[k]) {
+          const dot = document.createElement('span');
+          dot.className = 'preset-swatch';
+          dot.style.background = preset.colors[k];
+          dot.title = preset.colors[k];
+          swatches.appendChild(dot);
+        }
+      });
+      card.appendChild(swatches);
+    }
+
+    // Font name
+    if (preset.fonts && preset.fonts.font_display) {
+      const fontEl = document.createElement('span');
+      fontEl.className = 'preset-font';
+      fontEl.textContent = preset.fonts.font_display;
+      card.appendChild(fontEl);
+    }
+
     // Botão de deletar
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
@@ -482,5 +501,95 @@ function renderPresets() {
 
 function updateVisualPreview() {
   // Simulador removido
+}
+
+// ── CATEGORY FILTER ──
+function filterPostTypes(cat) {
+  document.querySelectorAll('.type-filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === cat);
+  });
+  const normalize = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  document.querySelectorAll('.type-card').forEach(card => {
+    if (cat === 'todos') { card.style.display = ''; return; }
+    const catEl = card.querySelector('.type-category');
+    const cardCat = catEl ? normalize(catEl.textContent.trim()) : 'educacao';
+    card.style.display = cardCat === cat ? '' : 'none';
+  });
+}
+
+// ── BRAND SUMMARY STRIP ──
+function updateBrandSummary() {
+  const name = f('bName');
+  const tone = f('bToneMain');
+  const primary = f('cPrimaryHex') || document.getElementById('cPrimary')?.value;
+  const secondary = f('cSecondaryHex') || document.getElementById('cSecondary')?.value;
+  const accent = f('cAccentHex') || document.getElementById('cAccent')?.value;
+  const font = f('bFontDisplay');
+
+  ['brandSummaryCar','brandSummaryPost'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!name) { el.setAttribute('data-empty','true'); el.innerHTML = ''; return; }
+    el.removeAttribute('data-empty');
+    let html = `<span class="brand-summary-item"><span class="brand-summary-lbl">Marca</span><span class="brand-summary-val">${name}</span></span>`;
+    if (tone) html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Tom</span><span class="brand-summary-val">${tone}</span></span>`;
+    if (font) html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Fonte</span><span class="brand-summary-val">${font}</span></span>`;
+    if (primary || secondary || accent) {
+      html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Paleta</span>`;
+      if (primary) html += `<span class="brand-summary-dot" style="background:${primary}"></span>`;
+      if (secondary) html += `<span class="brand-summary-dot" style="background:${secondary}"></span>`;
+      if (accent) html += `<span class="brand-summary-dot" style="background:${accent}"></span>`;
+      html += `</span>`;
+    }
+    el.innerHTML = html;
+  });
+}
+
+// ── PROMPT HISTORY ──
+let _promptHistory = [];
+try { _promptHistory = JSON.parse(localStorage.getItem('promptHistory') || '[]'); } catch(e) {}
+
+function savePromptHistory(type, text) {
+  _promptHistory.unshift({ type, text, ts: Date.now() });
+  _promptHistory = _promptHistory.slice(0, 15);
+  try { localStorage.setItem('promptHistory', JSON.stringify(_promptHistory)); } catch(e) {}
+  renderPromptHistory();
+}
+
+function recopyHistory(idx) {
+  const h = _promptHistory[idx];
+  if (!h) return;
+  navigator.clipboard.writeText(h.text).then(() => toast('Prompt copiado do histórico', 'success'));
+}
+
+function renderPromptHistory() {
+  ['base','car','post'].forEach(tab => {
+    const el = document.getElementById(`${tab}HistoryList`);
+    if (!el) return;
+    const entries = _promptHistory.map((h, i) => ({ ...h, gi: i })).filter(h => h.type === tab);
+    if (!entries.length) { el.innerHTML = '<span class="history-empty">Nenhum prompt copiado ainda.</span>'; return; }
+    el.innerHTML = entries.map(h => {
+      const d = new Date(h.ts);
+      const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      return `<div class="history-item"><span class="history-time">${label}</span><button class="history-copy-btn" onclick="recopyHistory(${h.gi})" title="Copiar novamente">⟳</button></div>`;
+    }).join('');
+  });
+}
+
+// ── KEYBOARD SHORTCUTS ──
+function initShortcuts() {
+  document.addEventListener('keydown', e => {
+    if (!e.metaKey && !e.ctrlKey) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (app.currentTab === 'base') baseCopy();
+      else if (app.currentTab === 'car') carCopy();
+      else if (app.currentTab === 'post') postCopy();
+    }
+    if (e.key === 's') {
+      e.preventDefault();
+      if (app.currentBrandId && app.isDirty) { setSaveStatus('saving'); app.save(); }
+    }
+  });
 }
 

@@ -649,4 +649,40 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   background: linear-gradient(180deg, rgba(255, 107, 53, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
+/* ── CATEGORY FILTER ── */
+.type-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.type-filter-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:var(--font-d);cursor:pointer;transition:all 0.15s;line-height:1.6;}
+.type-filter-btn:hover{border-color:var(--border-hi);color:var(--label);}
+.type-filter-btn.active{border-color:var(--acc-post);color:var(--acc-post);background:rgba(255,107,53,0.08);}
+
+/* ── BRAND SUMMARY STRIP ── */
+.brand-summary{padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:10px;color:var(--muted);}
+.brand-summary-item{display:flex;align-items:center;gap:4px;}
+.brand-summary-lbl{text-transform:uppercase;letter-spacing:1px;font-size:9px;font-family:var(--font-d);font-weight:700;color:var(--muted);}
+.brand-summary-val{color:var(--label);font-weight:500;}
+.brand-summary-dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:inline-block;}
+.brand-summary[data-empty="true"]{display:none;}
+
+/* ── PRESET SWATCHES ── */
+.preset-swatches{display:flex;gap:4px;margin-top:4px;}
+.preset-swatch{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);flex-shrink:0;}
+.preset-font{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+
+/* ── PROMPT HISTORY ── */
+.history-section{border-top:1px solid var(--border);padding-top:4px;}
+.history-toggle{background:transparent;border:none;padding:8px 0;width:100%;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:10px;cursor:pointer;font-family:var(--font-d);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.history-toggle:hover{color:var(--label);}
+.history-toggle .htarrow{transition:transform 0.2s;flex-shrink:0;}
+.history-section.open .history-toggle .htarrow{transform:rotate(180deg);}
+.history-list{display:none;flex-direction:column;gap:6px;padding-bottom:8px;}
+.history-section.open .history-list{display:flex;}
+.history-item{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.history-time{font-size:10px;color:var(--muted);}
+.history-copy-btn{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:12px;cursor:pointer;padding:2px 6px;line-height:1.4;transition:all 0.12s;}
+.history-copy-btn:hover{border-color:var(--border-hi);color:var(--label);}
+.history-empty{font-size:10px;color:var(--muted);font-style:italic;padding:4px 0;}
+
+/* ── KEYBOARD SHORTCUT BADGE ── */
+.shortcut-hint{font-size:9px;color:var(--muted);letter-spacing:.5px;text-align:center;padding-top:2px;}
+
 

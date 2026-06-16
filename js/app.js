@@ -80,6 +80,8 @@ const app = {
     this.loadBrandList();
     initScrollNav();
     initTooltips();
+    initShortcuts();
+    renderPromptHistory();
 
     // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
     if (btnAdmin) {
