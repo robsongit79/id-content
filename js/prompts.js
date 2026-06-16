@@ -177,6 +177,48 @@ const prompts = {
       if (app.postType === 'urgencia') { if(f('pUrgPrazo'))p4.push(`PRAZO:          ${f('pUrgPrazo')}`); if(f('pUrgOque'))p4.push(`O QUE ACABA:    ${f('pUrgOque')}`); }
       if (['depoimento','citacao'].includes(app.postType)) { if(f('pQuoteText'))p4.push(`CITAÇÃO:        "${f('pQuoteText')}"`); if(f('pQuoteAuthor'))p4.push(`AUTOR:          ${f('pQuoteAuthor')}`); if(f('pQuoteRole'))p4.push(`CARGO:          ${f('pQuoteRole')}`); }
       if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
+      if (app.postType === 'recibo') {
+        if (f('pReceiptTitle')) p4.push(`TÍTULO RECIBO:  ${f('pReceiptTitle')}`);
+        if (f('pReceiptItems')) p4.push(`ITENS:\n${f('pReceiptItems').split('\n').map(l => `  ${l}`).join('\n')}`);
+        if (f('pReceiptTotal')) p4.push(`TOTAL:          ${f('pReceiptTotal')}`);
+      }
+      if (app.postType === 'print-chat') {
+        if (f('pChatA')) p4.push(`PESSOA A:       ${f('pChatA')}`);
+        if (f('pChatB')) p4.push(`PESSOA B:       ${f('pChatB')}`);
+        if (f('pChatMessages')) p4.push(`MENSAGENS:\n${f('pChatMessages').split('\n').map(l => `  ${l}`).join('\n')}`);
+      }
+      if (app.postType === 'capa-revista') {
+        if (f('pMagSection')) p4.push(`REVISTA:        ${f('pMagSection')}`);
+        if (f('pMagEdition')) p4.push(`EDIÇÃO:         ${f('pMagEdition')}`);
+        if (f('pMagHeadline')) p4.push(`MANCHETE:       ${f('pMagHeadline')}`);
+        if (f('pMagSubtitle')) p4.push(`CHAMADA:        ${f('pMagSubtitle')}`);
+      }
+      if (app.postType === 'correcao') {
+        if (f('pCorrWrong')) p4.push(`ERRADO:         ${f('pCorrWrong')}`);
+        if (f('pCorrRight')) p4.push(`CORRETO:        ${f('pCorrRight')}`);
+      }
+      if (app.postType === 'manchete') {
+        if (f('pNewsPublication')) p4.push(`JORNAL:         ${f('pNewsPublication')}`);
+        if (f('pNewsHeadline')) p4.push(`MANCHETE:       ${f('pNewsHeadline')}`);
+        if (f('pNewsLead')) p4.push(`LEAD:           ${f('pNewsLead')}`);
+      }
+      if (app.postType === 'ranking') {
+        if (f('pRankTitle')) p4.push(`TÍTULO:         ${f('pRankTitle')}`);
+        if (app.chipData.pRankItems.length) p4.push(`ITENS:\n${app.chipData.pRankItems.map((v,i) => `  ${i+1}. ${v}`).join('\n')}`);
+      }
+      if (app.postType === 'dilema') {
+        if (f('pDilemmaQuestion')) p4.push(`CENÁRIO:        ${f('pDilemmaQuestion')}`);
+        if (f('pDilemmaA')) p4.push(`OPÇÃO A:        ${f('pDilemmaA')}`);
+        if (f('pDilemmaB')) p4.push(`OPÇÃO B:        ${f('pDilemmaB')}`);
+      }
+      if (app.postType === 'revelacao') {
+        if (f('pRevelacaoConclusion')) p4.push(`CONCLUSÃO:      ${f('pRevelacaoConclusion')}`);
+        if (f('pRevelacaoWhy')) p4.push(`POR QUÊ:        ${f('pRevelacaoWhy')}`);
+      }
+      if (app.postType === 'terminal') {
+        if (f('pTerminalContext')) p4.push(`LINGUAGEM:      ${f('pTerminalContext')}`);
+        if (f('pTerminalCode')) p4.push(`CÓDIGO:\n${f('pTerminalCode').split('\n').map(l => `  ${l}`).join('\n')}`);
+      }
     }
     const freeText = f('pFreeText');
     if (freeText) p4.push(`TEXTO LIVRE / COPY DIRETA:\n${freeText}`);
