@@ -506,10 +506,11 @@ const app = {
 
   fillChips(key, values, wrapId, inputId) {
     this.chipData[key] = [];
+    const wrap = document.getElementById(wrapId);
+    if (!wrap) { this.chipData[key] = [...values]; return; }
     document.querySelectorAll(`#${wrapId} .chip`).forEach(c => c.remove());
     values.forEach(v => {
       this.chipData[key].push(v);
-      const wrap = document.getElementById(wrapId);
       const chip = document.createElement('span'); chip.className = 'chip';
       chip.innerHTML = `${v}<span class="chip-x" onclick="removeChip(this,'${key}')">×</span>`;
       wrap.insertBefore(chip, document.getElementById(inputId));

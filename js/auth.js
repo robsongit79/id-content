@@ -88,29 +88,40 @@ const auth = {
       this.clearSession();
       return null;
     }
-    
-    // Tenta atualizar a sessão (refresh token) para manter o usuário sempre ativo
-    try {
-      const url = `${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refresh_token: refreshToken })
-      });
-      if (!res.ok) {
-        throw new Error('Sessão expirada');
+
+    // Evita disparar múltiplos refresh em paralelo (ex: saveAll com 3 requests
+    // simultâneas após token expirar). O Supabase rotaciona o refresh_token a
+    // cada uso, então renovações concorrentes com o mesmo token invalidam a
+    // sessão recém-renovada. Compartilha uma única promise em voo.
+    if (this._refreshPromise) return this._refreshPromise;
+
+    this._refreshPromise = (async () => {
+      try {
+        const url = `${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ refresh_token: refreshToken })
+        });
+        if (!res.ok) {
+          throw new Error('Sessão expirada');
+        }
+        const data = await res.json();
+        this.setSession(data);
+        return data.user;
+      } catch (e) {
+        console.warn('Sessão inválida ou expirada, limpando tokens...', e);
+        this.clearSession();
+        return null;
+      } finally {
+        this._refreshPromise = null;
       }
-      const data = await res.json();
-      this.setSession(data);
-      return data.user;
-    } catch (e) {
-      console.warn('Sessão inválida ou expirada, limpando tokens...', e);
-      this.clearSession();
-      return null;
-    }
+    })();
+
+    return this._refreshPromise;
   },
 
   setSession(data) {
