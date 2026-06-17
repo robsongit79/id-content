@@ -287,7 +287,7 @@
         <div id="cAdvancedOptions" class="advanced-options-group" style="display:none; margin-bottom:14px;">
           <div class="field-group cols-2">
             <div class="field"><label class="field-label">Formato de entrega</label><select id="cDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
-            <div class="field"><label class="field-label">Fontes</label><select id="cFontB64" disabled><option value="Embutir fontes em base64 no CSS" selected>Embutir em base64 (obrigatório)</option></select></div>
+            <div class="field"><label class="field-label">Fontes</label><select id="cFontB64" oninput="markDirty()"><option value="Importar via Google Fonts (Link HTML)" selected>Importar via Google Fonts (Recomendado)</option><option value="Embutir fontes em base64 no CSS">Embutir em base64 (CSS Standalone)</option></select></div>
           </div>
         </div>
 
@@ -540,7 +540,7 @@
         <div id="pAdvancedOptions" class="advanced-options-group" style="display:none; margin-bottom:14px;">
           <div class="field-group cols-2">
             <div class="field"><label class="field-label">Formato de entrega</label><select id="pDelivery" oninput="markDirty()"><option value="HTML standalone por formato">HTML standalone por formato</option><option value="Um único HTML com todos os formatos">Um HTML com todos os formatos</option><option value="HTML com botão exportar PNG">HTML com botão exportar PNG</option></select></div>
-            <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" disabled><option value="Embutir fontes em base64 no CSS" selected>Embutir em base64 (obrigatório)</option></select></div>
+            <div class="field"><label class="field-label">Fontes</label><select id="pFontB64" oninput="markDirty()"><option value="Importar via Google Fonts (Link HTML)" selected>Importar via Google Fonts (Recomendado)</option><option value="Embutir fontes em base64 no CSS">Embutir em base64 (CSS Standalone)</option></select></div>
           </div>
         </div>
 

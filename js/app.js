@@ -414,7 +414,7 @@ const app = {
     set('cSequence', c.sequence); set('cFixedEl', c.fixed_elements);
     set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta);
 
-    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '', content = '';
+    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Importar via Google Fonts (Link HTML)', final_notes = '', content = '';
     if (c.notes) {
       try {
         const parsed = JSON.parse(c.notes);
@@ -766,7 +766,7 @@ const app = {
       setVal('cFormat', preset.layout.format); setVal('cSlideCount', preset.layout.slide_count);
       setVal('cSequence', preset.layout.sequence); setVal('cFixedEl', preset.layout.fixed_elements);
       setVal('cSlide1', preset.layout.slide_hero); setVal('cSlideCta', preset.layout.slide_cta);
-      let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '';
+      let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Importar via Google Fonts (Link HTML)', final_notes = '';
       if (preset.layout.notes) {
         try {
           const parsed = JSON.parse(preset.layout.notes);

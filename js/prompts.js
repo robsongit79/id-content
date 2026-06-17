@@ -17,6 +17,54 @@ const prompts = {
       .replace(/\n/g, '<br>');
   },
 
+  getFontUrl() {
+    const display = f('bFontDisplay');
+    const body = f('bFontBody');
+    const weightStr = f('bWeightTitle');
+    let weight = '700';
+    if (weightStr) {
+      const match = weightStr.match(/\d+/);
+      if (match) weight = match[0];
+    }
+    if (!display && !body) return '';
+    const families = [];
+    if (display) {
+      const slugDisplay = display.replace(/ /g, '+');
+      const weights = Array.from(new Set([weight, '400', '700'])).sort((a, b) => parseInt(a) - parseInt(b));
+      families.push(`family=${slugDisplay}:wght@${weights.join(';')}`);
+    }
+    if (body && body !== display) {
+      const slugBody = body.replace(/ /g, '+');
+      families.push(`family=${slugBody}:wght@400;700`);
+    }
+    return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
+  },
+
+  getFontInstructions(optionId) {
+    const option = f(optionId);
+    const isGoogleFonts = option.includes('Google Fonts') || !option.includes('base64');
+    if (isGoogleFonts) {
+      const url = this.getFontUrl();
+      const display = f('bFontDisplay') || 'serif';
+      const body = f('bFontBody') || 'sans-serif';
+      return `5. **IMPORTAÇÃO DE FONTES VIA GOOGLE FONTS (OBRIGATÓRIO):**
+   - É OBRIGATÓRIO importar as fontes utilizando a seguinte tag \`<link>\` dentro da seção \`<head>\` do HTML:
+     \`<link href="${url}" rel="stylesheet">\`
+   - É PROIBIDO tentar codificar ou embutir fontes em Base64.
+   - Aplique as fontes no CSS da seguinte forma:
+     - Títulos/Display: font-family: '${display}', serif;
+     - Texto de corpo: font-family: '${body}', sans-serif;
+   - Certifique-se de aplicar o peso de título especificado nas diretrizes da marca (ex: \`font-weight: 300\` para Light, \`font-weight: 700\` para Bold, etc.) utilizando a propriedade \`font-weight\` no CSS.`;
+    } else {
+      return `5. **FONTES EM BASE64 (OBRIGATÓRIO):**
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
+   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
+   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
+   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.`;
+    }
+  },
+
   buildBase() {
     const s = [];
     s.push(`# BASE — ${f('bName') || 'MARCA'}\n# Identidade visual e tom de voz. Usada em todos os conteúdos.`);
@@ -131,12 +179,7 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **FONTES EM BASE64 (OBRIGATÓRIO):**
-   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
-   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
-   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
-   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.
+${this.getFontInstructions('cFontB64')}
 6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
@@ -250,12 +293,7 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **FONTES EM BASE64 (OBRIGATÓRIO):**
-   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
-   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
-   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
-   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.
+${this.getFontInstructions('pFontB64')}
 6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
