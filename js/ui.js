@@ -353,7 +353,7 @@ const FIELD_TIPS = {
   // Carrossel — Entrega
   cForbidden:  'Restrições visuais ou de conteúdo específicas para este carrossel.',
   cDelivery:   'Como o código HTML do carrossel será estruturado na entrega.',
-  cFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
+  cFontB64:    'Obrigatório: as fontes são sempre embutidas em base64 no CSS, garantindo que a estética tipográfica não dependa de conexão externa.',
   cFinalNotes: 'Últimas instruções antes de o Claude gerar o código do carrossel.',
   // Post — Conteúdo
   pHeadline:     'Texto de maior destaque. Deve capturar atenção em 3 segundos.',
@@ -378,7 +378,7 @@ const FIELD_TIPS = {
   // Post — Entrega
   pForbidden:  'Restrições visuais ou de conteúdo específicas para este post.',
   pDelivery:   'Como o código HTML do post será estruturado na entrega.',
-  pFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
+  pFontB64:    'Obrigatório: as fontes são sempre embutidas em base64 no CSS, garantindo que a estética tipográfica não dependa de conexão externa.',
   pFinalNotes: 'Últimas instruções antes de o Claude gerar o código do post.',
   // Layout por formato
   pL1Notes: 'Instruções específicas de layout para o formato 1:1.',

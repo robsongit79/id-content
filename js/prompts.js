@@ -129,9 +129,12 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **VISUAL DAS FONTES (CRÍTICO):**
+5. **FONTES EM BASE64 (OBRIGATÓRIO):**
    - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do carrossel seja mantido.
+   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
+   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
+   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
+   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.
 6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
@@ -244,9 +247,12 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **VISUAL DAS FONTES (CRÍTICO):**
+5. **FONTES EM BASE64 (OBRIGATÓRIO):**
    - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
+   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
+   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
+   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
+   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.
 6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
