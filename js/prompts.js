@@ -46,6 +46,7 @@ const prompts = {
     if (f('bSizeBody'))     s3.push(`TAMANHO CORPO:  ${f('bSizeBody')}`);
     if (f('bWeightTitle'))  s3.push(`PESO TÍTULO:    ${f('bWeightTitle')}`);
     if (f('bItalicUse'))    s3.push(`ITÁLICO:        ${f('bItalicUse')}`);
+    if (f('bTypoNotes'))    s3.push(`NOTAS:          ${f('bTypoNotes')}`);
     if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
 
     const s4 = [];
@@ -108,6 +109,7 @@ const prompts = {
     const c3 = [];
     if (f('cSlide1'))   c3.push(`SLIDE HERO:     ${f('cSlide1')}`);
     if (f('cSlideCta')) c3.push(`SLIDE CTA:      ${f('cSlideCta')}`);
+    if (f('cNotes'))    c3.push(`NOTAS:          ${f('cNotes')}`);
     if (c3.length) c.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
 
     const c4 = [];
@@ -223,6 +225,7 @@ const prompts = {
         if (f('pTerminalCode')) p4.push(`CÓDIGO:\n${f('pTerminalCode').split('\n').map(l => `  ${l}`).join('\n')}`);
       }
     }
+    if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
     const freeText = f('pFreeText');
     if (freeText) p4.push(`TEXTO LIVRE / COPY DIRETA:\n${freeText}`);
     if (p4.length) p.push(`## CONTEÚDO\n${p4.join('\n')}`);
