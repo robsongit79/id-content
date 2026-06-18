@@ -180,7 +180,16 @@ const prompts = {
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
 ${this.getFontInstructions('cFontB64')}
-6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
+   - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
+   - Se o bloco de texto de um slide não ocupar verticalmente uma fração razoável do espaço disponível (deixando grandes áreas vazias acima/abaixo), aumente o tamanho da fonte, o line-height, ou reposicione o bloco — nunca deixe vazios grandes e não intencionais.
+   - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
+7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
+   - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
+   - Não destaque verbos de ligação, artigos ou palavras genéricas apenas porque estão visualmente isoladas em uma linha.
+   - Identifique a ideia central da frase antes de aplicar o destaque — nunca destaque a última palavra da linha por padrão automático.
+   - Use no máximo 1-2 elementos de destaque por slide para manter a hierarquia visual clara.
+8. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
@@ -294,7 +303,16 @@ ${this.getFontInstructions('cFontB64')}
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
 ${this.getFontInstructions('pFontB64')}
-6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
+   - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
+   - Se o bloco de texto não ocupar verticalmente uma fração razoável do canvas (deixando grandes áreas vazias acima/abaixo), aumente o tamanho da fonte, o line-height, ou reposicione o bloco para preencher melhor o espaço — nunca deixe vazios grandes e não intencionais.
+   - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
+7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
+   - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
+   - Não destaque verbos de ligação, artigos ou palavras genéricas apenas porque estão visualmente isoladas em uma linha.
+   - Identifique a ideia central da frase antes de aplicar o destaque — nunca destaque a última palavra da linha por padrão automático.
+   - Use no máximo 1-2 elementos de destaque por peça para manter a hierarquia visual clara.
+8. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
