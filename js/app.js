@@ -5,7 +5,7 @@ const app = {
   isDirty: false,
   isAdminUser: false,
   currentBrandOriginalLogoUrl: null,
-  chipData: { personality: [], goal: [], pItems: [], hashtag: [], topic: [], pRankItems: [] },
+  chipData: { personality: [], goal: [], pItems: [], hashtag: [], topic: [] },
   presets: [],
   allBrands: [],
   activeCarouselPresetIndex: null,
@@ -27,15 +27,6 @@ const app = {
     'depoimento':    { label:'Depoimento', fields:['pFieldQuote'], dynLabel:'Depoimento', qA:'Nome do cliente', qR:'Cargo / Empresa' },
     'citacao':       { label:'Citação de especialista', fields:['pFieldQuote'], dynLabel:'Citação', qA:'Especialista', qR:'Cargo / Área' },
     'mini-artigo':   { label:'Mini artigo', fields:['pFieldArt'], dynLabel:'Conteúdo' },
-    'recibo':        { label:'Recibo / Nota fiscal', fields:['pFieldRecibo'], dynLabel:'Itens do recibo' },
-    'print-chat':    { label:'Print de conversa', fields:['pFieldChat'], dynLabel:'Conversa' },
-    'capa-revista':  { label:'Capa de revista', fields:['pFieldMagazine'], dynLabel:'Capa' },
-    'correcao':      { label:'Redação errada', fields:['pFieldCorrecao'], dynLabel:'Correção' },
-    'manchete':      { label:'Manchete de jornal', fields:['pFieldNews'], dynLabel:'Manchete' },
-    'ranking':       { label:'Ranking', fields:['pFieldRanking'], dynLabel:'Itens' },
-    'dilema':        { label:'Dilema', fields:['pFieldDilema'], dynLabel:'Dilema' },
-    'revelacao':     { label:'Inverso / Revelação', fields:['pFieldRevelacao'], dynLabel:'Revelação' },
-    'terminal':      { label:'Código / Terminal', fields:['pFieldTerminal'], dynLabel:'Código' },
   },
 
   // ── INIT ──
@@ -80,8 +71,6 @@ const app = {
     this.loadBrandList();
     initScrollNav();
     initTooltips();
-    initShortcuts();
-    renderPromptHistory();
 
     // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
     if (btnAdmin) {
@@ -414,7 +403,7 @@ const app = {
     set('cSequence', c.sequence); set('cFixedEl', c.fixed_elements);
     set('cSlide1', c.slide_hero); set('cSlideCta', c.slide_cta);
 
-    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Importar via Google Fonts (Link HTML)', final_notes = '', content = '';
+    let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '', content = '';
     if (c.notes) {
       try {
         const parsed = JSON.parse(c.notes);
@@ -482,22 +471,12 @@ const app = {
     set('pUrgPrazo', p.urgencia_prazo); set('pUrgOque', p.urgencia_oque);
     set('pQuoteText', p.quote_text); set('pQuoteAuthor', p.quote_author); set('pQuoteRole', p.quote_role);
     set('pArtBody', p.article_body);
-    set('pReceiptTitle', p.receipt_title); set('pReceiptItems', p.receipt_items); set('pReceiptTotal', p.receipt_total);
-    set('pChatA', p.chat_a); set('pChatB', p.chat_b); set('pChatMessages', p.chat_messages);
-    set('pMagHeadline', p.mag_headline); set('pMagSubtitle', p.mag_subtitle); set('pMagSection', p.mag_section); set('pMagEdition', p.mag_edition);
-    set('pCorrWrong', p.corr_wrong); set('pCorrRight', p.corr_right);
-    set('pNewsHeadline', p.news_headline); set('pNewsLead', p.news_lead); set('pNewsPublication', p.news_publication);
-    set('pRankTitle', p.rank_title);
-    set('pDilemmaQuestion', p.dilemma_question); set('pDilemmaA', p.dilemma_a); set('pDilemmaB', p.dilemma_b);
-    set('pRevelacaoConclusion', p.revelacao_conclusion); set('pRevelacaoWhy', p.revelacao_why);
-    set('pTerminalContext', p.terminal_context); set('pTerminalCode', p.terminal_code);
     set('pL1TextPos', p.layout_1x1_text_pos); set('pL1Bg', p.layout_1x1_bg); set('pL1Notes', p.layout_1x1_notes);
     set('pL4TextPos', p.layout_4x5_text_pos); set('pL4Bg', p.layout_4x5_bg); set('pL4Notes', p.layout_4x5_notes);
     set('pL9TextPos', p.layout_9x16_text_pos); set('pL9Bg', p.layout_9x16_bg); set('pL9Notes', p.layout_9x16_notes);
-    set('pDelivery', p.delivery_format); set('pFontB64', p.font_base64);
+    set('pForbidden', p.forbidden); set('pDelivery', p.delivery_format); set('pFontB64', p.font_base64);
     set('pFinalNotes', p.final_notes);
     if (p.items) this.fillChips('pItems', p.items, 'pItemsChips', 'pItemsInput');
-    if (p.rank_items) this.fillChips('pRankItems', p.rank_items, 'pRankItemsChips', 'pRankItemsInput');
     
     if (typeof syncUnifiedLayout === 'function') {
       syncUnifiedLayout();
@@ -506,11 +485,10 @@ const app = {
 
   fillChips(key, values, wrapId, inputId) {
     this.chipData[key] = [];
-    const wrap = document.getElementById(wrapId);
-    if (!wrap) { this.chipData[key] = [...values]; return; }
     document.querySelectorAll(`#${wrapId} .chip`).forEach(c => c.remove());
     values.forEach(v => {
       this.chipData[key].push(v);
+      const wrap = document.getElementById(wrapId);
       const chip = document.createElement('span'); chip.className = 'chip';
       chip.innerHTML = `${v}<span class="chip-x" onclick="removeChip(this,'${key}')">×</span>`;
       wrap.insertBefore(chip, document.getElementById(inputId));
@@ -609,19 +587,10 @@ const app = {
       urgencia_prazo: f('pUrgPrazo'), urgencia_oque: f('pUrgOque'),
       quote_text: f('pQuoteText'), quote_author: f('pQuoteAuthor'), quote_role: f('pQuoteRole'),
       article_body: f('pArtBody'),
-      receipt_title: f('pReceiptTitle'), receipt_items: f('pReceiptItems'), receipt_total: f('pReceiptTotal'),
-      chat_a: f('pChatA'), chat_b: f('pChatB'), chat_messages: f('pChatMessages'),
-      mag_headline: f('pMagHeadline'), mag_subtitle: f('pMagSubtitle'), mag_section: f('pMagSection'), mag_edition: f('pMagEdition'),
-      corr_wrong: f('pCorrWrong'), corr_right: f('pCorrRight'),
-      news_headline: f('pNewsHeadline'), news_lead: f('pNewsLead'), news_publication: f('pNewsPublication'),
-      rank_title: f('pRankTitle'), rank_items: this.chipData.pRankItems,
-      dilemma_question: f('pDilemmaQuestion'), dilemma_a: f('pDilemmaA'), dilemma_b: f('pDilemmaB'),
-      revelacao_conclusion: f('pRevelacaoConclusion'), revelacao_why: f('pRevelacaoWhy'),
-      terminal_context: f('pTerminalContext'), terminal_code: f('pTerminalCode'),
       layout_1x1_text_pos: f('pL1TextPos'), layout_1x1_bg: f('pL1Bg'), layout_1x1_notes: f('pL1Notes'),
       layout_4x5_text_pos: f('pL4TextPos'), layout_4x5_bg: f('pL4Bg'), layout_4x5_notes: f('pL4Notes'),
       layout_9x16_text_pos: f('pL9TextPos'), layout_9x16_bg: f('pL9Bg'), layout_9x16_notes: f('pL9Notes'),
-      delivery_format: f('pDelivery'), font_base64: f('pFontB64'),
+      forbidden: f('pForbidden'), delivery_format: f('pDelivery'), font_base64: f('pFontB64'),
       final_notes: f('pFinalNotes'),
     };
   },
@@ -673,9 +642,9 @@ const app = {
     document.querySelectorAll('#screenEditor select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
     document.querySelectorAll('.radio-item,.logo-pos-item,.type-card').forEach(e => e.classList.remove('selected'));
     document.querySelectorAll('#screenEditor input[type="radio"]').forEach(e => e.checked = false);
-    ['personality','goal','pItems','hashtag','topic','pRankItems'].forEach(k => {
+    ['personality','goal','pItems','hashtag','topic'].forEach(k => {
       this.chipData[k] = [];
-      const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips', hashtag:'hashtagChips', topic:'topicChips', pRankItems:'pRankItemsChips' };
+      const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips', hashtag:'hashtagChips', topic:'topicChips' };
       if (ids[k]) document.querySelectorAll(`#${ids[k]} .chip`).forEach(c => c.remove());
     });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
@@ -766,7 +735,7 @@ const app = {
       setVal('cFormat', preset.layout.format); setVal('cSlideCount', preset.layout.slide_count);
       setVal('cSequence', preset.layout.sequence); setVal('cFixedEl', preset.layout.fixed_elements);
       setVal('cSlide1', preset.layout.slide_hero); setVal('cSlideCta', preset.layout.slide_cta);
-      let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Importar via Google Fonts (Link HTML)', final_notes = '';
+      let notes = '', forbidden = '', delivery_format = 'HTML standalone por formato', font_base64 = 'Embutir fontes em base64 no CSS', final_notes = '';
       if (preset.layout.notes) {
         try {
           const parsed = JSON.parse(preset.layout.notes);

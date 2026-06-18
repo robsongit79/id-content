@@ -94,17 +94,23 @@ function showCopied(id) {
 
 function baseCopy() {
   const p = prompts.buildBase(); if (!p) { toast('Preencha pelo menos o nome da marca.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => { showCopied('baseCopyMsg'); savePromptHistory('base', p); });
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('baseCopyMsg');
+  });
 }
 
 function carCopy() {
   const p = prompts.buildCarousel(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => { showCopied('carCopyMsg'); savePromptHistory('car', p); });
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('carCopyMsg');
+  });
 }
 
 function postCopy() {
   const p = prompts.buildPost(); if (!p) { toast('Preencha a aba Base primeiro.', 'error'); return; }
-  navigator.clipboard.writeText(p).then(() => { showCopied('postCopyMsg'); savePromptHistory('post', p); });
+  navigator.clipboard.writeText(p).then(() => {
+    showCopied('postCopyMsg');
+  });
 }
 
 // ── UPDATE PREVIEWS ──
@@ -123,8 +129,8 @@ function updatePreviews() {
     activeBrandNameEl.textContent = f('bName') || 'Sem nome';
   }
 
-  updateBrandSummary();
   updateProgress();
+  updateVisualPreview();
 }
 
 function updateProgress() {
@@ -353,7 +359,7 @@ const FIELD_TIPS = {
   // Carrossel — Entrega
   cForbidden:  'Restrições visuais ou de conteúdo específicas para este carrossel.',
   cDelivery:   'Como o código HTML do carrossel será estruturado na entrega.',
-  cFontB64:    'Obrigatório: as fontes são sempre embutidas em base64 no CSS, garantindo que a estética tipográfica não dependa de conexão externa.',
+  cFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
   cFinalNotes: 'Últimas instruções antes de o Claude gerar o código do carrossel.',
   // Post — Conteúdo
   pHeadline:     'Texto de maior destaque. Deve capturar atenção em 3 segundos.',
@@ -378,7 +384,7 @@ const FIELD_TIPS = {
   // Post — Entrega
   pForbidden:  'Restrições visuais ou de conteúdo específicas para este post.',
   pDelivery:   'Como o código HTML do post será estruturado na entrega.',
-  pFontB64:    'Obrigatório: as fontes são sempre embutidas em base64 no CSS, garantindo que a estética tipográfica não dependa de conexão externa.',
+  pFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
   pFinalNotes: 'Últimas instruções antes de o Claude gerar o código do post.',
   // Layout por formato
   pL1Notes: 'Instruções específicas de layout para o formato 1:1.',
@@ -448,31 +454,7 @@ function renderPresets() {
     title.className = 'preset-title';
     title.textContent = preset.name;
     card.appendChild(title);
-
-    // Color swatches
-    if (preset.colors) {
-      const swatches = document.createElement('div');
-      swatches.className = 'preset-swatches';
-      ['color_primary','color_secondary','color_accent'].forEach(k => {
-        if (preset.colors[k]) {
-          const dot = document.createElement('span');
-          dot.className = 'preset-swatch';
-          dot.style.background = preset.colors[k];
-          dot.title = preset.colors[k];
-          swatches.appendChild(dot);
-        }
-      });
-      card.appendChild(swatches);
-    }
-
-    // Font name
-    if (preset.fonts && preset.fonts.font_display) {
-      const fontEl = document.createElement('span');
-      fontEl.className = 'preset-font';
-      fontEl.textContent = preset.fonts.font_display;
-      card.appendChild(fontEl);
-    }
-
+    
     // Botão de deletar
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
@@ -500,96 +482,412 @@ function renderPresets() {
 }
 
 function updateVisualPreview() {
-  // Simulador removido
-}
+  const card = document.getElementById('postPreviewCard');
+  if (!card) return;
 
-// ── CATEGORY FILTER ──
-function filterPostTypes(cat) {
-  document.querySelectorAll('.type-filter-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === cat);
-  });
-  const normalize = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  document.querySelectorAll('.type-card').forEach(card => {
-    if (cat === 'todos') { card.style.display = ''; return; }
-    const catEl = card.querySelector('.type-category');
-    const cardCat = catEl ? normalize(catEl.textContent.trim()) : 'educacao';
-    card.style.display = cardCat === cat ? '' : 'none';
-  });
-}
+  const primaryColor = document.getElementById('cPrimaryHex')?.value || '#1E40AF';
+  const secondaryColor = document.getElementById('cSecondaryHex')?.value || '#3B82F6';
+  const darkBgColor = document.getElementById('cDarkHex')?.value || '#0A0F1E';
+  const lightBgColor = document.getElementById('cLightHex')?.value || '#F0F4FF';
+  const textColor = document.getElementById('cTextHex')?.value || '#F5F0E8';
+  
+  const displayFont = f('bFontDisplay') || 'Montserrat';
+  const bodyFont = f('bFontBody') || 'sans-serif';
 
-// ── BRAND SUMMARY STRIP ──
-function updateBrandSummary() {
-  const name = f('bName');
-  const tone = f('bToneMain');
-  const primary = f('cPrimaryHex') || document.getElementById('cPrimary')?.value;
-  const secondary = f('cSecondaryHex') || document.getElementById('cSecondary')?.value;
-  const accent = f('cAccentHex') || document.getElementById('cAccent')?.value;
-  const font = f('bFontDisplay');
-
-  ['brandSummaryCar','brandSummaryPost'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (!name) { el.setAttribute('data-empty','true'); el.innerHTML = ''; return; }
-    el.removeAttribute('data-empty');
-    let html = `<span class="brand-summary-item"><span class="brand-summary-lbl">Marca</span><span class="brand-summary-val">${name}</span></span>`;
-    if (tone) html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Tom</span><span class="brand-summary-val">${tone}</span></span>`;
-    if (font) html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Fonte</span><span class="brand-summary-val">${font}</span></span>`;
-    if (primary || secondary || accent) {
-      html += `<span class="brand-summary-item"><span class="brand-summary-lbl">Paleta</span>`;
-      if (primary) html += `<span class="brand-summary-dot" style="background:${primary}"></span>`;
-      if (secondary) html += `<span class="brand-summary-dot" style="background:${secondary}"></span>`;
-      if (accent) html += `<span class="brand-summary-dot" style="background:${accent}"></span>`;
-      html += `</span>`;
+  card.style.fontFamily = `'${bodyFont}', sans-serif`;
+  const headlineEl = document.getElementById('postPreviewHeadline');
+  if (headlineEl) {
+    headlineEl.style.fontFamily = `'${displayFont}', sans-serif`;
+    headlineEl.style.color = textColor;
+    if (app.postType === 'frase-impacto') {
+      headlineEl.style.fontSize = '18px';
+      headlineEl.style.lineHeight = '1.3';
+    } else {
+      headlineEl.style.fontSize = '14px';
+      headlineEl.style.lineHeight = '1.25';
     }
-    el.innerHTML = html;
-  });
-}
+  }
 
-// ── PROMPT HISTORY ──
-let _promptHistory = [];
-try { _promptHistory = JSON.parse(localStorage.getItem('promptHistory') || '[]'); } catch(e) {}
+  const previewRatio = window.currentPreviewRatio || '1x1';
+  let textPos = '';
+  let bgType = '';
+  
+  if (previewRatio === '1x1') {
+    textPos = document.getElementById('pL1TextPos')?.value || '';
+    bgType = document.getElementById('pL1Bg')?.value || '';
+  } else if (previewRatio === '4x5') {
+    textPos = document.getElementById('pL4TextPos')?.value || '';
+    bgType = document.getElementById('pL4Bg')?.value || '';
+  } else if (previewRatio === '9x16') {
+    textPos = document.getElementById('pL9TextPos')?.value || '';
+    bgType = document.getElementById('pL9Bg')?.value || '';
+  }
 
-function savePromptHistory(type, text) {
-  _promptHistory.unshift({ type, text, ts: Date.now() });
-  _promptHistory = _promptHistory.slice(0, 15);
-  try { localStorage.setItem('promptHistory', JSON.stringify(_promptHistory)); } catch(e) {}
-  renderPromptHistory();
-}
+  // Configurações de Fundo
+  card.style.backgroundSize = ''; // Reset
+  if (bgType === 'Branco / claro') {
+    card.style.background = lightBgColor;
+    card.style.color = '#1A1A1A';
+    if (headlineEl) headlineEl.style.color = '#1A1A1A';
+  } else if (bgType === 'Cor sólida da marca') {
+    card.style.background = primaryColor;
+    card.style.color = textColor;
+  } else if (bgType === 'Gradiente da marca' || bgType === 'Gradiente vertical') {
+    card.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor || primaryColor})`;
+    card.style.color = textColor;
+  } else if (bgType === 'Foto com overlay') {
+    card.style.background = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)), radial-gradient(circle at 80% 20%, ${secondaryColor || primaryColor} 0%, ${darkBgColor} 80%)`;
+    card.style.color = textColor;
+  } else if (bgType === 'Padrão / textura') {
+    card.style.background = `radial-gradient(${secondaryColor || primaryColor} 1px, transparent 1px), ${darkBgColor}`;
+    card.style.backgroundSize = '12px 12px';
+    card.style.color = textColor;
+  } else {
+    card.style.background = darkBgColor;
+    card.style.color = textColor;
+  }
 
-function recopyHistory(idx) {
-  const h = _promptHistory[idx];
-  if (!h) return;
-  navigator.clipboard.writeText(h.text).then(() => toast('Prompt copiado do histórico', 'success'));
-}
-
-function renderPromptHistory() {
-  ['base','car','post'].forEach(tab => {
-    const el = document.getElementById(`${tab}HistoryList`);
-    if (!el) return;
-    const entries = _promptHistory.map((h, i) => ({ ...h, gi: i })).filter(h => h.type === tab);
-    if (!entries.length) { el.innerHTML = '<span class="history-empty">Nenhum prompt copiado ainda.</span>'; return; }
-    el.innerHTML = entries.map(h => {
-      const d = new Date(h.ts);
-      const label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      return `<div class="history-item"><span class="history-time">${label}</span><button class="history-copy-btn" onclick="recopyHistory(${h.gi})" title="Copiar novamente">⟳</button></div>`;
-    }).join('');
-  });
-}
-
-// ── KEYBOARD SHORTCUTS ──
-function initShortcuts() {
-  document.addEventListener('keydown', e => {
-    if (!e.metaKey && !e.ctrlKey) return;
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (app.currentTab === 'base') baseCopy();
-      else if (app.currentTab === 'car') carCopy();
-      else if (app.currentTab === 'post') postCopy();
+  // Posicionamento absoluto da Logo
+  const logoActive = document.getElementById('bLogoActive')?.checked || false;
+  const logoPos = getRadio('postLogoPos') || 'não exibir';
+  const logoEl = document.getElementById('postPreviewLogo');
+  
+  if (logoEl) {
+    if (logoActive && logoPos !== 'não exibir') {
+      logoEl.style.display = 'block';
+      logoEl.style.position = 'absolute';
+      logoEl.style.zIndex = '10';
+      logoEl.textContent = 'logo';
+      
+      // Resetar propriedades absolutas
+      logoEl.style.top = 'auto';
+      logoEl.style.bottom = 'auto';
+      logoEl.style.left = 'auto';
+      logoEl.style.right = 'auto';
+      logoEl.style.transform = 'none';
+      logoEl.style.margin = '0';
+      
+      // Topo ou Base
+      if (logoPos.startsWith('topo')) {
+        logoEl.style.top = '14px';
+      } else if (logoPos.startsWith('base')) {
+        logoEl.style.bottom = '14px';
+      }
+      
+      // Alinhamento Horizontal
+      if (logoPos.includes('esquerdo') || logoPos.includes('esquerda')) {
+        logoEl.style.left = '16px';
+      } else if (logoPos.includes('direito') || logoPos.includes('direita')) {
+        logoEl.style.right = '16px';
+      } else if (logoPos.includes('centro')) {
+        logoEl.style.left = '50%';
+        logoEl.style.transform = 'translateX(-50%)';
+      } else if (logoPos === 'centro') {
+        logoEl.style.top = '50%';
+        logoEl.style.left = '50%';
+        logoEl.style.transform = 'translate(-50%, -50%)';
+      }
+    } else {
+      logoEl.style.display = 'none';
     }
-    if (e.key === 's') {
-      e.preventDefault();
-      if (app.currentBrandId && app.isDirty) { setSaveStatus('saving'); app.save(); }
+  }
+
+  const contentEl = card.querySelector('.post-preview-content');
+  if (contentEl) {
+    contentEl.style.marginTop = '';
+    contentEl.style.marginBottom = '';
+    
+    // Aumenta margem se a logo estiver na mesma direção do alinhamento vertical
+    if (logoActive && logoPos !== 'não exibir') {
+      if (logoPos.startsWith('topo')) {
+        contentEl.style.marginTop = '22px';
+      } else if (logoPos.startsWith('base')) {
+        contentEl.style.marginBottom = '22px';
+      }
     }
-  });
+
+    // Alinhamento Horizontal
+    if (textPos === 'Alinhado à esquerda' || textPos === 'Canto inferior esquerdo' || textPos === 'Terço inferior (safe zone)' || textPos === 'Terço inferior') {
+      contentEl.style.textAlign = 'left';
+      contentEl.style.alignItems = 'flex-start';
+    } else if (textPos === 'Dividido — topo e base' || textPos === 'Full screen empilhado') {
+      contentEl.style.textAlign = 'center';
+      contentEl.style.alignItems = 'stretch';
+    } else {
+      contentEl.style.textAlign = 'center';
+      contentEl.style.alignItems = 'center';
+    }
+
+    // Alinhamento Vertical
+    if (textPos.includes('inferior') || textPos.includes('base')) {
+      contentEl.style.justifyContent = 'flex-end';
+    } else if (textPos.includes('superior') || textPos.includes('topo')) {
+      contentEl.style.justifyContent = 'flex-start';
+    } else if (textPos.includes('Dividido') || textPos.includes('empilhado')) {
+      contentEl.style.justifyContent = 'space-between';
+    } else {
+      contentEl.style.justifyContent = 'center';
+    }
+  }
+
+  const handleEl = document.getElementById('postPreviewHandle');
+  if (handleEl) {
+    const handleText = f('bHandle');
+    handleEl.textContent = handleText ? (handleText.startsWith('@') ? handleText : '@' + handleText) : '';
+  }
+
+  if (headlineEl) {
+    headlineEl.textContent = f('pHeadline') || 'Título do Post';
+  }
+  const subtitleEl = document.getElementById('postPreviewSubtitle');
+  if (subtitleEl) {
+    const text = f('pSubtitle');
+    subtitleEl.textContent = text;
+    subtitleEl.style.display = text ? 'block' : 'none';
+  }
+  const ctaEl = document.getElementById('postPreviewCta');
+  if (ctaEl) {
+    const text = f('pCta');
+    ctaEl.textContent = text || 'Ação';
+    ctaEl.style.display = text ? 'inline-block' : 'none';
+  }
+
+  const bodyArea = document.getElementById('postPreviewBody');
+  if (bodyArea) {
+    bodyArea.innerHTML = '';
+    bodyArea.style.display = 'block';
+    
+    const freeText = f('pFreeText');
+    if (freeText) {
+      const div = document.createElement('div');
+      div.style.fontSize = '9.5px';
+      div.style.textAlign = 'left';
+      div.style.lineHeight = '1.3';
+      div.style.whiteSpace = 'pre-wrap';
+      div.textContent = freeText.length > 200 ? freeText.substring(0, 200) + '...' : freeText;
+      bodyArea.appendChild(div);
+    } else if (app.postType === 'checklist' || app.postType === 'passo-a-passo') {
+      if (app.chipData.pItems.length) {
+        const ul = document.createElement('ul');
+        ul.style.listStyleType = app.postType === 'checklist' ? 'none' : 'decimal';
+        ul.style.paddingLeft = app.postType === 'checklist' ? '0' : '15px';
+        ul.style.margin = '4px 0';
+        ul.style.textAlign = 'left';
+        app.chipData.pItems.slice(0, 4).forEach(item => {
+          const li = document.createElement('li');
+          li.style.marginBottom = '2px';
+          li.textContent = (app.postType === 'checklist' ? '✓ ' : '') + item;
+          ul.appendChild(li);
+        });
+        bodyArea.appendChild(ul);
+      }
+    } else if (app.postType === 'estatistica') {
+      const num = f('pStatNum');
+      const ctx = f('pStatCtx');
+      const src = f('pStatSrc');
+      if (num || ctx || src) {
+        if (num) {
+          const divNum = document.createElement('div');
+          divNum.style.fontSize = '26px';
+          divNum.style.fontWeight = '900';
+          divNum.style.lineHeight = '1';
+          divNum.style.color = secondaryColor || primaryColor;
+          divNum.textContent = num;
+          bodyArea.appendChild(divNum);
+        }
+        if (ctx) {
+          const divCtx = document.createElement('div');
+          divCtx.style.fontSize = '10px';
+          divCtx.style.opacity = '0.9';
+          divCtx.style.marginTop = '4px';
+          divCtx.textContent = ctx;
+          bodyArea.appendChild(divCtx);
+        }
+        if (src) {
+          const divSrc = document.createElement('div');
+          divSrc.style.fontSize = '8px';
+          divSrc.style.opacity = '0.6';
+          divSrc.style.marginTop = '6px';
+          divSrc.style.fontStyle = 'italic';
+          divSrc.textContent = 'Fonte: ' + src;
+          bodyArea.appendChild(divSrc);
+        }
+      }
+    } else if (app.postType === 'antes-depois' || app.postType === 'comparativo') {
+      const compA = f('pCompA');
+      const compB = f('pCompB');
+      if (compA || compB) {
+        const div = document.createElement('div');
+        div.style.display = 'grid';
+        div.style.gridTemplateColumns = '1fr 1fr';
+        div.style.gap = '8px';
+        div.style.fontSize = '9px';
+        div.style.textAlign = 'left';
+        div.style.marginTop = '4px';
+        
+        const cfg = app.postTypeConfig[app.postType];
+        const labelA = cfg?.compA || 'Lado A';
+        const labelB = cfg?.compB || 'Lado B';
+        
+        const colA = document.createElement('div');
+        colA.style.background = 'rgba(255,255,255,0.05)';
+        colA.style.padding = '6px';
+        colA.style.borderRadius = '4px';
+        colA.innerHTML = `<strong>${labelA}:</strong><br>${compA || 'Opção A'}`;
+        
+        const colB = document.createElement('div');
+        colB.style.background = 'rgba(71,255,212,0.05)';
+        colB.style.padding = '6px';
+        colB.style.borderRadius = '4px';
+        colB.innerHTML = `<strong>${labelB}:</strong><br>${compB || 'Opção B'}`;
+        
+        div.appendChild(colA);
+        div.appendChild(colB);
+        bodyArea.appendChild(div);
+      }
+    } else if (app.postType === 'depoimento' || app.postType === 'citacao') {
+      const text = f('pQuoteText');
+      const author = f('pQuoteAuthor');
+      const role = f('pQuoteRole');
+      if (text || author) {
+        const div = document.createElement('div');
+        div.style.fontStyle = 'italic';
+        div.style.padding = '6px 8px';
+        div.style.borderLeft = `2px solid ${primaryColor}`;
+        div.style.background = 'rgba(255,255,255,0.02)';
+        div.style.textAlign = 'left';
+        div.textContent = `"${text || 'Frase de citação ou depoimento...'}"`;
+        
+        const divAuthor = document.createElement('div');
+        divAuthor.style.fontSize = '9px';
+        divAuthor.style.fontWeight = 'bold';
+        divAuthor.style.marginTop = '4px';
+        divAuthor.style.fontStyle = 'normal';
+        
+        const cfg = app.postTypeConfig[app.postType];
+        const defaultAuthor = cfg?.qA || 'Autor';
+        divAuthor.textContent = `- ${author || defaultAuthor}${role ? ` (${role})` : ''}`;
+        
+        bodyArea.appendChild(div);
+        bodyArea.appendChild(divAuthor);
+      }
+    } else if (app.postType === 'mini-artigo') {
+      const text = f('pArtBody');
+      if (text) {
+        const div = document.createElement('div');
+        div.style.fontSize = '9.5px';
+        div.style.textAlign = 'left';
+        div.style.lineHeight = '1.3';
+        div.textContent = text.length > 150 ? text.substring(0, 150) + '...' : text;
+        bodyArea.appendChild(div);
+      }
+    } else if (app.postType === 'anuncio') {
+      const price = f('pAnPrice');
+      const benefit = f('pAnBenefit');
+      if (price || benefit) {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(71,255,212,0.06)';
+        div.style.border = `1px dashed ${secondaryColor || primaryColor}`;
+        div.style.padding = '8px';
+        div.style.borderRadius = '4px';
+        div.style.textAlign = 'center';
+        div.style.marginTop = '4px';
+        
+        if (price) {
+          const pPrice = document.createElement('div');
+          pPrice.style.fontSize = '16px';
+          pPrice.style.fontWeight = '800';
+          pPrice.style.color = secondaryColor || primaryColor;
+          pPrice.textContent = price;
+          div.appendChild(pPrice);
+        }
+        if (benefit) {
+          const pBenefit = document.createElement('div');
+          pBenefit.style.fontSize = '9.5px';
+          pBenefit.style.marginTop = '4px';
+          pBenefit.textContent = benefit;
+          div.appendChild(pBenefit);
+        }
+        bodyArea.appendChild(div);
+      }
+    } else if (app.postType === 'urgencia') {
+      const prazo = f('pUrgPrazo');
+      const oque = f('pUrgOque');
+      if (prazo || oque) {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(255,92,92,0.06)';
+        div.style.border = '1px solid rgba(255,92,92,0.2)';
+        div.style.padding = '8px';
+        div.style.borderRadius = '4px';
+        div.style.textAlign = 'left';
+        div.style.marginTop = '4px';
+        
+        if (oque) {
+          const pOque = document.createElement('div');
+          pOque.style.fontSize = '9.5px';
+          pOque.style.fontWeight = 'bold';
+          pOque.style.color = '#FF5C5C';
+          pOque.textContent = '⏳ CORRA: ' + oque;
+          div.appendChild(pOque);
+        }
+        if (prazo) {
+          const pPrazo = document.createElement('div');
+          pPrazo.style.fontSize = '9px';
+          pPrazo.style.marginTop = '4px';
+          pPrazo.style.opacity = '0.9';
+          pPrazo.textContent = 'Prazo: ' + prazo;
+          div.appendChild(pPrazo);
+        }
+        bodyArea.appendChild(div);
+      }
+    } else if (app.postType === 'lancamento') {
+      const div = document.createElement('div');
+      div.style.display = 'inline-block';
+      div.style.background = `linear-gradient(90deg, ${primaryColor}, ${secondaryColor || primaryColor})`;
+      div.style.color = '#fff';
+      div.style.padding = '4px 10px';
+      div.style.borderRadius = '20px';
+      div.style.fontWeight = 'bold';
+      div.style.fontSize = '9px';
+      div.style.textTransform = 'uppercase';
+      div.style.letterSpacing = '1px';
+      div.style.marginTop = '4px';
+      div.textContent = '🚀 Novo Lançamento';
+      bodyArea.appendChild(div);
+    } else if (app.postType === 'pergunta') {
+      const div = document.createElement('div');
+      div.style.fontSize = '24px';
+      div.style.opacity = '0.3';
+      div.style.textAlign = 'center';
+      div.style.marginTop = '4px';
+      div.textContent = '❓';
+      bodyArea.appendChild(div);
+    } else {
+      bodyArea.style.display = 'none';
+    }
+  }
 }
 
+function setPreviewRatio(ratio) {
+  window.currentPreviewRatio = ratio;
+  const card = document.getElementById('postPreviewCard');
+  if (!card) return;
+  
+  if (ratio === '1x1') {
+    card.style.aspectRatio = '1 / 1';
+  } else if (ratio === '4x5') {
+    card.style.aspectRatio = '4 / 5';
+  } else if (ratio === '9x16') {
+    card.style.aspectRatio = '9 / 16';
+  }
+
+  const toggles = document.getElementById('postPreviewToggles');
+  if (toggles) {
+    toggles.querySelectorAll('button').forEach(btn => {
+      const active = btn.textContent.trim().replace(':', 'x') === ratio;
+      btn.classList.toggle('active', active);
+    });
+  }
+  
+  updateVisualPreview();
+}

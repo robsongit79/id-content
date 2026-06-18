@@ -17,59 +17,16 @@ const prompts = {
       .replace(/\n/g, '<br>');
   },
 
-  getFontUrl() {
-    const display = f('bFontDisplay');
-    const body = f('bFontBody');
-    const weightStr = f('bWeightTitle');
-    let weight = '700';
-    if (weightStr) {
-      const match = weightStr.match(/\d+/);
-      if (match) weight = match[0];
-    }
-    if (!display && !body) return '';
-    const families = [];
-    if (display) {
-      const slugDisplay = display.replace(/ /g, '+');
-      const weights = Array.from(new Set([weight, '400', '700'])).sort((a, b) => parseInt(a) - parseInt(b));
-      families.push(`family=${slugDisplay}:wght@${weights.join(';')}`);
-    }
-    if (body && body !== display) {
-      const slugBody = body.replace(/ /g, '+');
-      families.push(`family=${slugBody}:wght@400;700`);
-    }
-    return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
-  },
-
-  getFontInstructions(optionId) {
-    const option = f(optionId);
-    const isGoogleFonts = option.includes('Google Fonts') || !option.includes('base64');
-    if (isGoogleFonts) {
-      const url = this.getFontUrl();
-      const display = f('bFontDisplay') || 'serif';
-      const body = f('bFontBody') || 'sans-serif';
-      return `5. **IMPORTAÇÃO DE FONTES VIA GOOGLE FONTS (OBRIGATÓRIO):**
-   - É OBRIGATÓRIO importar as fontes utilizando a seguinte tag \`<link>\` dentro da seção \`<head>\` do HTML:
-     \`<link href="${url}" rel="stylesheet">\`
-   - É PROIBIDO tentar codificar ou embutir fontes em Base64.
-   - Aplique as fontes no CSS da seguinte forma:
-     - Títulos/Display: font-family: '${display}', serif;
-     - Texto de corpo: font-family: '${body}', sans-serif;
-   - Certifique-se de aplicar o peso de título especificado nas diretrizes da marca (ex: \`font-weight: 300\` para Light, \`font-weight: 700\` para Bold, etc.) utilizando a propriedade \`font-weight\` no CSS.`;
-    } else {
-      return `5. **FONTES EM BASE64 (OBRIGATÓRIO):**
-   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - É OBRIGATÓRIO embutir essas fontes via \`@font-face\` com dados reais em base64 diretamente no \`<style>\`, usando \`src: url(data:font/woff2;base64,...)\`. Isso garante que a estética tipográfica seja preservada de forma 100% independente de conexão externa.
-   - Baixe o arquivo .woff2 real da fonte (nos pesos/estilos utilizados, ex: 400 e 700) a partir do Google Fonts ou de uma CDN oficial e converta os bytes para uma string base64 genuína antes de embutir.
-   - É PROIBIDO usar \`@import\` ou \`<link>\` para carregar fontes do Google Fonts como alternativa — a entrega final não pode depender de requisições externas para renderizar o texto corretamente.
-   - **NUNCA invente, trunque ou alucine uma string base64 fictícia** (uma string inválida impede o carregamento da fonte e quebra o visual). Se não for possível obter o binário real da fonte exata, utilize a fonte mais próxima visualmente disponível, mas sempre entregue um \`@font-face\` funcional com base64 genuíno.`;
-    }
-  },
-
   buildBase() {
     const s = [];
     s.push(`# BASE — ${f('bName') || 'MARCA'}\n# Identidade visual e tom de voz. Usada em todos os conteúdos.`);
 
     const s1 = [];
+    if (f('bName'))        s1.push(`MARCA:          ${f('bName')}`);
+    if (f('bHandle'))      s1.push(`HANDLE:         ${f('bHandle')}`);
+    if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
+    if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
+    if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
     if (activeLogo) {
       s1.push("LOGO:           Ativa — Solicite o envio do link da logo ao usuário.");
@@ -84,6 +41,7 @@ const prompts = {
       const v = document.getElementById(id)?.value;
       if (v) s2.push(`${label}:${' '.repeat(Math.max(1, 16 - label.length))}${v}`);
     });
+    if (f('bColorsNotes')) s2.push(`NOTAS:          ${f('bColorsNotes')}`);
     if (s2.length) s.push(`## 02 · PALETA\n${s2.join('\n')}`);
 
     const s3 = [];
@@ -95,13 +53,14 @@ const prompts = {
     if (f('bWeightTitle'))  s3.push(`PESO TÍTULO:    ${f('bWeightTitle')}`);
     if (f('bItalicUse'))    s3.push(`ITÁLICO:        ${f('bItalicUse')}`);
     if (f('bTypoNotes'))    s3.push(`NOTAS:          ${f('bTypoNotes')}`);
-    if (s3.length) s.push(`## 03 · TIPOGRAFIA (VALORES OBRIGATÓRIOS — NÃO ALTERAR)\n${s3.join('\n')}\nOBS: os tamanhos acima são fixos e devem ser aplicados exatamente como especificados. Se um valor for informado como faixa (ex: 28–36px), use um valor único dentro da faixa e mantenha-o idêntico em todas as peças geradas na mesma sessão. Nunca aumente ou reduza esses tamanhos para preencher espaço vazio ou ajustar quebras de linha — esses ajustes devem ser feitos por outros meios (line-height, padding, reposicionamento de elementos, max-width do texto).`);
+    if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
 
     const s4 = [];
     if (app.chipData.personality.length) s4.push(`PERSONALIDADE:  ${app.chipData.personality.join(', ')}`);
     if (f('bToneMain'))    s4.push(`TOM:            ${f('bToneMain')}`);
     if (f('bToneReader'))  s4.push(`TRATAMENTO:     ${f('bToneReader')}`);
     if (f('bToneNever'))   s4.push(`NUNCA:          ${f('bToneNever')}`);
+    if (f('bToneExample')) s4.push(`EXEMPLO:        "${f('bToneExample')}"`);
     if (s4.length) s.push(`## 04 · TOM DE VOZ\n${s4.join('\n')}`);
 
     const s5 = [], sv = getRadio('styleVisual');
@@ -118,7 +77,18 @@ const prompts = {
     if (f('bPain'))     s6.push(`DOR:            ${f('bPain')}`);
     if (f('bDesire'))   s6.push(`DESEJO:         ${f('bDesire')}`);
     if (app.chipData.goal.length) s6.push(`OBJETIVOS:      ${app.chipData.goal.join(', ')}`);
+    if (app.chipData.topic.length) s6.push(`PAUTAS:         ${app.chipData.topic.join(', ')}`);
+    if (f('bPostFrequency')) s6.push(`FREQUÊNCIA:     ${f('bPostFrequency')}`);
     if (s6.length) s.push(`## 06 · AUDIÊNCIA\n${s6.join('\n')}`);
+
+    const s7 = [];
+    if (f('bReferences')) s7.push(`REFERÊNCIAS:    ${f('bReferences')}`);
+    if (f('bForbidden'))  s7.push(`PROIBIDO:       ${f('bForbidden')}`);
+    if (f('bCanonical'))  s7.push(`CANÔNICO:       ${f('bCanonical')}`);
+    if (app.chipData.hashtag.length) s7.push(`HASHTAGS:       ${app.chipData.hashtag.map(h => h.startsWith('#') ? h : '#' + h).join(' ')}`);
+    if (f('bCompetitors')) s7.push(`CONCORRENTES:   ${f('bCompetitors')}`);
+    if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
+    if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
 
     if (s.length <= 1) return null;
     return s.join('\n\n');
@@ -161,6 +131,7 @@ const prompts = {
     if (c3.length) c.push(`## SLIDES ESPECIAIS\n${c3.join('\n')}`);
 
     const c4 = [];
+    if (f('cForbidden')) c4.push(`PROIBIDO:       ${f('cForbidden')}`);
     if (f('cDelivery'))  c4.push(`ENTREGA:        ${f('cDelivery')}`);
     if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
@@ -179,17 +150,10 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-${this.getFontInstructions('cFontB64')}
-6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
-   - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
-   - Se o bloco de texto de um slide não ocupar verticalmente uma fração razoável do espaço disponível (deixando grandes áreas vazias acima/abaixo), ajuste line-height, padding ou reposicione o bloco — nunca deixe vazios grandes e não intencionais. **NUNCA altere os tamanhos de fonte definidos na seção TIPOGRAFIA para resolver isso.**
-   - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
-7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
-   - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
-   - Não destaque verbos de ligação, artigos ou palavras genéricas apenas porque estão visualmente isoladas em uma linha.
-   - Identifique a ideia central da frase antes de aplicar o destaque — nunca destaque a última palavra da linha por padrão automático.
-   - Use no máximo 1-2 elementos de destaque por slide para manter a hierarquia visual clara.
-8. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+5. **VISUAL DAS FONTES (CRÍTICO):**
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do carrossel seja mantido.
+6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
@@ -234,48 +198,6 @@ ${this.getFontInstructions('cFontB64')}
       if (app.postType === 'urgencia') { if(f('pUrgPrazo'))p4.push(`PRAZO:          ${f('pUrgPrazo')}`); if(f('pUrgOque'))p4.push(`O QUE ACABA:    ${f('pUrgOque')}`); }
       if (['depoimento','citacao'].includes(app.postType)) { if(f('pQuoteText'))p4.push(`CITAÇÃO:        "${f('pQuoteText')}"`); if(f('pQuoteAuthor'))p4.push(`AUTOR:          ${f('pQuoteAuthor')}`); if(f('pQuoteRole'))p4.push(`CARGO:          ${f('pQuoteRole')}`); }
       if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
-      if (app.postType === 'recibo') {
-        if (f('pReceiptTitle')) p4.push(`TÍTULO RECIBO:  ${f('pReceiptTitle')}`);
-        if (f('pReceiptItems')) p4.push(`ITENS:\n${f('pReceiptItems').split('\n').map(l => `  ${l}`).join('\n')}`);
-        if (f('pReceiptTotal')) p4.push(`TOTAL:          ${f('pReceiptTotal')}`);
-      }
-      if (app.postType === 'print-chat') {
-        if (f('pChatA')) p4.push(`PESSOA A:       ${f('pChatA')}`);
-        if (f('pChatB')) p4.push(`PESSOA B:       ${f('pChatB')}`);
-        if (f('pChatMessages')) p4.push(`MENSAGENS:\n${f('pChatMessages').split('\n').map(l => `  ${l}`).join('\n')}`);
-      }
-      if (app.postType === 'capa-revista') {
-        if (f('pMagSection')) p4.push(`REVISTA:        ${f('pMagSection')}`);
-        if (f('pMagEdition')) p4.push(`EDIÇÃO:         ${f('pMagEdition')}`);
-        if (f('pMagHeadline')) p4.push(`MANCHETE:       ${f('pMagHeadline')}`);
-        if (f('pMagSubtitle')) p4.push(`CHAMADA:        ${f('pMagSubtitle')}`);
-      }
-      if (app.postType === 'correcao') {
-        if (f('pCorrWrong')) p4.push(`ERRADO:         ${f('pCorrWrong')}`);
-        if (f('pCorrRight')) p4.push(`CORRETO:        ${f('pCorrRight')}`);
-      }
-      if (app.postType === 'manchete') {
-        if (f('pNewsPublication')) p4.push(`JORNAL:         ${f('pNewsPublication')}`);
-        if (f('pNewsHeadline')) p4.push(`MANCHETE:       ${f('pNewsHeadline')}`);
-        if (f('pNewsLead')) p4.push(`LEAD:           ${f('pNewsLead')}`);
-      }
-      if (app.postType === 'ranking') {
-        if (f('pRankTitle')) p4.push(`TÍTULO:         ${f('pRankTitle')}`);
-        if (app.chipData.pRankItems.length) p4.push(`ITENS:\n${app.chipData.pRankItems.map((v,i) => `  ${i+1}. ${v}`).join('\n')}`);
-      }
-      if (app.postType === 'dilema') {
-        if (f('pDilemmaQuestion')) p4.push(`CENÁRIO:        ${f('pDilemmaQuestion')}`);
-        if (f('pDilemmaA')) p4.push(`OPÇÃO A:        ${f('pDilemmaA')}`);
-        if (f('pDilemmaB')) p4.push(`OPÇÃO B:        ${f('pDilemmaB')}`);
-      }
-      if (app.postType === 'revelacao') {
-        if (f('pRevelacaoConclusion')) p4.push(`CONCLUSÃO:      ${f('pRevelacaoConclusion')}`);
-        if (f('pRevelacaoWhy')) p4.push(`POR QUÊ:        ${f('pRevelacaoWhy')}`);
-      }
-      if (app.postType === 'terminal') {
-        if (f('pTerminalContext')) p4.push(`LINGUAGEM:      ${f('pTerminalContext')}`);
-        if (f('pTerminalCode')) p4.push(`CÓDIGO:\n${f('pTerminalCode').split('\n').map(l => `  ${l}`).join('\n')}`);
-      }
     }
     if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
     const freeText = f('pFreeText');
@@ -289,6 +211,7 @@ ${this.getFontInstructions('cFontB64')}
     if (p5.length) p.push(`## LAYOUT\n${p5.join('\n\n')}`);
 
     const p6 = [];
+    if (f('pForbidden')) p6.push(`PROIBIDO:       ${f('pForbidden')}`);
     if (f('pDelivery'))  p6.push(`ENTREGA:        ${f('pDelivery')}`);
     if (f('pFontB64'))   p6.push(`FONTES:         ${f('pFontB64')}`);
     if (f('pFinalNotes'))p6.push(`NOTAS:          ${f('pFinalNotes')}`);
@@ -302,17 +225,10 @@ ${this.getFontInstructions('cFontB64')}
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-${this.getFontInstructions('pFontB64')}
-6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
-   - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
-   - Se o bloco de texto não ocupar verticalmente uma fração razoável do canvas (deixando grandes áreas vazias acima/abaixo), ajuste line-height, padding ou reposicione o bloco para preencher melhor o espaço — nunca deixe vazios grandes e não intencionais. **NUNCA altere os tamanhos de fonte definidos na seção TIPOGRAFIA para resolver isso.**
-   - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
-7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
-   - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
-   - Não destaque verbos de ligação, artigos ou palavras genéricas apenas porque estão visualmente isoladas em uma linha.
-   - Identifique a ideia central da frase antes de aplicar o destaque — nunca destaque a última palavra da linha por padrão automático.
-   - Use no máximo 1-2 elementos de destaque por peça para manter a hierarquia visual clara.
-8. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+5. **VISUAL DAS FONTES (CRÍTICO):**
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
+6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
