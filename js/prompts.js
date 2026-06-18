@@ -225,10 +225,18 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **VISUAL DAS FONTES (CRÍTICO):**
+5. **COMPOSIÇÃO VISUAL E HIERARQUIA (CRÍTICO):**
+   - Nunca centralize todos os elementos por padrão. Defina um ponto focal claro (geralmente o headline ou o elemento de maior impacto do tipo de post) e organize os demais elementos ao redor dele com pesos visuais diferentes — composição assimétrica, não um bloco de texto centralizado isolado no meio do canvas.
+   - Crie hierarquia em pelo menos 3 camadas de peso visual: (1) destaque principal — headline, número ou citação; (2) suporte — subtítulo, contexto, autor; (3) elementos secundários — CTA, fonte do dado, marca/handle. Cada camada precisa de contraste real de tamanho, peso de fonte ou cor em relação às demais.
+   - Use espaço negativo de forma intencional: não preencha o canvas inteiro com texto ou blocos de cor. Deixe respiro generoso nas margens e entre blocos de conteúdo — vazio também é decisão de design, não espaço "sobrando".
+   - Adicione pelo menos 1 elemento de apoio visual (não textual) por peça, escolhido conforme o conteúdo: eyebrow/label curto acima do headline, número grande estilizado, ícone ou forma geométrica de acento, linha/divisor sutil, badge ou tag, aspas estilizadas para citações, etc. Use a cor de acento da marca nesses elementos para criar ponto de cor.
+   - Quebre a simetria do grid: alinhe o bloco principal à esquerda ou em proporção 60/40 do canvas em vez de sempre centralizar tudo; considere sobreposição leve entre elementos (ex: número grande atrás do texto) quando fizer sentido para o tipo de post.
+   - Garanta contraste forte entre fundo e texto e use a paleta da marca para criar profundidade (ex: fundo escuro + acento vibrante + texto claro), evitando o padrão default "texto preto sobre fundo branco, tudo centralizado".
+   - Adapte a composição ao TIPO de post quando informado: estatística → número como elemento dominante e maior do canvas; citação/depoimento → aspas estilizadas com atribuição discreta; comparativo/antes-depois → divisão visual clara entre os dois lados; checklist/passo-a-passo → numeração ou ícones alinhados verticalmente com respiro entre itens; anúncio/urgência → hierarquia que force o olho para preço, prazo ou CTA primeiro.
+6. **VISUAL DAS FONTES (CRÍTICO):**
    - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
    - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
-6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+7. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
