@@ -95,7 +95,7 @@ const prompts = {
     if (f('bWeightTitle'))  s3.push(`PESO TÍTULO:    ${f('bWeightTitle')}`);
     if (f('bItalicUse'))    s3.push(`ITÁLICO:        ${f('bItalicUse')}`);
     if (f('bTypoNotes'))    s3.push(`NOTAS:          ${f('bTypoNotes')}`);
-    if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
+    if (s3.length) s.push(`## 03 · TIPOGRAFIA (VALORES OBRIGATÓRIOS — NÃO ALTERAR)\n${s3.join('\n')}\nOBS: os tamanhos acima são fixos e devem ser aplicados exatamente como especificados. Se um valor for informado como faixa (ex: 28–36px), use um valor único dentro da faixa e mantenha-o idêntico em todas as peças geradas na mesma sessão. Nunca aumente ou reduza esses tamanhos para preencher espaço vazio ou ajustar quebras de linha — esses ajustes devem ser feitos por outros meios (line-height, padding, reposicionamento de elementos, max-width do texto).`);
 
     const s4 = [];
     if (app.chipData.personality.length) s4.push(`PERSONALIDADE:  ${app.chipData.personality.join(', ')}`);
@@ -182,7 +182,7 @@ const prompts = {
 ${this.getFontInstructions('cFontB64')}
 6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
    - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
-   - Se o bloco de texto de um slide não ocupar verticalmente uma fração razoável do espaço disponível (deixando grandes áreas vazias acima/abaixo), aumente o tamanho da fonte, o line-height, ou reposicione o bloco — nunca deixe vazios grandes e não intencionais.
+   - Se o bloco de texto de um slide não ocupar verticalmente uma fração razoável do espaço disponível (deixando grandes áreas vazias acima/abaixo), ajuste line-height, padding ou reposicione o bloco — nunca deixe vazios grandes e não intencionais. **NUNCA altere os tamanhos de fonte definidos na seção TIPOGRAFIA para resolver isso.**
    - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
 7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
    - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
@@ -305,7 +305,7 @@ ${this.getFontInstructions('cFontB64')}
 ${this.getFontInstructions('pFontB64')}
 6. **QUEBRA DE LINHA E APROVEITAMENTO DE ESPAÇO (CRÍTICO):**
    - Nunca deixe uma palavra isolada e curta ("órfã") sozinha em uma linha do título — redistribua as quebras de linha para que todas as linhas tenham comprimento visual equilibrado (use \`text-wrap: balance\` quando suportado, ou calcule manualmente os pontos de quebra).
-   - Se o bloco de texto não ocupar verticalmente uma fração razoável do canvas (deixando grandes áreas vazias acima/abaixo), aumente o tamanho da fonte, o line-height, ou reposicione o bloco para preencher melhor o espaço — nunca deixe vazios grandes e não intencionais.
+   - Se o bloco de texto não ocupar verticalmente uma fração razoável do canvas (deixando grandes áreas vazias acima/abaixo), ajuste line-height, padding ou reposicione o bloco para preencher melhor o espaço — nunca deixe vazios grandes e não intencionais. **NUNCA altere os tamanhos de fonte definidos na seção TIPOGRAFIA para resolver isso.**
    - Ajuste o max-width do contêiner de texto para que as linhas quebrem em pontos semânticos (entre frases ou grupos de palavras), evitando linhas com 1-2 palavras quando o restante do texto tem linhas muito mais longas.
 7. **SELEÇÃO DE PALAVRAS EM DESTAQUE (CRÍTICO):**
    - Destaque (cor de acento, peso, itálico) apenas a palavra ou expressão que representa o conceito central da frase — o que mudaria o sentido se fosse removido (ex: o benefício, o número-chave, a transformação, a objeção que está sendo quebrada).
