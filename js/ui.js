@@ -885,6 +885,79 @@ function setPreviewRatio(ratio) {
       btn.classList.toggle('active', active);
     });
   }
-  
+
   updateVisualPreview();
+}
+
+// ── PASTED HTML PREVIEW ──
+function stripCodeFences(text) {
+  let t = text.trim();
+  t = t.replace(/^```(?:html)?\s*\n?/i, '');
+  t = t.replace(/\n?```\s*$/, '');
+  return t.trim();
+}
+
+function getPastedCanvasSize(html) {
+  const wMatch = html.match(/data-canvas-width=["']?(\d+)/i);
+  const hMatch = html.match(/data-canvas-height=["']?(\d+)/i);
+  return {
+    width: wMatch ? parseInt(wMatch[1], 10) : 1080,
+    height: hMatch ? parseInt(hMatch[1], 10) : 1080
+  };
+}
+
+function renderPastedHtml(panel) {
+  const textareaId = panel === 'car' ? 'carPastedHtml' : 'postPastedHtml';
+  const wrapId = panel === 'car' ? 'carPastedFrameWrap' : 'postPastedFrameWrap';
+  const frameId = panel === 'car' ? 'carPastedFrame' : 'postPastedFrame';
+  const raw = document.getElementById(textareaId).value;
+  if (!raw.trim()) { toast('Cole o HTML antes de renderizar.', 'error'); return; }
+  const html = stripCodeFences(raw);
+  const wrap = document.getElementById(wrapId);
+  const frame = document.getElementById(frameId);
+  const { width, height } = getPastedCanvasSize(html);
+  frame.setAttribute('width', width);
+  frame.setAttribute('height', height);
+  wrap.style.display = 'flex';
+  frame.onload = () => {
+    const scale = Math.min(wrap.clientWidth / width, wrap.clientHeight / height);
+    frame.style.transform = `scale(${scale})`;
+  };
+  frame.srcdoc = html;
+}
+
+function expandPreview(panel) {
+  const textareaId = panel === 'car' ? 'carPastedHtml' : 'postPastedHtml';
+  const raw = document.getElementById(textareaId).value;
+  if (!raw.trim()) return;
+  const html = stripCodeFences(raw);
+  const { width, height } = getPastedCanvasSize(html);
+  const modal = document.getElementById('previewExpandModal');
+  const frame = document.getElementById('expandedPreviewFrame');
+  frame.setAttribute('width', width);
+  frame.setAttribute('height', height);
+  frame.style.transform = '';
+  modal.style.display = 'flex';
+  frame.onload = () => {
+    const maxW = window.innerWidth * 0.85;
+    const maxH = window.innerHeight * 0.8;
+    const scale = Math.min(1, maxW / width, maxH / height);
+    frame.style.transform = `scale(${scale})`;
+    frame.style.transformOrigin = 'top left';
+  };
+  frame.srcdoc = html;
+}
+
+function closeExpandedPreview() {
+  document.getElementById('previewExpandModal').style.display = 'none';
+  document.getElementById('expandedPreviewFrame').srcdoc = '';
+}
+
+function clearPastedPreview(panel) {
+  const textareaId = panel === 'car' ? 'carPastedHtml' : 'postPastedHtml';
+  const wrapId = panel === 'car' ? 'carPastedFrameWrap' : 'postPastedFrameWrap';
+  const frameId = panel === 'car' ? 'carPastedFrame' : 'postPastedFrame';
+  document.getElementById(textareaId).value = '';
+  document.getElementById(wrapId).style.display = 'none';
+  document.getElementById(frameId).srcdoc = '';
 }

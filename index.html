@@ -324,6 +324,15 @@
       <div><div class="preview-label">Prompt — Base + Carrossel</div><div class="output-box" id="carOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="carCopy()">⌘ Copiar prompt</button><div class="copy-success" id="carCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o carrossel, cole este prompt unificado no Claude.</div>
+      <div class="pasted-preview">
+        <div class="preview-label">Visualizar resultado</div>
+        <textarea id="carPastedHtml" placeholder="Cole aqui o HTML que o Claude gerou"></textarea>
+        <button class="btn btn-car" style="width:100%;justify-content:center;margin-top:8px;" onclick="renderPastedHtml('car')">Renderizar</button>
+        <div class="pasted-preview-frame-wrap" id="carPastedFrameWrap">
+          <iframe id="carPastedFrame" class="pasted-preview-frame" sandbox="allow-scripts"></iframe>
+          <button class="btn btn-ghost pasted-preview-expand" onclick="expandPreview('car')">⤢ Expandir</button>
+        </div>
+      </div>
     </aside>
   </div>
   </div>
@@ -543,6 +552,15 @@
       <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o post, cole este prompt unificado no Claude.</div>
+      <div class="pasted-preview">
+        <div class="preview-label">Visualizar resultado</div>
+        <textarea id="postPastedHtml" placeholder="Cole aqui o HTML que o Claude gerou"></textarea>
+        <button class="btn btn-post" style="width:100%;justify-content:center;margin-top:8px;" onclick="renderPastedHtml('post')">Renderizar</button>
+        <div class="pasted-preview-frame-wrap" id="postPastedFrameWrap">
+          <iframe id="postPastedFrame" class="pasted-preview-frame" sandbox="allow-scripts"></iframe>
+          <button class="btn btn-ghost pasted-preview-expand" onclick="expandPreview('post')">⤢ Expandir</button>
+        </div>
+      </div>
     </aside>
   </div>
   </div>
@@ -615,6 +633,19 @@
     </div>
     <div class="modal-footer" style="padding: 16px 28px; border-top: 1px solid var(--border);">
       <button class="btn btn-ghost" onclick="app.closeTemplateModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PASTED HTML PREVIEW — EXPAND MODAL ══ -->
+<div id="previewExpandModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeExpandedPreview()">
+  <div class="modal-card" style="max-width:96vw;width:fit-content;">
+    <div class="modal-header modal-header-flex">
+      <div class="modal-title">Preview</div>
+      <button class="btn btn-ghost" onclick="closeExpandedPreview()">Fechar</button>
+    </div>
+    <div style="padding:24px;display:flex;justify-content:center;overflow:auto;max-height:90vh;">
+      <iframe id="expandedPreviewFrame" class="expanded-preview-frame" sandbox="allow-scripts"></iframe>
     </div>
   </div>
 </div>
