@@ -1,3 +1,24 @@
+// Mapa determinístico: cada tipo de post recebe exatamente um padrão de
+// composição. Sem isso, a IA recebia 4 opções e "escolher" virava sugestão
+// fraca — em chamadas independentes ela convergia sempre para a mesma
+// opção (a mais genérica), produzindo posts com a mesma diagramação
+// independente do tipo de conteúdo.
+const POST_COMPOSITION_PATTERNS = {
+  'frase-impacto':  { name: 'Figura/número de fundo', desc: 'uma palavra-chave ou símbolo gigante e sutil como camada de fundo, com a frase de impacto sobreposta em alto contraste.' },
+  'checklist':      { name: 'Card sobreposto', desc: 'um cartão com a lista de itens sobreposto a um fundo texturizado ou em gradiente, criando profundidade em camadas.' },
+  'estatistica':    { name: 'Figura/número de fundo', desc: 'o número/dado estatístico como elemento dominante e gigante, ocupando boa parte do canvas, com contexto e fonte em camadas menores sobrepostas.' },
+  'antes-depois':   { name: 'Split assimétrico', desc: 'canvas dividido em duas áreas desproporcionais (ex: 50/50 com diagonal sutil, ou 60/40), uma para "antes", outra para "depois", com contraste visual claro entre os dois lados.' },
+  'passo-a-passo':  { name: 'Split assimétrico', desc: 'uma área lateral (60/40) com a numeração/etapas alinhadas verticalmente, e a outra área com um elemento gráfico de apoio (ícone, forma, número da etapa em destaque).' },
+  'pergunta':       { name: 'Figura/número de fundo', desc: 'um símbolo de interrogação (ou elemento gráfico relacionado ao tema) gigante e sutil como camada de fundo, com a pergunta provocativa sobreposta em destaque.' },
+  'comparativo':    { name: 'Banner diagonal', desc: 'uma faixa diagonal cortando o canvas, separando claramente os dois lados (X vs Y) com cores ou texturas distintas de cada lado.' },
+  'anuncio':        { name: 'Banner diagonal', desc: 'uma faixa diagonal destacando o preço/oferta, cortando o canvas e criando hierarquia clara até o CTA.' },
+  'urgencia':       { name: 'Split assimétrico', desc: 'uma área dominante (60/40 ou mais) para o prazo/contagem, e uma área secundária para o que está acabando, com contraste forte de cor de alerta.' },
+  'lancamento':     { name: 'Banner diagonal', desc: 'uma faixa diagonal com a chamada de lançamento cruzando o canvas, criando dinamismo e senso de novidade.' },
+  'depoimento':     { name: 'Figura/número de fundo', desc: 'aspas estilizadas gigantes como camada de fundo, com o depoimento e a atribuição (nome/cargo) sobrepostos em destaque.' },
+  'citacao':        { name: 'Card sobreposto', desc: 'um cartão com a citação sobreposto a um fundo com textura ou gradiente, com a atribuição do especialista discreta abaixo.' },
+  'mini-artigo':    { name: 'Card sobreposto', desc: 'o corpo do texto organizado num cartão sobreposto a um fundo com textura sutil, mantendo legibilidade e hierarquia entre título e corpo.' },
+};
+
 // Prompt builders
 const prompts = {
 
@@ -218,6 +239,15 @@ const prompts = {
     if (p6.length) p.push(`## ENTREGA\n${p6.join('\n')}`);
     s.push(p.join('\n\n'));
 
+    const chosenPattern = POST_COMPOSITION_PATTERNS[app.postType];
+    const compositionDirective = chosenPattern
+      ? `   - **PADRÃO OBRIGATÓRIO PARA ESTE POST: ${chosenPattern.name}** — ${chosenPattern.desc} Este é o único padrão válido para esta peça: não use nenhum outro (não centralize tudo, não empilhe blocos genéricos, não substitua por um padrão diferente).`
+      : `   - **Escolha um destes padrões de composição nomeados (não invente um quinto padrão genérico de "card empilhado e centralizado"):**
+     a) **Split assimétrico** — canvas dividido em duas áreas desproporcionais (ex: 60/40 ou 65/35), uma com o texto principal, outra com um elemento gráfico dominante (número grande, forma, ícone, bloco de cor sólida).
+     b) **Figura/número de fundo** — um elemento gigante (número, símbolo, palavra única, aspas) ocupando boa parte do canvas como camada de fundo, com o conteúdo textual sobreposto por cima em contraste.
+     c) **Banner diagonal** — uma faixa ou divisor diagonal corta o canvas, separando duas cores/seções ou destacando uma chamada específica (preço, prazo, badge).
+     d) **Card sobreposto** — um bloco/cartão (com sombra, borda ou cor sólida) sobreposto a um fundo com textura, gradiente ou elemento gráfico, criando profundidade em camadas.`;
+
     s.push(`# INSTRUÇÕES DE SAÍDA
 1. Atue como um desenvolvedor frontend sênior e designer especialista em conversão.
 2. Crie o layout do post em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia, formatos e regras visuais especificadas nas seções anteriores.
@@ -226,18 +256,13 @@ const prompts = {
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
 5. **COMPOSIÇÃO VISUAL E HIERARQUIA (CRÍTICO):**
-   - **Escolha um destes padrões de composição nomeados para o post (não invente um quinto padrão genérico de "card empilhado e centralizado"):**
-     a) **Split assimétrico** — canvas dividido em duas áreas desproporcionais (ex: 60/40 ou 65/35), uma com o texto principal, outra com um elemento gráfico dominante (número grande, forma, ícone, bloco de cor sólida).
-     b) **Figura/número de fundo** — um elemento gigante (número, símbolo, palavra única, aspas) ocupando boa parte do canvas como camada de fundo, com o conteúdo textual sobreposto por cima em contraste.
-     c) **Banner diagonal** — uma faixa ou divisor diagonal corta o canvas, separando duas cores/seções ou destacando uma chamada específica (preço, prazo, badge).
-     d) **Card sobreposto** — um bloco/cartão (com sombra, borda ou cor sólida) sobreposto a um fundo com textura, gradiente ou elemento gráfico, criando profundidade em camadas.
-   - Defina um ponto focal claro dentro do padrão escolhido (geralmente o headline, número ou elemento de maior impacto) — nunca um bloco de texto solto e centralizado sem nenhum elemento gráfico de apoio.
+${compositionDirective}
+   - Defina um ponto focal claro dentro do padrão (geralmente o headline, número ou elemento de maior impacto) — nunca um bloco de texto solto e centralizado sem nenhum elemento gráfico de apoio.
    - Crie hierarquia em pelo menos 3 camadas de peso visual: (1) destaque principal; (2) suporte — subtítulo, contexto, autor; (3) elementos secundários — CTA, fonte do dado, marca/handle.
    - **Proporção mínima de tamanho de texto:** nenhum texto de suporte (listas, badges, subtítulos secundários, rodapé) pode ter menos de 25% do tamanho em px do headline principal. Textos de apoio devem ter no mínimo 1/3 do tamanho do headline para permanecerem legíveis e com presença visual real no canvas — evite textos pequenos demais que pareçam "rodapé esquecido".
-   - **Limite de espaço vazio não-preenchido:** nenhum espaço entre dois blocos de conteúdo consecutivos pode exceder ~8% da altura total do canvas sem conter um elemento decorativo (forma, linha, textura, gradiente, número de fundo) preenchendo-o. Se sobrar espaço depois de posicionar todo o conteúdo, redistribua o conteúdo, aumente os elementos do padrão de composição escolhido, ou adicione um elemento gráfico de apoio — nunca deixe um vão vazio sem função.
+   - **Limite de espaço vazio não-preenchido:** nenhum espaço entre dois blocos de conteúdo consecutivos pode exceder ~8% da altura total do canvas sem conter um elemento decorativo (forma, linha, textura, gradiente, número de fundo) preenchendo-o. Se sobrar espaço depois de posicionar todo o conteúdo, redistribua o conteúdo, aumente os elementos do padrão de composição, ou adicione um elemento gráfico de apoio — nunca deixe um vão vazio sem função.
    - Adicione pelo menos 1 elemento de apoio visual (não textual) por peça, escolhido conforme o conteúdo: eyebrow/label curto acima do headline, número grande estilizado, ícone ou forma geométrica de acento, linha/divisor sutil, badge ou tag, aspas estilizadas para citações, etc. Use a cor de acento da marca nesses elementos para criar ponto de cor.
    - Garanta contraste forte entre fundo e texto e use a paleta da marca para criar profundidade (ex: fundo escuro + acento vibrante + texto claro), evitando o padrão default "texto preto sobre fundo branco, tudo centralizado".
-   - Adapte o padrão de composição ao TIPO de post quando informado: estatística → "figura/número de fundo" com o número como elemento dominante; citação/depoimento → "figura/número de fundo" com aspas estilizadas; comparativo/antes-depois → "split assimétrico" ou "banner diagonal" com divisão clara entre os dois lados; checklist/passo-a-passo → "card sobreposto" com numeração/ícones alinhados verticalmente; anúncio/urgência → "banner diagonal" ou "split assimétrico" forçando o olho para preço, prazo ou CTA primeiro.
 6. **VISUAL DAS FONTES (CRÍTICO):**
    - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
    - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
