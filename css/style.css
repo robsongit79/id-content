@@ -816,3 +816,12 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   .app-sidebar-toggle{display:inline-flex;}
 }
 
+/* ══ PASTED HTML PREVIEW ══ */
+.pasted-preview{border-top:1px solid var(--border);padding-top:16px;margin-top:4px;}
+.pasted-preview textarea{font-size:11px;min-height:80px;}
+.pasted-preview-frame-wrap{position:relative;margin-top:12px;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fff;display:none;align-items:center;justify-content:center;height:200px;}
+.pasted-preview-frame{border:none;transform-origin:top left;pointer-events:none;}
+.pasted-preview-expand{position:absolute;bottom:8px;right:8px;padding:4px 10px;font-size:10px;background:rgba(14,14,14,0.7);backdrop-filter:blur(4px);}
+.modal-header-flex{display:flex;align-items:center;justify-content:space-between;}
+.expanded-preview-frame{border:none;}
+
