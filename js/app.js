@@ -129,6 +129,7 @@ const app = {
   switchDestination(dest) {
     if (!this.currentBrandId) return;
     this.currentDestination = dest;
+    document.getElementById('destWelcome').classList.remove('active');
     ['identity', 'create', 'history'].forEach(d => {
       document.getElementById(`dest${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
       document.getElementById(`nav${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
@@ -617,7 +618,12 @@ const app = {
     }
     this.currentBrandId = null;
     this.isDirty = false;
-    ['navIdentity', 'navCreate', 'navHistory'].forEach(id => document.getElementById(id).classList.add('disabled'));
+    ['navIdentity', 'navCreate', 'navHistory'].forEach(id => {
+      document.getElementById(id).classList.add('disabled');
+      document.getElementById(id).classList.remove('active');
+    });
+    ['destIdentity', 'destCreate', 'destHistory'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById('destWelcome').classList.add('active');
     document.getElementById('appActiveBrandName').textContent = 'Selecionar marca';
     this.toggleBrandSwitcher();
   },
