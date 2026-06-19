@@ -512,12 +512,6 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
     height: 36px;
     border-bottom: 2px solid transparent;
   }
-  .app-shell{grid-template-columns:1fr;}
-  .app-shell.active{display:block;}
-  .app-sidebar{position:fixed;left:0;top:49px;bottom:0;width:260px;transform:translateX(-100%);transition:transform 0.2s ease;z-index:250;background:var(--bg);}
-  .app-shell.mobile-open .app-sidebar{transform:translateX(0);box-shadow:0 0 30px rgba(0,0,0,0.5);}
-  .app-content{height:auto;}
-  .app-sidebar-toggle{display:inline-flex;}
 }
 
 /* ══ BRAND LIST SEARCH ══ */
@@ -812,4 +806,13 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .app-sidebar-toggle{display:none;}
 .create-subpanel{display:none;}
 .create-subpanel.active{display:block;}
+
+@media (max-width: 920px) {
+  .app-shell{grid-template-columns:1fr;}
+  .app-shell.active{display:block;}
+  .app-sidebar{position:fixed;left:0;top:49px;bottom:0;width:260px;transform:translateX(-100%);transition:transform 0.2s ease;z-index:250;background:var(--bg);}
+  .app-shell.mobile-open .app-sidebar{transform:translateX(0);box-shadow:0 0 30px rgba(0,0,0,0.5);}
+  .app-content{height:auto;}
+  .app-sidebar-toggle{display:inline-flex;}
+}
 
