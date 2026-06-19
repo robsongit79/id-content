@@ -124,9 +124,9 @@ function updatePreviews() {
   const pp = prompts.buildPost();
   document.getElementById('postOutput').innerHTML = pp ? prompts.highlight(pp, 'sec-post') : '<span class="empty">← Preencha a aba Base para gerar o prompt.</span>';
 
-  const activeBrandNameEl = document.getElementById('activeBrandName');
-  if (activeBrandNameEl && app.currentBrandId) {
-    activeBrandNameEl.textContent = f('bName') || 'Sem nome';
+  const switcherNameEl = document.getElementById('appActiveBrandName');
+  if (switcherNameEl && app.currentBrandId) {
+    switcherNameEl.textContent = f('bName') || 'Sem nome';
   }
 
   updateProgress();
@@ -178,11 +178,8 @@ function updateProgress() {
 
 // ── TAB SWITCHING ──
 function switchTab(tab) {
-  ['base','car','post'].forEach(t => {
-    document.getElementById(`panel${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.toggle('active', t === tab);
-    document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = `tab-btn${t === tab ? ' active-' + t : ''}`;
-  });
-  app.currentTab = tab;
+  if (tab === 'base') { app.currentTab = 'base'; return; }
+  app.setCreateTab(tab);
 }
 
 // ── POST TYPE ──

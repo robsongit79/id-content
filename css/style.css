@@ -769,4 +769,50 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   background: linear-gradient(180deg, rgba(255, 107, 53, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
+/* ══ APP SHELL (workspace navigation) ══ */
+.app-shell{display:none;grid-template-columns:240px 1fr;min-height:calc(100vh - 49px);}
+.app-shell.active{display:grid;}
+.app-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 49px);position:sticky;top:49px;}
+.app-sidebar-brand{padding:16px;border-bottom:1px solid var(--border);position:relative;}
+.app-brand-switcher{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;color:var(--text);font-family:var(--font-m);font-size:12px;cursor:pointer;text-align:left;}
+.app-brand-switcher:hover{border-color:var(--border-hi);}
+.app-brand-switcher-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.app-brand-dropdown{position:absolute;top:calc(100% + 6px);left:16px;right:16px;background:var(--surface);border:1px solid var(--border-hi);border-radius:6px;box-shadow:0 12px 30px rgba(0,0,0,0.5);z-index:300;padding:10px;}
+.app-brand-dropdown input[type="text"]{margin-bottom:8px;}
+.app-brand-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;margin-bottom:8px;}
+.app-brand-list-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:4px;cursor:pointer;font-size:12px;color:var(--text);}
+.app-brand-list-item:hover{background:rgba(255,255,255,0.04);}
+.app-brand-list-item.active{background:rgba(180,130,255,0.08);color:var(--acc-base);}
+.app-brand-list-actions{display:flex;gap:4px;opacity:0;transition:opacity 0.12s;}
+.app-brand-list-item:hover .app-brand-list-actions{opacity:1;}
+.app-brand-list-actions button{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px;display:flex;}
+.app-brand-list-actions button:hover{color:var(--text);}
+.app-sidebar-nav{padding:14px 10px;display:flex;flex-direction:column;gap:2px;}
+.app-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:5px;color:var(--muted);font-size:12px;font-family:var(--font-m);cursor:pointer;transition:all 0.12s;}
+.app-nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.app-nav-item.active{background:rgba(71,255,212,0.08);color:var(--accent2);}
+.app-nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none;}
+.app-sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.app-content{overflow-y:auto;height:calc(100vh - 49px);}
+.app-dest{display:none;}
+.app-dest.active{display:block;}
+.segmented{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px;margin:24px 44px 0;width:fit-content;}
+.segmented-btn{background:none;border:none;color:var(--muted);font-family:var(--font-m);font-size:12px;padding:7px 18px;border-radius:4px;cursor:pointer;transition:all 0.12s;}
+.segmented-btn.active{background:var(--acc-car);color:#0E0E0E;font-weight:600;}
+.segmented-btn[data-sub="post"].active{background:var(--acc-post);color:#fff;}
+.app-empty-state{padding:80px 48px;text-align:center;color:var(--muted);}
+.app-empty-state h3{font-family:var(--font-d);font-size:18px;color:var(--text);margin-bottom:8px;}
+.app-empty-state p{font-size:12px;max-width:380px;margin:0 auto;}
+.app-sidebar-toggle{display:none;}
+.create-subpanel{display:none;}
+.create-subpanel.active{display:block;}
+
+@media (max-width: 920px) {
+  .app-shell{grid-template-columns:1fr;}
+  .app-shell.active{display:block;}
+  .app-sidebar{position:fixed;left:0;top:49px;bottom:0;width:260px;transform:translateX(-100%);transition:transform 0.2s ease;z-index:250;background:var(--bg);}
+  .app-shell.mobile-open .app-sidebar{transform:translateX(0);box-shadow:0 0 30px rgba(0,0,0,0.5);}
+  .app-content{height:auto;}
+  .app-sidebar-toggle{display:inline-flex;}
+}
 
