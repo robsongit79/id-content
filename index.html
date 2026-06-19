@@ -15,13 +15,6 @@
 <div class="topbar">
   <div class="topbar-left">
     <div class="brand-mark">ID<span>Content</span></div>
-    <span id="userWelcome" class="user-welcome" style="display:none;">Olá, <span id="userEmail" class="user-email"></span></span>
-    <div id="activeBrandName" class="active-brand-name" style="display:none;"></div>
-    <div class="tabs" id="tabs" style="display:none;">
-      <button class="tab-btn active-base" id="tabBase" onclick="switchTab('base')"><span class="tab-badge badge-base">Base</span> Marca</button>
-      <button class="tab-btn" id="tabCar" onclick="switchTab('car')"><span class="tab-badge badge-car">Carrossel</span> Carrossel</button>
-      <button class="tab-btn" id="tabPost" onclick="switchTab('post')"><span class="tab-badge badge-post">Post</span> Post</button>
-    </div>
   </div>
   <div class="topbar-right">
     <div id="topbarActions" style="display:flex;align-items:center;gap:8px;">
@@ -31,35 +24,35 @@
   </div>
 </div>
 
-<!-- ══ BRAND LIST (home screen) ══ -->
-<div id="screenList" class="screen">
-  <div class="list-header">
-    <div>
-      <h1 class="list-title">Suas Marcas</h1>
-      <p class="list-subtitle">Selecione uma marca para editar ou crie uma nova.</p>
+<!-- ══ APP SHELL ══ -->
+<div id="appShell" class="app-shell">
+  <nav class="app-sidebar">
+    <div class="app-sidebar-brand">
+      <button class="app-brand-switcher" id="brandSwitcherBtn" onclick="app.toggleBrandSwitcher()">
+        <span class="app-brand-switcher-name" id="appActiveBrandName">Selecionar marca</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="app-brand-dropdown" id="brandSwitcherDropdown" style="display:none;">
+        <input type="text" id="brandSearch" placeholder="Buscar marca..." oninput="app.filterBrands()">
+        <div id="brandGrid" class="app-brand-list">
+          <div class="loading-state">Carregando marcas...</div>
+        </div>
+        <button class="btn btn-base" style="width:100%;justify-content:center;" onclick="app.showTemplateModal()">+ Nova marca</button>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-ghost" id="btnAdminPanel" onclick="app.showScreen('admin')" style="display:none;color:var(--acc-base);border-color:rgba(180,130,255,0.3);">Painel Admin</button>
-      <button class="btn btn-base" onclick="app.showTemplateModal()">+ Nova marca</button>
+    <div class="app-sidebar-nav">
+      <a class="app-nav-item disabled" id="navIdentity" onclick="app.switchDestination('identity')">Identidade</a>
+      <a class="app-nav-item disabled" id="navCreate" onclick="app.switchDestination('create')">Criar conteúdo</a>
+      <a class="app-nav-item disabled" id="navHistory" onclick="app.switchDestination('history')">Histórico</a>
     </div>
-  </div>
-  <div class="list-search-bar">
-    <input type="text" id="brandSearch" placeholder="Buscar por nome, nicho ou handle..." oninput="app.filterBrands()" style="flex:1;max-width:360px;">
-    <select id="brandSort" onchange="app.filterBrands()" style="width:180px;">
-      <option value="updated">Recentemente editadas</option>
-      <option value="name">Nome A–Z</option>
-    </select>
-  </div>
-  <div id="brandGrid" class="brand-grid">
-    <div class="loading-state">Carregando marcas...</div>
-  </div>
-</div>
-
-<!-- ══ EDITOR ══ -->
-<div id="screenEditor" class="screen" style="display:none;">
-
-  <!-- BASE TAB -->
-  <div class="tab-panel active" id="panelBase">
+    <div class="app-sidebar-footer">
+      <span id="userWelcome" class="user-welcome" style="display:none;">Olá, <span id="userEmail" class="user-email"></span></span>
+      <button class="btn btn-ghost" id="btnAdminPanel" onclick="app.showScreen('admin')" style="display:none;color:var(--acc-base);border-color:rgba(180,130,255,0.3);justify-content:center;">Painel Admin</button>
+    </div>
+  </nav>
+  <div class="app-content" id="appContent">
+    <div class="app-dest" id="destIdentity">
+  <div id="panelBase">
   <div class="layout base-focus">
     <nav class="sidebar">
       <div class="sidebar-section base-nav">
@@ -205,9 +198,16 @@
     </aside>
   </div>
   </div>
+    </div>
+    <div class="app-dest" id="destCreate">
+      <div class="segmented" id="createSegmented">
+        <button class="segmented-btn active" data-sub="car" onclick="app.setCreateTab('car')">Carrossel</button>
+        <button class="segmented-btn" data-sub="post" onclick="app.setCreateTab('post')">Post</button>
+      </div>
+      <div id="createSubpanels">
 
-  <!-- CARROSSEL TAB -->
-  <div class="tab-panel" id="panelCar">
+  <!-- CARROSSEL TAB → createSubpanels -->
+  <div class="create-subpanel active" id="panelCar">
   <div class="layout car-focus">
     <nav class="sidebar">
       <div class="sidebar-section car-nav">
@@ -320,8 +320,8 @@
   </div>
   </div>
 
-  <!-- POST TAB -->
-  <div class="tab-panel" id="panelPost">
+  <!-- POST TAB → createSubpanels -->
+  <div class="create-subpanel" id="panelPost">
   <div class="layout post-focus">
     <nav class="sidebar">
       <div class="sidebar-section post-nav">
@@ -539,7 +539,16 @@
   </div>
   </div>
 
-</div><!-- /screenEditor -->
+      </div>
+    </div>
+    <div class="app-dest" id="destHistory">
+      <div class="app-empty-state">
+        <h3>Nenhum conteúdo gerado ainda</h3>
+        <p>Em breve, as peças de carrossel e post que você gerar vão aparecer aqui, com histórico e preview.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ CLAUDE GENERATE MODAL ══ -->
 <div id="claudeModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)claudeGenerate.close()">

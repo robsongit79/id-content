@@ -40,9 +40,7 @@ const app = {
   },
 
   showLoginForm() {
-    document.getElementById('screenList').style.display = 'none';
-    document.getElementById('screenEditor').style.display = 'none';
-    document.getElementById('tabs').style.display = 'none';
+    document.getElementById('appShell').classList.remove('active');
     document.getElementById('btnLogout').style.display = 'none';
     document.getElementById('screenLogin').style.display = 'flex';
   },
@@ -67,7 +65,7 @@ const app = {
       btnAdmin.style.display = isLocalAdmin ? 'inline-flex' : 'none';
     }
 
-    this.showScreen('list');
+    this.showScreen('editor');
     this.loadBrandList();
     initScrollNav();
     initTooltips();
@@ -113,31 +111,52 @@ const app = {
 
   // ── SCREENS ──
   showScreen(screen) {
-    document.getElementById('screenList').style.display = screen === 'list' ? 'block' : 'none';
-    document.getElementById('screenEditor').style.display = screen === 'editor' ? 'block' : 'none';
+    document.getElementById('appShell').classList.toggle('active', screen === 'editor');
     document.getElementById('screenAdmin').style.display = screen === 'admin' ? 'block' : 'none';
-    document.getElementById('tabs').style.display = screen === 'editor' ? 'flex' : 'none';
-    
-    // Controla visibilidade de boas-vindas e selo da marca na topbar
-    const activeBrandNameEl = document.getElementById('activeBrandName');
+
     const userWelcomeEl = document.getElementById('userWelcome');
-    
-    if (screen === 'editor') {
-      if (activeBrandNameEl) activeBrandNameEl.style.display = 'inline-block';
-      if (userWelcomeEl) userWelcomeEl.style.display = 'none';
-    } else {
-      if (activeBrandNameEl) activeBrandNameEl.style.display = 'none';
-      if (userWelcomeEl && auth.isAuthenticated()) {
-        userWelcomeEl.style.display = 'inline-flex';
-      } else if (userWelcomeEl) {
-        userWelcomeEl.style.display = 'none';
-      }
+    if (userWelcomeEl) {
+      userWelcomeEl.style.display = (screen !== 'editor' && auth.isAuthenticated()) ? 'inline-flex' : 'none';
     }
 
     this.renderTopbar(screen);
     if (screen === 'admin') {
       this.loadAdminUsers();
     }
+  },
+
+  // ── APP SHELL DESTINATIONS ──
+  switchDestination(dest) {
+    if (!this.currentBrandId) return;
+    this.currentDestination = dest;
+    ['identity', 'create', 'history'].forEach(d => {
+      document.getElementById(`dest${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
+      document.getElementById(`nav${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
+    });
+  },
+
+  toggleBrandSwitcher() {
+    const dd = document.getElementById('brandSwitcherDropdown');
+    const isOpen = dd.style.display !== 'none';
+    if (isOpen) { dd.style.display = 'none'; return; }
+    dd.style.display = 'block';
+    this.loadBrandList();
+    const close = (e) => {
+      if (!dd.contains(e.target) && e.target.id !== 'brandSwitcherBtn') {
+        dd.style.display = 'none';
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  },
+
+  setCreateTab(sub) {
+    this.currentCreateTab = sub;
+    document.querySelectorAll('#createSegmented .segmented-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === sub));
+    document.getElementById('panelCar').classList.toggle('active', sub === 'car');
+    document.getElementById('panelPost').classList.toggle('active', sub === 'post');
+    app.currentTab = sub;
+    updatePreviews();
   },
 
   renderTopbar(screen) {
@@ -157,12 +176,9 @@ const app = {
             <button class="topbar-menu-item" onclick="carCopy();app.closeMenu()">⌘ Copiar prompt Carrossel</button>
             <button class="topbar-menu-item" onclick="postCopy();app.closeMenu()">⌘ Copiar prompt Post</button>
             <div class="topbar-menu-divider"></div>
-            <button class="topbar-menu-item" onclick="app.downloadBrandConfig();app.closeMenu()">Baixar configuração (.json)</button>
-            <div class="topbar-menu-divider"></div>
             <button class="topbar-menu-item topbar-menu-danger" onclick="app.confirmDelete();app.closeMenu()">Excluir marca</button>
           </div>
         </div>
-        <button class="btn btn-ghost topbar-back-btn" onclick="app.goHome()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span>Voltar</span></button>
         <button class="btn btn-ghost topbar-save-btn" onclick="app.save()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       `;
     }
@@ -183,51 +199,24 @@ const app = {
   renderBrandGrid(brands) {
     const grid = document.getElementById('brandGrid');
     if (brands.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <h3>Nenhuma marca encontrada</h3>
-          <p>Clique em "+ Nova marca" para começar ou ajuste a busca.</p>
-        </div>`;
+      grid.innerHTML = `<div class="loading-state">Nenhuma marca encontrada.</div>`;
       return;
     }
     grid.innerHTML = brands.map(b => {
       let meta = { is_shared: false };
       if (b.logo_url) {
-        try {
-          meta = JSON.parse(b.logo_url) || meta;
-        } catch(e) {}
+        try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
       }
       const isShared = !!meta.is_shared;
-      const shareBtnHtml = app.isAdminUser ? `
-        <button class="btn ${isShared ? 'btn-copy' : 'btn-ghost'}" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;${isShared ? 'border-color:var(--accent2);color:var(--accent2);' : ''}" onclick="event.stopPropagation(); app.toggleShareBrand('${b.id}')" title="Compartilhar com todos">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-          <span>${isShared ? 'Compartilhado' : 'Compartilhar'}</span>
-        </button>
-      ` : '';
-
+      const isActive = b.id === app.currentBrandId;
       return `
-        <div class="brand-card" onclick="app.openBrand('${b.id}')">
-          <div class="brand-card-name">${b.name}</div>
-          <div class="brand-card-meta">${b.handle || '—'}${b.niche ? ' · ' + b.niche : ''}</div>
-          <div class="brand-card-colors">
-            <div class="color-dot" style="background:${b.color_primary || '#1E40AF'}" title="Primária"></div>
-            <div class="color-dot" style="background:${b.color_secondary || '#3B82F6'}" title="Secundária"></div>
-            <div class="color-dot" style="background:${b.color_accent || '#FFFFFF'};border-color:rgba(255,255,255,0.3);" title="Acento"></div>
-          </div>
-          <div class="brand-card-meta">Atualizado ${this.formatDate(b.updated_at)}</div>
-          <div class="brand-card-actions" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
-            ${shareBtnHtml}
-            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.downloadBrandConfigById('${b.id}')" title="Baixar configuração">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Baixar</span>
-            </button>
-            <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;flex:1;justify-content:center;gap:4px;" onclick="event.stopPropagation(); app.duplicateBrand('${b.id}')" title="Duplicar marca">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Duplicar</span>
-            </button>
-            <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;justify-content:center;gap:0;width:30px;" onclick="event.stopPropagation(); app.deleteBrandById('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="Excluir marca">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-            </button>
+        <div class="app-brand-list-item${isActive ? ' active' : ''}" onclick="app.openBrand('${b.id}');document.getElementById('brandSwitcherDropdown').style.display='none';">
+          <span class="app-brand-switcher-name">${b.name}${isShared ? ' 🔗' : ''}</span>
+          <div class="app-brand-list-actions">
+            ${app.isAdminUser ? `<button onclick="event.stopPropagation();app.toggleShareBrand('${b.id}')" title="${isShared ? 'Remover compartilhamento' : 'Compartilhar'}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>` : ''}
+            <button onclick="event.stopPropagation();app.downloadBrandConfigById('${b.id}')" title="Baixar configuração"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            <button onclick="event.stopPropagation();app.duplicateBrand('${b.id}')" title="Duplicar marca"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+            <button onclick="event.stopPropagation();app.deleteBrandById('${b.id}', '${b.name.replace(/'/g, "\\'")}')" title="Excluir marca"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
           </div>
         </div>
       `;
@@ -236,9 +225,7 @@ const app = {
 
   filterBrands() {
     const searchEl = document.getElementById('brandSearch');
-    const sortEl = document.getElementById('brandSort');
     const q = searchEl ? searchEl.value.toLowerCase().trim() : '';
-    const sort = sortEl ? sortEl.value : 'updated';
     const user = auth.getUser();
 
     let filtered = this.allBrands.filter(b => {
@@ -261,10 +248,7 @@ const app = {
       return (b.name || '').toLowerCase().includes(q) || (b.niche || '').toLowerCase().includes(q) || (b.handle || '').toLowerCase().includes(q);
     });
 
-    filtered = [...filtered].sort((a, b) => {
-      if (sort === 'name') return (a.name || '').localeCompare(b.name || '', 'pt-BR');
-      return new Date(b.updated_at) - new Date(a.updated_at);
-    });
+    filtered = [...filtered].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
     this.renderBrandGrid(filtered);
   },
@@ -312,18 +296,17 @@ const app = {
       if (brand) {
         app.currentBrandOriginalLogoUrl = brand.logo_url;
         this.fillBrand(brand);
-        const activeBrandNameEl = document.getElementById('activeBrandName');
-        if (activeBrandNameEl) {
-          activeBrandNameEl.textContent = brand.name || 'Sem nome';
-          activeBrandNameEl.style.display = 'block';
-        }
+        const switcherNameEl = document.getElementById('appActiveBrandName');
+        if (switcherNameEl) switcherNameEl.textContent = brand.name || 'Sem nome';
       }
       this.presets = presets || [];
       if (carousel) this.fillCarousel(carousel);
       if (post) this.fillPost(post);
       setSaveStatus('saved');
       this.isDirty = false;
-      switchTab('base');
+      ['navIdentity', 'navCreate', 'navHistory'].forEach(id => document.getElementById(id).classList.remove('disabled'));
+      this.setCreateTab('car');
+      this.switchDestination('identity');
       updatePreviews();
       renderPresets();
       setTimeout(() => document.getElementById('bName')?.focus(), 150);
@@ -629,8 +612,9 @@ const app = {
     }
     this.currentBrandId = null;
     this.isDirty = false;
-    this.showScreen('list');
-    await this.loadBrandList();
+    ['navIdentity', 'navCreate', 'navHistory'].forEach(id => document.getElementById(id).classList.add('disabled'));
+    document.getElementById('appActiveBrandName').textContent = 'Selecionar marca';
+    this.toggleBrandSwitcher();
   },
 
   // ── RESET FORM ──
@@ -638,10 +622,10 @@ const app = {
     this.activeCarouselPresetIndex = null;
     this.activePostPresetIndex = null;
     this.presets = [];
-    document.querySelectorAll('#screenEditor input[type="text"],#screenEditor input[type="url"],#screenEditor textarea').forEach(e => e.value = '');
-    document.querySelectorAll('#screenEditor select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
+    document.querySelectorAll('#appContent input[type="text"],#appContent input[type="url"],#appContent textarea').forEach(e => e.value = '');
+    document.querySelectorAll('#appContent select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
     document.querySelectorAll('.radio-item,.logo-pos-item,.type-card').forEach(e => e.classList.remove('selected'));
-    document.querySelectorAll('#screenEditor input[type="radio"]').forEach(e => e.checked = false);
+    document.querySelectorAll('#appContent input[type="radio"]').forEach(e => e.checked = false);
     ['personality','goal','pItems','hashtag','topic'].forEach(k => {
       this.chipData[k] = [];
       const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips', hashtag:'hashtagChips', topic:'topicChips' };
@@ -661,8 +645,6 @@ const app = {
     document.getElementById('pDynamic').style.display = 'none';
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
-    const activeBrandNameEl = document.getElementById('activeBrandName');
-    if (activeBrandNameEl) { activeBrandNameEl.textContent = ''; activeBrandNameEl.style.display = 'none'; }
   },
 
   // ── PRESETS ──

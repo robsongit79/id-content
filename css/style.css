@@ -804,4 +804,6 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .app-empty-state h3{font-family:var(--font-d);font-size:18px;color:var(--text);margin-bottom:8px;}
 .app-empty-state p{font-size:12px;max-width:380px;margin:0 auto;}
 .app-sidebar-toggle{display:none;}
+.create-subpanel{display:none;}
+.create-subpanel.active{display:block;}
 
