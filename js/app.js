@@ -133,6 +133,7 @@ const app = {
       document.getElementById(`dest${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
       document.getElementById(`nav${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
     });
+    document.getElementById('appShell').classList.remove('mobile-open');
   },
 
   toggleBrandSwitcher() {
@@ -148,6 +149,10 @@ const app = {
       }
     };
     setTimeout(() => document.addEventListener('click', close), 0);
+  },
+
+  toggleMobileSidebar() {
+    document.getElementById('appShell').classList.toggle('mobile-open');
   },
 
   setCreateTab(sub) {
