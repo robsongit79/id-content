@@ -135,6 +135,8 @@ const app = {
       document.getElementById(`nav${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.toggle('active', d === dest);
     });
     document.getElementById('appShell').classList.remove('mobile-open');
+    clearPastedPreview('car');
+    clearPastedPreview('post');
   },
 
   toggleBrandSwitcher() {
@@ -161,6 +163,8 @@ const app = {
     document.querySelectorAll('#createSegmented .segmented-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === sub));
     document.getElementById('panelCar').classList.toggle('active', sub === 'car');
     document.getElementById('panelPost').classList.toggle('active', sub === 'post');
+    clearPastedPreview('car');
+    clearPastedPreview('post');
     app.currentTab = sub;
     updatePreviews();
   },
