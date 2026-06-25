@@ -186,11 +186,8 @@ const prompts = {
     if (p5.length) p.push(`## LAYOUT\n${p5.join('\n\n')}`);
 
     const p6 = [];
-    if (f('pForbidden')) p6.push(`PROIBIDO:       ${f('pForbidden')}`);
-    if (f('pDelivery'))  p6.push(`ENTREGA:        ${f('pDelivery')}`);
-    if (f('pFontB64'))   p6.push(`FONTES:         ${f('pFontB64')}`);
-    if (f('pFinalNotes'))p6.push(`NOTAS:          ${f('pFinalNotes')}`);
-    if (p6.length) p.push(`## ENTREGA\n${p6.join('\n')}`);
+    if (f('pFinalNotes'))p6.push(`OBRIGATORIEDADES: ${f('pFinalNotes')}`);
+    if (p6.length) p.push(`## OBRIGATORIEDADES\n${p6.join('\n')}`);
     s.push(p.join('\n\n'));
 
     const chosenPattern = POST_COMPOSITION_PATTERNS[app.postType];
