@@ -518,7 +518,7 @@ const app = {
   collectCarousel() {
     const notesData = {
       notes: f('cNotes'), forbidden: f('cForbidden'),
-      delivery_format: f('cDelivery'), font_base64: f('cFontB64'), final_notes: f('cFinalNotes'),
+      final_notes: f('cFinalNotes'),
       content: f('cContent')
     };
     return {

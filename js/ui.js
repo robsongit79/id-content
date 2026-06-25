@@ -148,7 +148,7 @@ function updateProgress() {
   document.getElementById('baseProgPct').textContent = bPct + '%';
 
   const cReq = ['cFormat','cSlideCount','cSequence'];
-  const cOpt = ['cDelivery','cFontB64'];
+  const cOpt = ['cFixedEl'];
   let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
   cReq.forEach(id => { if (f(id)) cScore += 2; });
   cOpt.forEach(id => { if (f(id)) cScore += 1; });

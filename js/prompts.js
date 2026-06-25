@@ -123,8 +123,6 @@ const prompts = {
 
     const c4 = [];
     if (f('cForbidden')) c4.push(`PROIBIDO:       ${f('cForbidden')}`);
-    if (f('cDelivery'))  c4.push(`ENTREGA:        ${f('cDelivery')}`);
-    if (f('cFontB64'))   c4.push(`FONTES:         ${f('cFontB64')}`);
     if (f('cFinalNotes'))c4.push(`NOTAS:          ${f('cFinalNotes')}`);
     if (c4.length) c.push(`## ENTREGA\n${c4.join('\n')}`);
     s.push(c.join('\n\n'));
