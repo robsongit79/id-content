@@ -292,11 +292,6 @@ function setSaveStatus(status) {
 const FIELD_TIPS = {
   // Base — Identidade
   bName:        'Nome completo como será exibido nos posts e no prompt gerado.',
-  bHandle:      'Seu @ do Instagram sem espaços. Ex: @suamarca',
-  bTagline:     'Frase curta que resume o posicionamento. Aparece em posts de identidade.',
-  bNiche:       'Setor de atuação da marca. Usado para contextualizar tom e referências.',
-  bPositioning: 'Como a marca quer ser percebida: autoridade, proximidade, inovação etc.',
-  bLogoUrl:     'Link direto para PNG com fundo transparente. No Dropbox: botão direito → Copiar link direto.',
   // Base — Paleta
   bColorsNotes: 'Regras de uso das cores. Ex: primária nunca sobre fundo claro.',
   // Base — Tipografia
@@ -308,28 +303,12 @@ const FIELD_TIPS = {
   bWeightTitle:  'Espessura da fonte nos títulos. Bold+ para alto impacto, Medium para elegância.',
   bItalicUse:    'Define quando o itálico pode ser usado na comunicação da marca.',
   bTypoNotes:    'Regras específicas. Ex: títulos sempre em caixa alta, nunca misturar 3 fontes.',
-  // Base — Tom de voz
-  personalityInput: 'Adjetivos que descrevem como a marca fala. Pressione Enter após cada um.',
-  bToneMain:    'Registro geral da comunicação da marca.',
-  bToneReader:  'Como a marca se dirige ao leitor no texto.',
-  bToneNever:   'Comportamentos de comunicação proibidos. Um por linha.',
-  bToneExample: 'Headline real aprovada que exemplifica o tom e estilo da marca.',
   // Base — Visual
   bBorderUse:    'Papel das bordas no design. De decorativas a estruturais.',
   bCornerRadius: 'Grau de arredondamento de cards e botões.',
   bBgRhythm:     'Padrão de alternância escuro/claro entre os slides do carrossel.',
   bGradientUse:  'Quando e onde gradientes da paleta podem ser usados.',
   bVisualSig:    'Elementos recorrentes que identificam a marca visualmente. Ex: linha fina na base, número de slide em destaque.',
-  // Base — Audiência
-  bAudience: 'Quem é a audiência: cargo, faixa etária, contexto de vida ou trabalho.',
-  bPain:     'O maior problema ou frustração que o público enfrenta.',
-  bDesire:   'O que o público mais quer conquistar ou resolver.',
-  goalInput: 'Meta de cada post. Ex: gerar leads, educar, aumentar autoridade. Enter para adicionar.',
-  // Base — Referências
-  bReferences: 'Marcas, perfis ou sites com visual próximo ao desejado.',
-  bForbidden:  'O que nunca pode aparecer em nenhum post desta marca.',
-  bCanonical:  'Post ou carrossel já aprovado que serve como padrão de qualidade.',
-  bFinalNotes: 'Observações gerais que o Claude deve considerar ao gerar conteúdo.',
   // Carrossel — Estrutura
   cFormat:     'Proporção padrão dos slides deste carrossel.',
   cSlideCount: 'Quantidade de slides por carrossel. Entre 5 e 10 é o ideal para retenção.',
@@ -341,34 +320,14 @@ const FIELD_TIPS = {
   cNotes:    'Instruções adicionais: ritmo, limite de palavras por slide, variações.',
   // Carrossel — Entrega
   cForbidden:  'Restrições visuais ou de conteúdo específicas para este carrossel.',
-  cDelivery:   'Como o código HTML do carrossel será estruturado na entrega.',
-  cFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
   cFinalNotes: 'Últimas instruções antes de o Claude gerar o código do carrossel.',
   // Post — Conteúdo
-  pHeadline:     'Texto de maior destaque. Deve capturar atenção em 3 segundos.',
-  pSubtitle:     'Complementa ou contextualiza a headline.',
-  pCta:          'Chamada para ação. Ex: "Salve este post", "Acesse o link na bio".',
   pContentNotes: 'Instruções específicas sobre elementos, destaques ou tom deste post.',
-  // Post — Campos dinâmicos
-  pStatNum:    'Número ou porcentagem principal que será exibido em destaque.',
-  pStatCtx:    'Frase que contextualiza o número. Ex: "das autoescolas não controlam inadimplência."',
-  pStatSrc:    'Fonte da estatística para dar credibilidade. Ex: IBGE 2024.',
-  pAnPrice:    'Preço ou condição da oferta. Ex: R$ 197/mês ou 3× sem juros.',
-  pAnBenefit:  'Principal benefício ou proposta de valor da oferta.',
-  pUrgPrazo:   'Prazo ou data limite da oferta.',
-  pUrgOque:    'O que acaba: vagas, desconto, bônus etc.',
-  pQuoteText:  'Texto literal da citação ou depoimento.',
-  pQuoteAuthor:'Nome de quem disse ou escreveu.',
-  pQuoteRole:  'Cargo, empresa ou contexto de quem falou.',
-  pArtBody:    'Corpo do mini artigo. Máximo de 3–4 linhas para caber no post.',
   // Novos campos de conteúdo
   cContent:    'Conteúdo bruto (texto, tópicos ou roteiro) que servirá de base para a geração dos slides do carrossel.',
   pFreeText:   'Caso prefira colar a copy direta do post em formato livre, cole aqui. Esse texto será enviado no prompt.',
-  // Post — Entrega
-  pForbidden:  'Restrições visuais ou de conteúdo específicas para este post.',
-  pDelivery:   'Como o código HTML do post será estruturado na entrega.',
-  pFontB64:    'Como as fontes serão carregadas no arquivo HTML entregue.',
-  pFinalNotes: 'Últimas instruções antes de o Claude gerar o código do post.',
+  // Post — Obrigatoriedades
+  pFinalNotes: 'Itens que sempre devem aparecer no post. Ex: telefone de contato, logo no topo.',
   // Layout por formato
   pL1Notes: 'Instruções específicas de layout para o formato 1:1.',
   pL4Notes: 'Instruções específicas de layout para o formato 4:5.',
