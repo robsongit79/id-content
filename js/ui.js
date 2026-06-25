@@ -134,19 +134,17 @@ function updatePreviews() {
 }
 
 function updateProgress() {
-  const bReq = ['bName','cPrimaryHex','bFontDisplay','bToneMain','bAudience'];
-  const bOpt = ['bHandle','bTagline','bNiche','cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm','bReferences'];
+  const bReq = ['bName','cPrimaryHex','bFontDisplay'];
+  const bOpt = ['cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm'];
   let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
   bReq.forEach(id => { if (f(id)) bScore += 2; });
   bOpt.forEach(id => { if (f(id)) bScore += 1; });
-  if (app.chipData.personality.length) bScore += 2;
-  if (app.chipData.goal.length) bScore += 1;
   if (getRadio('styleVisual')) bScore += 1;
-  bMax += 3;
-  const bReqFilled = bReq.filter(id => f(id)).length + (app.chipData.personality.length ? 1 : 0);
+  bMax += 1;
+  const bReqFilled = bReq.filter(id => f(id)).length;
   const bPct = Math.round((bScore / bMax) * 100);
   document.getElementById('baseProgFill').style.width = bPct + '%';
-  document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length + 1} obrig.`;
+  document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length} obrig.`;
   document.getElementById('baseProgPct').textContent = bPct + '%';
 
   const cReq = ['cFormat','cSlideCount','cSequence'];

@@ -66,12 +66,9 @@
       <div class="sidebar-section base-nav">
         <div class="sidebar-label">Seções</div>
         <a href="#b1" class="nav-item active" data-base="b1"><span class="nav-dot"></span> 01 · Marca</a>
-        <a href="#b4" class="nav-item" data-base="b4"><span class="nav-dot"></span> 02 · Tom de voz</a>
-        <a href="#b6" class="nav-item" data-base="b6"><span class="nav-dot"></span> 03 · Audiência</a>
-        <a href="#b2" class="nav-item" data-base="b2"><span class="nav-dot"></span> 04 · Cores</a>
-        <a href="#b3" class="nav-item" data-base="b3"><span class="nav-dot"></span> 05 · Tipografia</a>
-        <a href="#b5" class="nav-item" data-base="b5"><span class="nav-dot"></span> 06 · Estilo visual</a>
-        <a href="#b7" class="nav-item" data-base="b7"><span class="nav-dot"></span> 07 · Restrições</a>
+        <a href="#b2" class="nav-item" data-base="b2"><span class="nav-dot"></span> 02 · Cores</a>
+        <a href="#b3" class="nav-item" data-base="b3"><span class="nav-dot"></span> 03 · Tipografia</a>
+        <a href="#b5" class="nav-item" data-base="b5"><span class="nav-dot"></span> 04 · Estilo visual</a>
       </div>
       <div class="sidebar-section base-prog">
         <div class="sidebar-label">Progresso</div>
@@ -85,15 +82,9 @@
     <main class="main" id="baseMain">
       <section class="section" id="b1">
         <div class="section-header"><div><div class="section-num base-num">01</div><h2 class="section-title">Identidade da Marca</h2><p class="section-desc">Informações base usadas em todos os tipos de conteúdo.</p></div></div>
-        <div class="field-group cols-2">
+        <div class="field-group">
           <div class="field"><label class="field-label">Nome da marca <span class="required">*</span></label><input type="text" id="bName" placeholder="Ex: CFC Produtivo" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Handle Instagram</label><input type="text" id="bHandle" placeholder="@cfcprodutivo" oninput="markDirty()"></div>
         </div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Tagline</label><input type="text" id="bTagline" placeholder="Ex: Gestão para autoescolas" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Segmento / Nicho</label><input type="text" id="bNiche" placeholder="Ex: Autoescolas" oninput="markDirty()"></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Posicionamento</label><textarea id="bPositioning" placeholder="Como a marca quer ser percebida..." oninput="markDirty()"></textarea></div></div>
         <div class="divider"></div>
         <div class="field-group" style="margin-top:14px;">
           <div class="field">
@@ -115,35 +106,8 @@
         </div>
       </section>
 
-      <section class="section" id="b4">
-        <div class="section-header"><div><div class="section-num base-num">02</div><h2 class="section-title">Tom de Voz</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Personalidade</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="personalityChips" onclick="document.getElementById('personalityInput').focus()"><input class="chip-input" id="personalityInput" placeholder="Ex: Direto, Autoritário..." onkeydown="addChip(event,'personalityChips','personality')"></div></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Tom principal</label><select id="bToneMain" oninput="markDirty()"><option value="">Selecione</option><option>Autoritário e direto</option><option>Consultivo e educativo</option><option>Provocativo e agressivo</option><option>Inspiracional e motivacional</option><option>Premium e sofisticado</option><option>Técnico e objetivo</option><option>Próximo e conversacional</option><option>Editorial e jornalístico</option></select></div>
-          <div class="field"><label class="field-label">Tratamento</label><select id="bToneReader" oninput="markDirty()"><option value="">Selecione</option><option>Você (informal)</option><option>Você (formal)</option><option>Tu</option><option>Gestor / Profissional (3ª pessoa)</option></select></div>
-        </div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Nunca fazer</label><textarea id="bToneNever" placeholder="Ex: Nunca usar gírias. Nunca diminutivos. Evitar exclamações em excesso." oninput="markDirty()"></textarea></div>
-          <div class="field"><label class="field-label">Exemplo de headline</label><textarea id="bToneExample" placeholder="Ex: 'Você está gerenciando sua autoescola no improviso — e isso tem custo.'" oninput="markDirty()"></textarea></div>
-        </div>
-      </section>
-
-      <section class="section" id="b6">
-        <div class="section-header"><div><div class="section-num base-num">03</div><h2 class="section-title">Audiência</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Perfil do público</label><textarea id="bAudience" placeholder="Ex: Donos e gestores de autoescolas, 30–55 anos, que já têm operação rodando mas sentem que poderiam ser mais organizados." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Principal dor</label><textarea id="bPain" style="min-height:66px;" placeholder="Ex: Perdem alunos por falta de acompanhamento pós-matrícula e não têm visibilidade financeira." oninput="markDirty()"></textarea></div>
-          <div class="field"><label class="field-label">Principal desejo</label><textarea id="bDesire" style="min-height:66px;" placeholder="Ex: Ter controle total da escola sem depender de planilhas ou da memória." oninput="markDirty()"></textarea></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Objetivos de conteúdo</label><div class="chips-wrap" id="goalChips" onclick="document.getElementById('goalInput').focus()"><input class="chip-input" id="goalInput" placeholder="Ex: Gerar leads, Educar..." onkeydown="addChip(event,'goalChips','goal')"></div></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Temas / Pautas recorrentes</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="topicChips" onclick="document.getElementById('topicInput').focus()"><input class="chip-input" id="topicInput" placeholder="Ex: Gestão, Vendas, Legislação..." onkeydown="addChip(event,'topicChips','topic')"></div></div>
-          <div class="field"><label class="field-label">Frequência de postagem</label><select id="bPostFrequency" oninput="markDirty()"><option value="">Selecione</option><option>Diário</option><option>3× por semana</option><option>2× por semana</option><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select></div>
-        </div>
-      </section>
-
       <section class="section" id="b2">
-        <div class="section-header"><div><div class="section-num base-num">04</div><h2 class="section-title">Paleta de Cores</h2></div></div>
+        <div class="section-header"><div><div class="section-num base-num">02</div><h2 class="section-title">Paleta de Cores</h2></div></div>
         <div class="palette-grid">
           <div class="field"><div class="field-label">Primária <span class="required">*</span></div><div class="palette-swatch-row"><input type="color" id="cPrimary" value="#1E40AF" oninput="document.getElementById('cPrimaryHex').value=this.value;markDirty()"><input type="text" id="cPrimaryHex" value="#1E40AF" oninput="syncColor('cPrimary','cPrimaryHex')" style="flex:1;"></div></div>
           <div class="field"><div class="field-label">Secundária</div><div class="palette-swatch-row"><input type="color" id="cSecondary" value="#3B82F6" oninput="document.getElementById('cSecondaryHex').value=this.value;markDirty()"><input type="text" id="cSecondaryHex" value="#3B82F6" oninput="syncColor('cSecondary','cSecondaryHex')" style="flex:1;"></div></div>
@@ -156,7 +120,7 @@
       </section>
 
       <section class="section" id="b3">
-        <div class="section-header"><div><div class="section-num base-num">05</div><h2 class="section-title">Tipografia</h2><p class="section-desc">Nome exato como aparece em <a href="https://fonts.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">fonts.google.com</a></p></div></div>
+        <div class="section-header"><div><div class="section-num base-num">03</div><h2 class="section-title">Tipografia</h2><p class="section-desc">Nome exato como aparece em <a href="https://fonts.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">fonts.google.com</a></p></div></div>
         <div class="field-group cols-2">
           <div class="field"><label class="field-label">Fonte de display <span class="required">*</span></label><div style="position:relative;"><input type="text" id="bFontDisplay" placeholder="Ex: Playfair Display" oninput="markDirty();loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay')" style="padding-right:36px;"><span id="bStatusDisplay" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewDisplay" style="font-size:22px;">Título de exemplo</div></div>
           <div class="field"><label class="field-label">Fonte de corpo</label><div style="position:relative;"><input type="text" id="bFontBody" placeholder="Ex: DM Sans" oninput="markDirty();loadFont('bFontBody','bPreviewBody','bStatusBody')" style="padding-right:36px;"><span id="bStatusBody" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewBody" style="font-size:14px;">Texto de corpo. Clareza e leitura fluida.</div></div>
@@ -174,7 +138,7 @@
       </section>
 
       <section class="section" id="b5">
-        <div class="section-header"><div><div class="section-num base-num">06</div><h2 class="section-title">Estrutura Visual</h2></div></div>
+        <div class="section-header"><div><div class="section-num base-num">04</div><h2 class="section-title">Estrutura Visual</h2></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Estilo visual geral</label><div class="radio-grid base-radio" id="styleGrid"><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Minimalista e limpo"><span class="radio-title">Minimalista</span><span class="radio-desc">Espaço generoso, poucos elementos</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Bold e agressivo"><span class="radio-title">Bold / Agressivo</span><span class="radio-desc">Alto contraste, tipografia pesada</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Premium e editorial"><span class="radio-title">Premium / Editorial</span><span class="radio-desc">Serifado, dourado, sofisticado</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Tech e moderno"><span class="radio-title">Tech / Moderno</span><span class="radio-desc">Geométrico, neon, data-driven</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Orgânico e humano"><span class="radio-title">Orgânico / Humano</span><span class="radio-desc">Arredondado, acolhedor, quente</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Brutalist e cru"><span class="radio-title">Brutalist / Cru</span><span class="radio-desc">Bordas, grid exposto, raw</span></label></div></div></div>
         <div class="field-group cols-2">
           <div class="field"><label class="field-label">Bordas</label><select id="bBorderUse" oninput="markDirty()"><option value="">Selecione</option><option>Sem bordas</option><option>Bordas finas e sutis (1px)</option><option>Bordas coloridas como elemento de design</option><option>Linhas ornamentais (topo, base)</option><option>Quadros e molduras nos cards</option></select></div>
@@ -187,17 +151,6 @@
         <div class="field-group"><div class="field"><label class="field-label">Assinatura visual</label><textarea id="bVisualSig" placeholder="Ex: Linha fina na base de cada slide. Número do slide em destaque no canto superior direito. Ícone geométrico como marcador de seção." oninput="markDirty()"></textarea></div></div>
       </section>
 
-      <section class="section" id="b7">
-        <div class="section-header"><div><div class="section-num base-num">07</div><h2 class="section-title">Referências & Restrições</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Referências visuais</label><textarea id="bReferences" placeholder="Ex: @resultadosdigitais no Instagram, site linear.app, carrosséis da marca Nubank — todos usam tipografia grande, espaço generoso e paleta sóbria." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Proibições globais</label><textarea id="bForbidden" placeholder="Ex: Nunca usar stock photos genéricas. Nunca fundo branco puro. Proibido emoji fora do contexto de checklist." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Referência canônica aprovada</label><textarea id="bCanonical" placeholder="Ex: O carrossel 'Os 5 erros...' publicado em 12/03 é o padrão de qualidade aprovado pelo cliente — usar como régua." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Hashtags padrão</label><div class="field-hint">Pressione Enter para adicionar</div><div class="chips-wrap" id="hashtagChips" onclick="document.getElementById('hashtagInput').focus()"><input class="chip-input" id="hashtagInput" placeholder="Ex: #autoescola, #gestao..." onkeydown="addChip(event,'hashtagChips','hashtag')"></div></div>
-          <div class="field"><label class="field-label">Concorrentes principais</label><textarea id="bCompetitors" placeholder="Ex: CFC Central, Escola de Trânsito XYZ — ambos focados em volume, não em qualidade de atendimento." oninput="markDirty()"></textarea></div>
-        </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="bFinalNotes" placeholder="Ex: Cliente prefere variações com mais texto. Revisar sempre antes de entregar posts de campanha." oninput="markDirty()"></textarea></div></div>
-      </section>
     </main>
     <aside class="preview-panel">
       <div><div class="preview-label">Prompt — Base</div><div class="output-box" id="baseOutput"><span class="empty">← Preencha os campos.</span></div></div>

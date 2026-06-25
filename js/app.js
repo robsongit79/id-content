@@ -325,8 +325,7 @@ const app = {
   // ── FILL FORMS ──
   fillBrand(b) {
     const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-    set('bName', b.name); set('bHandle', b.handle); set('bTagline', b.tagline);
-    set('bNiche', b.niche); set('bPositioning', b.positioning);
+    set('bName', b.name);
     set('cPrimaryHex', b.color_primary); set('cSecondaryHex', b.color_secondary);
     set('cAccentHex', b.color_accent); set('cDarkHex', b.color_dark);
     set('cLightHex', b.color_light); set('cTextHex', b.color_text);
@@ -337,27 +336,14 @@ const app = {
     set('bColorsNotes', b.colors_notes); set('bFontDisplay', b.font_display); set('bFontBody', b.font_body);
     set('bSizeTitle', b.size_title); set('bSizeSubtitle', b.size_subtitle); set('bSizeBody', b.size_body);
     set('bWeightTitle', b.weight_title); set('bItalicUse', b.italic_use); set('bTypoNotes', b.typo_notes);
-    set('bToneMain', b.tone_main); set('bToneReader', b.tone_reader);
-    set('bToneNever', b.tone_never); set('bToneExample', b.tone_example);
     set('bBorderUse', b.border_use); set('bCornerRadius', b.corner_radius);
     set('bBgRhythm', b.bg_rhythm); set('bGradientUse', b.gradient_use); set('bVisualSig', b.visual_signature);
-    set('bAudience', b.audience); set('bPain', b.pain); set('bDesire', b.desire);
-    set('bReferences', b.visual_references); set('bForbidden', b.forbidden);
-    set('bCanonical', b.canonical); set('bFinalNotes', b.final_notes);
-
-    // Novos campos
-    set('bCompetitors', b.competitors);
-    set('bPostFrequency', b.post_frequency);
 
     if (b.style_visual) {
       document.querySelectorAll(`input[name="styleVisual"]`).forEach(r => {
         if (r.value === b.style_visual) { r.checked = true; r.closest('.radio-item')?.classList.add('selected'); }
       });
     }
-    if (b.personality) this.fillChips('personality', b.personality, 'personalityChips', 'personalityInput');
-    if (b.goals) this.fillChips('goal', b.goals, 'goalChips', 'goalInput');
-    if (b.hashtags) this.fillChips('hashtag', b.hashtags, 'hashtagChips', 'hashtagInput');
-    if (b.topics) this.fillChips('topic', b.topics, 'topicChips', 'topicInput');
 
     if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
@@ -511,8 +497,6 @@ const app = {
 
     return {
       name: f('bName') || 'Sem nome',
-      handle: f('bHandle'), tagline: f('bTagline'), niche: f('bNiche'),
-      positioning: f('bPositioning'),
       logo_active: document.getElementById('bLogoActive')?.checked || false,
       logo_url: JSON.stringify(meta),
       color_primary: document.getElementById('cPrimaryHex')?.value,
@@ -525,20 +509,9 @@ const app = {
       font_display: f('bFontDisplay'), font_body: f('bFontBody'),
       size_title: f('bSizeTitle'), size_subtitle: f('bSizeSubtitle'), size_body: f('bSizeBody'),
       weight_title: f('bWeightTitle'), italic_use: f('bItalicUse'), typo_notes: f('bTypoNotes'),
-      personality: this.chipData.personality, goals: this.chipData.goal,
-      tone_main: f('bToneMain'), tone_reader: f('bToneReader'),
-      tone_never: f('bToneNever'), tone_example: f('bToneExample'),
       style_visual: getRadio('styleVisual'),
       border_use: f('bBorderUse'), corner_radius: f('bCornerRadius'),
       bg_rhythm: f('bBgRhythm'), gradient_use: f('bGradientUse'), visual_signature: f('bVisualSig'),
-      audience: f('bAudience'), pain: f('bPain'), desire: f('bDesire'),
-      visual_references: f('bReferences'), forbidden: f('bForbidden'),
-      canonical: f('bCanonical'), final_notes: f('bFinalNotes'),
-      // Novos campos
-      hashtags: this.chipData.hashtag,
-      competitors: f('bCompetitors'),
-      topics: this.chipData.topic,
-      post_frequency: f('bPostFrequency'),
     };
   },
 
@@ -837,10 +810,6 @@ const app = {
         logo_url: JSON.stringify(meta)
       });
       await this.openBrand(brand.id);
-      if (personality) this.fillChips('personality', personality, 'personalityChips', 'personalityInput');
-      if (goals) this.fillChips('goal', goals, 'goalChips', 'goalInput');
-      if (topics) this.fillChips('topic', topics, 'topicChips', 'topicInput');
-      if (hashtags) this.fillChips('hashtag', hashtags, 'hashtagChips', 'hashtagInput');
       await this.save();
       toast(`Template "${tmpl.label}" aplicado!`, 'success');
     } catch (e) {

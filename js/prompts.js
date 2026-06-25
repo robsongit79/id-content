@@ -44,10 +44,6 @@ const prompts = {
 
     const s1 = [];
     if (f('bName'))        s1.push(`MARCA:          ${f('bName')}`);
-    if (f('bHandle'))      s1.push(`HANDLE:         ${f('bHandle')}`);
-    if (f('bTagline'))     s1.push(`TAGLINE:        ${f('bTagline')}`);
-    if (f('bNiche'))       s1.push(`NICHO:          ${f('bNiche')}`);
-    if (f('bPositioning')) s1.push(`POSICIONAMENTO: ${f('bPositioning')}`);
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
     if (activeLogo) {
       s1.push("LOGO:           Ativa — Solicite o envio do link da logo ao usuário.");
@@ -76,14 +72,6 @@ const prompts = {
     if (f('bTypoNotes'))    s3.push(`NOTAS:          ${f('bTypoNotes')}`);
     if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
 
-    const s4 = [];
-    if (app.chipData.personality.length) s4.push(`PERSONALIDADE:  ${app.chipData.personality.join(', ')}`);
-    if (f('bToneMain'))    s4.push(`TOM:            ${f('bToneMain')}`);
-    if (f('bToneReader'))  s4.push(`TRATAMENTO:     ${f('bToneReader')}`);
-    if (f('bToneNever'))   s4.push(`NUNCA:          ${f('bToneNever')}`);
-    if (f('bToneExample')) s4.push(`EXEMPLO:        "${f('bToneExample')}"`);
-    if (s4.length) s.push(`## 04 · TOM DE VOZ\n${s4.join('\n')}`);
-
     const s5 = [], sv = getRadio('styleVisual');
     if (sv)               s5.push(`ESTILO:         ${sv}`);
     if (f('bBorderUse'))  s5.push(`BORDAS:         ${f('bBorderUse')}`);
@@ -91,25 +79,7 @@ const prompts = {
     if (f('bBgRhythm'))   s5.push(`RITMO FUNDOS:   ${f('bBgRhythm')}`);
     if (f('bGradientUse'))s5.push(`GRADIENTES:     ${f('bGradientUse')}`);
     if (f('bVisualSig'))  s5.push(`ASSINATURA:     ${f('bVisualSig')}`);
-    if (s5.length) s.push(`## 05 · VISUAL\n${s5.join('\n')}`);
-
-    const s6 = [];
-    if (f('bAudience')) s6.push(`PÚBLICO:        ${f('bAudience')}`);
-    if (f('bPain'))     s6.push(`DOR:            ${f('bPain')}`);
-    if (f('bDesire'))   s6.push(`DESEJO:         ${f('bDesire')}`);
-    if (app.chipData.goal.length) s6.push(`OBJETIVOS:      ${app.chipData.goal.join(', ')}`);
-    if (app.chipData.topic.length) s6.push(`PAUTAS:         ${app.chipData.topic.join(', ')}`);
-    if (f('bPostFrequency')) s6.push(`FREQUÊNCIA:     ${f('bPostFrequency')}`);
-    if (s6.length) s.push(`## 06 · AUDIÊNCIA\n${s6.join('\n')}`);
-
-    const s7 = [];
-    if (f('bReferences')) s7.push(`REFERÊNCIAS:    ${f('bReferences')}`);
-    if (f('bForbidden'))  s7.push(`PROIBIDO:       ${f('bForbidden')}`);
-    if (f('bCanonical'))  s7.push(`CANÔNICO:       ${f('bCanonical')}`);
-    if (app.chipData.hashtag.length) s7.push(`HASHTAGS:       ${app.chipData.hashtag.map(h => h.startsWith('#') ? h : '#' + h).join(' ')}`);
-    if (f('bCompetitors')) s7.push(`CONCORRENTES:   ${f('bCompetitors')}`);
-    if (f('bFinalNotes')) s7.push(`NOTAS:          ${f('bFinalNotes')}`);
-    if (s7.length) s.push(`## 07 · REFERÊNCIAS\n${s7.join('\n')}`);
+    if (s5.length) s.push(`## 04 · VISUAL\n${s5.join('\n')}`);
 
     if (s.length <= 1) return null;
     return s.join('\n\n');
