@@ -727,26 +727,15 @@ const app = {
       }
 
       const pFields = {
-        pHeadline: preset.layout.headline, pSubtitle: preset.layout.subtitle, pCta: preset.layout.cta,
         pContentNotes: content_notes,
         pFreeText: free_text,
-        pStatNum: preset.layout.stat_number,
-        pStatCtx: preset.layout.stat_context, pStatSrc: preset.layout.stat_source,
-        pCompA: preset.layout.comp_a, pCompB: preset.layout.comp_b,
-        pAnPrice: preset.layout.anuncio_price, pAnBenefit: preset.layout.anuncio_benefit,
-        pUrgPrazo: preset.layout.urgencia_prazo, pUrgOque: preset.layout.urgencia_oque,
-        pQuoteText: preset.layout.quote_text, pQuoteAuthor: preset.layout.quote_author, pQuoteRole: preset.layout.quote_role,
-        pArtBody: preset.layout.article_body,
         pL1TextPos: preset.layout.layout_1x1_text_pos, pL1Bg: preset.layout.layout_1x1_bg, pL1Notes: preset.layout.layout_1x1_notes,
         pL4TextPos: preset.layout.layout_4x5_text_pos, pL4Bg: preset.layout.layout_4x5_bg, pL4Notes: preset.layout.layout_4x5_notes,
         pL9TextPos: preset.layout.layout_9x16_text_pos, pL9Bg: preset.layout.layout_9x16_bg, pL9Notes: preset.layout.layout_9x16_notes,
-        pForbidden: preset.layout.forbidden, pDelivery: preset.layout.delivery_format,
-        pFontB64: preset.layout.font_base64, pFinalNotes: preset.layout.final_notes
+        pFinalNotes: preset.layout.final_notes
       };
       Object.entries(pFields).forEach(([id, val]) => setVal(id, val));
-      const items = preset.layout.items || [];
-      this.fillChips('pItems', items, 'pItemsChips', 'pItemsInput');
-      
+
       if (typeof syncUnifiedLayout === 'function') {
         syncUnifiedLayout();
       }
