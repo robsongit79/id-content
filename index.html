@@ -423,32 +423,6 @@
       </section>
     </main>
     <aside class="preview-panel">
-      <!-- Simulador Visual do Post -->
-      <div class="post-preview-container">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;width:100%;">
-          <div class="preview-label" style="margin:0;">Simulador Visual</div>
-          <div class="post-preview-toggle-wrap" id="postPreviewToggles">
-            <button type="button" class="btn btn-ghost active" onclick="setPreviewRatio('1x1')">1:1</button>
-            <button type="button" class="btn btn-ghost" onclick="setPreviewRatio('4x5')">4:5</button>
-            <button type="button" class="btn btn-ghost" onclick="setPreviewRatio('9x16')">9:16</button>
-          </div>
-        </div>
-        <div class="post-preview-card-wrap">
-          <div class="post-preview-card" id="postPreviewCard">
-            <div class="post-preview-logo" id="postPreviewLogo">logo</div>
-            <div class="post-preview-content">
-              <div class="post-preview-headline" id="postPreviewHeadline">Título do Post</div>
-              <div class="post-preview-subtitle" id="postPreviewSubtitle">Subtítulo</div>
-              <div class="post-preview-body" id="postPreviewBody"></div>
-            </div>
-            <div class="post-preview-footer">
-              <span class="post-preview-handle" id="postPreviewHandle">@handle</span>
-              <span class="post-preview-cta" id="postPreviewCta">CTA</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div><div class="preview-label">Prompt — Base + Post</div><div class="output-box" id="postOutput"><span class="empty">← Preencha os campos.</span></div></div>
       <div><button class="btn btn-copy" style="width:100%;display:flex;justify-content:center;" onclick="postCopy()">⌘ Copiar prompt</button><div class="copy-success" id="postCopyMsg">✓ Copiado</div></div>
       <div style="font-size:10px;color:var(--muted);line-height:1.6;">Para gerar o post, cole este prompt unificado no Claude.</div>
