@@ -24,6 +24,7 @@
 - Modify: `index.html` (section `b1`, remove sections `b4`, `b6`, `b7`, renumber `b2`/`b3`/`b5`)
 - Modify: `js/prompts.js` (`buildBase()`)
 - Modify: `js/app.js` (`collectBrand()`, `fillBrand()`)
+- Modify: `js/ui.js` (`updateProgress()`'s Base section)
 
 **Interfaces:**
 - Consumes: nothing new.
@@ -365,7 +366,47 @@ Replace with:
 
 (This deliberately stops calling `this.fillChips('personality'|'goal'|'hashtag'|'topic', ...)` — those wrap elements no longer exist in the DOM after Step 2/4, and this also prevents the old `Cannot read properties of null (reading 'insertBefore')` crash from recurring for any existing brand that has saved `personality`/`goals`/`hashtags`/`topics` data.)
 
-- [ ] **Step 9: Run syntax checks**
+- [ ] **Step 9: Fix `updateProgress()`'s Base section in `js/ui.js` (would otherwise permanently cap the progress bar below 100% — it references `bToneMain`/`bAudience`, removed in Step 2/4, and chip bonuses that can never fire again after Step 8)**
+
+Find:
+```javascript
+function updateProgress() {
+  const bReq = ['bName','cPrimaryHex','bFontDisplay','bToneMain','bAudience'];
+  const bOpt = ['bHandle','bTagline','bNiche','cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm','bReferences'];
+  let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
+  bReq.forEach(id => { if (f(id)) bScore += 2; });
+  bOpt.forEach(id => { if (f(id)) bScore += 1; });
+  if (app.chipData.personality.length) bScore += 2;
+  if (app.chipData.goal.length) bScore += 1;
+  if (getRadio('styleVisual')) bScore += 1;
+  bMax += 3;
+  const bReqFilled = bReq.filter(id => f(id)).length + (app.chipData.personality.length ? 1 : 0);
+  const bPct = Math.round((bScore / bMax) * 100);
+  document.getElementById('baseProgFill').style.width = bPct + '%';
+  document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length + 1} obrig.`;
+  document.getElementById('baseProgPct').textContent = bPct + '%';
+```
+
+Replace with:
+```javascript
+function updateProgress() {
+  const bReq = ['bName','cPrimaryHex','bFontDisplay'];
+  const bOpt = ['cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm'];
+  let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
+  bReq.forEach(id => { if (f(id)) bScore += 2; });
+  bOpt.forEach(id => { if (f(id)) bScore += 1; });
+  if (getRadio('styleVisual')) bScore += 1;
+  bMax += 1;
+  const bReqFilled = bReq.filter(id => f(id)).length;
+  const bPct = Math.round((bScore / bMax) * 100);
+  document.getElementById('baseProgFill').style.width = bPct + '%';
+  document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length} obrig.`;
+  document.getElementById('baseProgPct').textContent = bPct + '%';
+```
+
+(Leave the rest of `updateProgress()` — the Carrossel `cReq`/`cOpt` block and the Post block — untouched in this task; the Carrossel block is fixed in Task 2.)
+
+- [ ] **Step 10: Run syntax checks**
 
 ```bash
 node --check js/prompts.js
@@ -373,17 +414,18 @@ node --check js/app.js
 ```
 Expected: no output, exit code 0 for both.
 
-- [ ] **Step 10: Manual browser verification**
+- [ ] **Step 11: Manual browser verification**
 
 Serve the directory (`python3 -m http.server 8000`) and in the browser:
 1. Open a brand. Confirm the Identidade tab shows only: Nome da marca, logo checkbox, admin-share checkbox (if admin), then Paleta de Cores (02), Tipografia (03), Estrutura Visual (04) — no Handle/Tagline/Nicho/Posicionamento, no Tom de Voz, no Audiência, no Referências & Restrições section.
 2. Fill in name + a color + a font, confirm the generated prompt (right panel) shows `## 01 · IDENTIDADE`, `## 02 · PALETA`, `## 03 · TIPOGRAFIA`, and (if any visual field filled) `## 04 · VISUAL` — no Tom de Voz/Audiência/Referências sections.
 3. If you have an existing brand created before this change with data in the removed fields (e.g. a Handle), open it, confirm the app doesn't crash, save it, then check in Supabase (or re-fetch via the API) that the old `handle` column value is still there (not wiped to empty).
+4. Confirm the Base progress bar (top of the left sidebar in the Identidade tab) can reach 100% by filling Nome da marca, a primary color, and a display font (the only 3 required fields now).
 
-- [ ] **Step 11: Commit**
+- [ ] **Step 12: Commit**
 
 ```bash
-git add index.html js/prompts.js js/app.js
+git add index.html js/prompts.js js/app.js js/ui.js
 git commit -m "feat(forms): simplificar Identidade — remover Tom de Voz, Audiência, Referências e campos secundários"
 ```
 
@@ -395,6 +437,7 @@ git commit -m "feat(forms): simplificar Identidade — remover Tom de Voz, Audi�
 - Modify: `index.html` (section `c4`)
 - Modify: `js/prompts.js` (`buildCarousel()`)
 - Modify: `js/app.js` (`collectCarousel()`)
+- Modify: `js/ui.js` (`updateProgress()`'s Carrossel section)
 
 **Interfaces:** none new.
 
@@ -467,20 +510,37 @@ Replace with:
 
 (`cDelivery`/`cFontB64` are intentionally still read by `fillCarousel()` from old saved JSON via `parsed.delivery_format`/`parsed.font_base64` — that function is unaffected by this task since those keys may still exist in old rows; we're only stopping *new* writes of these keys going forward. Do not modify `fillCarousel()` in this task.)
 
-- [ ] **Step 4: Verify and commit**
+- [ ] **Step 4: Fix `updateProgress()`'s Carrossel section in `js/ui.js` (its `cOpt` array references `cDelivery`/`cFontB64`, removed in Step 1 — this doesn't crash, since `f()` returns `''` for missing elements, but it permanently wastes 2 of the Carrossel progress bar's max points)**
+
+Find:
+```javascript
+  const cReq = ['cFormat','cSlideCount','cSequence'];
+  const cOpt = ['cDelivery','cFontB64'];
+  let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
+```
+
+Replace with:
+```javascript
+  const cReq = ['cFormat','cSlideCount','cSequence'];
+  const cOpt = ['cFixedEl'];
+  let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
+```
+
+- [ ] **Step 5: Verify and commit**
 
 ```bash
 node --check js/prompts.js
 node --check js/app.js
+node --check js/ui.js
 python3 -c "import re; s=open('index.html').read(); print(s.count('<div'), s.count('</div>'))"
 grep -c 'id="cToggleAdvancedBtn"\|id="cAdvancedOptions"\|id="cDelivery"\|id="cFontB64"' index.html
 ```
-Expected: `node --check` clean; div counts equal; last grep returns `0`.
+Expected: `node --check` clean for all three files; div counts equal; last grep returns `0`.
 
-Manually: open the Carrossel tab, confirm there's no "Mostrar Configurações Avançadas" button and the section goes directly from "O que não fazer" to "Notas finais".
+Manually: open the Carrossel tab, confirm there's no "Mostrar Configurações Avançadas" button and the section goes directly from "O que não fazer" to "Notas finais". Confirm the Carrossel progress bar can still reach 100% by filling Formato, Nº de slides, and Sequência.
 
 ```bash
-git add index.html js/prompts.js js/app.js
+git add index.html js/prompts.js js/app.js js/ui.js
 git commit -m "feat(forms): remover Configurações Avançadas do Carrossel"
 ```
 
@@ -1167,62 +1227,6 @@ git commit -m "feat(forms): remover Simulador Visual do Post"
 
 ## Plan Self-Review Notes
 
-- **Spec coverage:** Identidade simplification (Task 1) ✓. Carrossel Configurações Avançadas removal (Task 2) ✓. Post dynamic-fields + Headline/Subtítulo/CTA removal, type selector preserved (Task 3) ✓. Post Obrigatoriedades single-field rename (Task 4) ✓. Simulador Visual removal (Task 5) ✓. Data-safety principle (omit keys, don't blank them) applied in Tasks 1 (`collectBrand`), 2 (`collectCarousel`), 3 (`collectPost`) ✓. Sequential section renumbering in both UI (Task 1 Steps 2-4) and prompt (Task 1 Step 6) ✓. `POST_COMPOSITION_PATTERNS` determinism explicitly preserved and verified in Task 3 Step 11 ✓. Progress bar fix (Task 1 implicit — Base req list was already only `bName`/`cPrimaryHex`/`bFontDisplay` after removing `bToneMain`/`bAudience`... — **gap found and fixed below**.
-- **Gap found during self-review:** the original `updateProgress()` Base section (`bReq`/`bOpt`/the chip-bonus block) was never explicitly rewritten in Task 1, but it references `bToneMain`, `bAudience` (removed in Task 1) and `app.chipData.personality`/`.goal` (orphaned after Task 1 removes their UI). Since `f('bToneMain')`/`f('bAudience')` simply return `''` for missing elements and `chipData.personality.length`/`.goal.length` stay `0` forever, this does **not crash** — but it permanently caps the Base progress bar below 100% (2 of 5 "required" points can never be earned) and wastes 3 points of `bMax` on chip bonuses that can never fire. Adding a corrective step to Task 1.
-- **Fix:** add this step to Task 1, after Step 8 (renumber it Step 8.5, executed before the final Step 9 syntax check):
-
-  Find (in `js/ui.js`):
-  ```javascript
-  function updateProgress() {
-    const bReq = ['bName','cPrimaryHex','bFontDisplay','bToneMain','bAudience'];
-    const bOpt = ['bHandle','bTagline','bNiche','cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm','bReferences'];
-    let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
-    bReq.forEach(id => { if (f(id)) bScore += 2; });
-    bOpt.forEach(id => { if (f(id)) bScore += 1; });
-    if (app.chipData.personality.length) bScore += 2;
-    if (app.chipData.goal.length) bScore += 1;
-    if (getRadio('styleVisual')) bScore += 1;
-    bMax += 3;
-    const bReqFilled = bReq.filter(id => f(id)).length + (app.chipData.personality.length ? 1 : 0);
-    const bPct = Math.round((bScore / bMax) * 100);
-    document.getElementById('baseProgFill').style.width = bPct + '%';
-    document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length + 1} obrig.`;
-    document.getElementById('baseProgPct').textContent = bPct + '%';
-  ```
-
-  Replace with:
-  ```javascript
-  function updateProgress() {
-    const bReq = ['bName','cPrimaryHex','bFontDisplay'];
-    const bOpt = ['cSecondaryHex','bFontBody','bSizeTitle','bSizeSubtitle','bSizeBody','bBgRhythm'];
-    let bScore = 0, bMax = bReq.length * 2 + bOpt.length;
-    bReq.forEach(id => { if (f(id)) bScore += 2; });
-    bOpt.forEach(id => { if (f(id)) bScore += 1; });
-    if (getRadio('styleVisual')) bScore += 1;
-    bMax += 1;
-    const bReqFilled = bReq.filter(id => f(id)).length;
-    const bPct = Math.round((bScore / bMax) * 100);
-    document.getElementById('baseProgFill').style.width = bPct + '%';
-    document.getElementById('baseProgLabel').textContent = `${bReqFilled}/${bReq.length} obrig.`;
-    document.getElementById('baseProgPct').textContent = bPct + '%';
-  ```
-
-  (This is now Task 1 Step 8.5 — insert it between the existing Step 8 (`fillBrand()` update) and Step 9 (syntax check) of Task 1 above. The `cReq`/`cOpt` block for Carrossel right below this in the same function still references `cDelivery`/`cFontB64` in `cOpt` — that's handled separately by Task 2, which must also patch `updateProgress()`'s Carrossel block. Adding that to Task 2 below.)
-
-- **Second gap found:** Task 2 removes `cDelivery`/`cFontB64` fields but the plan's Task 2 never touched `updateProgress()`'s `cOpt = ['cDelivery','cFontB64'];` line. Same non-crashing-but-capped-percentage issue as above. **Fix:** add to Task 2, as a new Step 2.5 (between the existing Step 2 and Step 3):
-
-  Find (in `js/ui.js`):
-  ```javascript
-  const cReq = ['cFormat','cSlideCount','cSequence'];
-  const cOpt = ['cDelivery','cFontB64'];
-  let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
-  ```
-
-  Replace with:
-  ```javascript
-  const cReq = ['cFormat','cSlideCount','cSequence'];
-  const cOpt = ['cFixedEl'];
-  let cScore = 0, cMax = cReq.length * 2 + cOpt.length + 2;
-  ```
-
+- **Spec coverage:** Identidade simplification (Task 1) ✓. Carrossel Configurações Avançadas removal (Task 2) ✓. Post dynamic-fields + Headline/Subtítulo/CTA removal, type selector preserved (Task 3) ✓. Post Obrigatoriedades single-field rename (Task 4) ✓. Simulador Visual removal (Task 5) ✓. Data-safety principle (omit keys, don't blank them) applied in Tasks 1 (`collectBrand`), 2 (`collectCarousel`), 3 (`collectPost`) ✓. Sequential section renumbering in both UI (Task 1 Steps 2-4) and prompt (Task 1 Step 6) ✓. `POST_COMPOSITION_PATTERNS` determinism explicitly preserved and verified in Task 3 Step 11 ✓.
+- **Progress bar fix (gap found and corrected inline):** `updateProgress()`'s Base section referenced `bToneMain`/`bAudience` (removed in Task 1) and chip-length bonuses that could never fire again — fixed as Task 1 Step 9, inserted between the old `fillBrand()` step and the syntax-check step (renumbered the rest of Task 1 accordingly: Steps 10–12). `updateProgress()`'s Carrossel section referenced `cDelivery`/`cFontB64` (removed in Task 2) — fixed as Task 2 Step 4, with the old "verify and commit" step renumbered to Step 5. Both fixes are now part of their task's own step list and `js/ui.js` is included in those tasks' `Files`/commit lists, not left as a trailing note.
 - **Type/name consistency checked:** `pFinalNotes` keeps the same id/column (`final_notes`) across Task 3 (kept in `collectPost`/`fillPost`) and Task 4 (relabeled in HTML and in the prompt's entrega line) — no renaming mismatch. `postTypeConfig[type].label` is the only property read anywhere after Task 3 (confirmed no other code reads `.fields`/`.dynLabel`/`.compA`/`.compB`/`.qA`/`.qR`).
