@@ -160,17 +160,14 @@ function updateProgress() {
   document.getElementById('carProgLabel').textContent = `${cReqFilled}/${cReq.length} obrig.`;
   document.getElementById('carProgPct').textContent = cPct + '%';
 
-  const pReq = ['pHeadline'];
-  const pOpt = ['pSubtitle','pCta'];
-  let pScore = 0, pMax = pReq.length * 2 + pOpt.length + 2;
-  pReq.forEach(id => { if (f(id)) pScore += 2; });
-  pOpt.forEach(id => { if (f(id)) pScore += 1; });
+  let pScore = 0, pMax = 4;
   if (app.postType) pScore += 2;
+  if (f('pFreeText')) pScore += 1;
   if (app.postFmts.size) pScore += 1;
-  const pReqFilled = pReq.filter(id => f(id)).length + (app.postType ? 1 : 0);
+  const pReqFilled = app.postType ? 1 : 0;
   const pPct = Math.round((pScore / pMax) * 100);
   document.getElementById('postProgFill').style.width = pPct + '%';
-  document.getElementById('postProgLabel').textContent = `${pReqFilled}/${pReq.length + 1} obrig.`;
+  document.getElementById('postProgLabel').textContent = `${pReqFilled}/1 obrig.`;
   document.getElementById('postProgPct').textContent = pPct + '%';
 }
 
@@ -187,14 +184,6 @@ function selectPostType(el, type) {
   const cfg = app.postTypeConfig[type];
   document.getElementById('pTypeInfo').style.display = 'block';
   document.getElementById('pTypeLabel').textContent = cfg.label;
-  ['pFieldItems','pFieldStat','pFieldComp','pFieldAnuncio','pFieldUrg','pFieldQuote','pFieldArt'].forEach(id => document.getElementById(id).style.display = 'none');
-  if (cfg.fields.length) {
-    document.getElementById('pDynamic').style.display = 'block';
-    document.getElementById('pDynLabel').textContent = cfg.dynLabel || 'Campos específicos';
-    cfg.fields.forEach(id => document.getElementById(id).style.display = 'block');
-  } else document.getElementById('pDynamic').style.display = 'none';
-  if (cfg.compA) { document.getElementById('pCompLabelA').textContent = cfg.compA; document.getElementById('pCompLabelB').textContent = cfg.compB; }
-  if (cfg.qA) { document.getElementById('pQuoteALabel').textContent = cfg.qA; document.getElementById('pQuoteRLabel').textContent = cfg.qR; }
   markDirty(); updatePreviews();
 }
 

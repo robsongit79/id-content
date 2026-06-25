@@ -174,23 +174,9 @@ const prompts = {
     if (app.postFmts.size) p.push(`## FORMATOS\nFORMATOS:       ${[...app.postFmts].join(', ')}\nGerar uma versão de layout adaptada para cada formato.`);
 
     const p4 = [];
-    if (f('pHeadline')) p4.push(`HEADLINE:       ${f('pHeadline')}`);
-    if (f('pSubtitle')) p4.push(`SUBTÍTULO:      ${f('pSubtitle')}`);
-    if (f('pCta'))      p4.push(`CTA:            ${f('pCta')}`);
-    if (app.postType) {
-      const cfg = app.postTypeConfig[app.postType];
-      if (['checklist','passo-a-passo'].includes(app.postType) && app.chipData.pItems.length)
-        p4.push(`ITENS:\n${app.chipData.pItems.map((v,i) => `  ${i+1}. ${v}`).join('\n')}`);
-      if (app.postType === 'estatistica') { if(f('pStatNum'))p4.push(`NÚMERO:         ${f('pStatNum')}`); if(f('pStatCtx'))p4.push(`CONTEXTO:       ${f('pStatCtx')}`); if(f('pStatSrc'))p4.push(`FONTE:          ${f('pStatSrc')}`); }
-      if (['antes-depois','comparativo'].includes(app.postType)) { if(f('pCompA'))p4.push(`${cfg.compA.toUpperCase()}:${' '.repeat(Math.max(1,14-cfg.compA.length))}${f('pCompA')}`); if(f('pCompB'))p4.push(`${cfg.compB.toUpperCase()}:${' '.repeat(Math.max(1,14-cfg.compB.length))}${f('pCompB')}`); }
-      if (app.postType === 'anuncio') { if(f('pAnPrice'))p4.push(`PREÇO:          ${f('pAnPrice')}`); if(f('pAnBenefit'))p4.push(`BENEFÍCIO:      ${f('pAnBenefit')}`); }
-      if (app.postType === 'urgencia') { if(f('pUrgPrazo'))p4.push(`PRAZO:          ${f('pUrgPrazo')}`); if(f('pUrgOque'))p4.push(`O QUE ACABA:    ${f('pUrgOque')}`); }
-      if (['depoimento','citacao'].includes(app.postType)) { if(f('pQuoteText'))p4.push(`CITAÇÃO:        "${f('pQuoteText')}"`); if(f('pQuoteAuthor'))p4.push(`AUTOR:          ${f('pQuoteAuthor')}`); if(f('pQuoteRole'))p4.push(`CARGO:          ${f('pQuoteRole')}`); }
-      if (app.postType === 'mini-artigo' && f('pArtBody')) p4.push(`CORPO:          ${f('pArtBody')}`);
-    }
-    if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
     const freeText = f('pFreeText');
     if (freeText) p4.push(`TEXTO LIVRE / COPY DIRETA:\n${freeText}`);
+    if (f('pContentNotes')) p4.push(`NOTAS:          ${f('pContentNotes')}`);
     if (p4.length) p.push(`## CONTEÚDO\n${p4.join('\n')}`);
 
     const p5 = [];

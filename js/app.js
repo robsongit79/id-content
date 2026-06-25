@@ -14,19 +14,19 @@ const app = {
   postType: '',
   postFmts: new Set(),
   postTypeConfig: {
-    'frase-impacto': { label:'Frase de impacto', fields:[] },
-    'checklist':     { label:'Checklist', fields:['pFieldItems'], dynLabel:'Itens do checklist' },
-    'estatistica':   { label:'Estatística / Dado', fields:['pFieldStat'], dynLabel:'Dados' },
-    'antes-depois':  { label:'Antes e depois', fields:['pFieldComp'], dynLabel:'Comparação', compA:'Antes', compB:'Depois' },
-    'passo-a-passo': { label:'Passo a passo', fields:['pFieldItems'], dynLabel:'Etapas' },
-    'pergunta':      { label:'Pergunta provocativa', fields:[] },
-    'comparativo':   { label:'Comparativo X vs Y', fields:['pFieldComp'], dynLabel:'Os dois lados', compA:'X', compB:'Y' },
-    'anuncio':       { label:'Anúncio / Oferta', fields:['pFieldAnuncio'], dynLabel:'Oferta' },
-    'urgencia':      { label:'Urgência / Prazo', fields:['pFieldUrg'], dynLabel:'Urgência' },
-    'lancamento':    { label:'Lançamento / Novidade', fields:[] },
-    'depoimento':    { label:'Depoimento', fields:['pFieldQuote'], dynLabel:'Depoimento', qA:'Nome do cliente', qR:'Cargo / Empresa' },
-    'citacao':       { label:'Citação de especialista', fields:['pFieldQuote'], dynLabel:'Citação', qA:'Especialista', qR:'Cargo / Área' },
-    'mini-artigo':   { label:'Mini artigo', fields:['pFieldArt'], dynLabel:'Conteúdo' },
+    'frase-impacto': { label:'Frase de impacto' },
+    'checklist':     { label:'Checklist' },
+    'estatistica':   { label:'Estatística / Dado' },
+    'antes-depois':  { label:'Antes e depois' },
+    'passo-a-passo': { label:'Passo a passo' },
+    'pergunta':      { label:'Pergunta provocativa' },
+    'comparativo':   { label:'Comparativo X vs Y' },
+    'anuncio':       { label:'Anúncio / Oferta' },
+    'urgencia':      { label:'Urgência / Prazo' },
+    'lancamento':    { label:'Lançamento / Novidade' },
+    'depoimento':    { label:'Depoimento' },
+    'citacao':       { label:'Citação de especialista' },
+    'mini-artigo':   { label:'Mini artigo' },
   },
 
   // ── INIT ──
@@ -411,7 +411,6 @@ const app = {
       document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => { if (r.value === p.logo_pos) { r.checked = true; r.closest('.logo-pos-item')?.classList.add('selected'); } });
     }
     if (p.formats) p.formats.forEach(fmt => { if (!this.postFmts.has(fmt)) togglePostFmt(fmt); });
-    set('pHeadline', p.headline); set('pSubtitle', p.subtitle); set('pCta', p.cta);
     let content_notes = '', free_text = '', unified_layout = false;
     if (p.content_notes) {
       try {
@@ -440,19 +439,11 @@ const app = {
       set('pUnifiedNotes', p.layout_1x1_notes || '');
     }
 
-    set('pStatNum', p.stat_number); set('pStatCtx', p.stat_context); set('pStatSrc', p.stat_source);
-    set('pCompA', p.comp_a); set('pCompB', p.comp_b);
-    set('pAnPrice', p.anuncio_price); set('pAnBenefit', p.anuncio_benefit);
-    set('pUrgPrazo', p.urgencia_prazo); set('pUrgOque', p.urgencia_oque);
-    set('pQuoteText', p.quote_text); set('pQuoteAuthor', p.quote_author); set('pQuoteRole', p.quote_role);
-    set('pArtBody', p.article_body);
     set('pL1TextPos', p.layout_1x1_text_pos); set('pL1Bg', p.layout_1x1_bg); set('pL1Notes', p.layout_1x1_notes);
     set('pL4TextPos', p.layout_4x5_text_pos); set('pL4Bg', p.layout_4x5_bg); set('pL4Notes', p.layout_4x5_notes);
     set('pL9TextPos', p.layout_9x16_text_pos); set('pL9Bg', p.layout_9x16_bg); set('pL9Notes', p.layout_9x16_notes);
-    set('pForbidden', p.forbidden); set('pDelivery', p.delivery_format); set('pFontB64', p.font_base64);
     set('pFinalNotes', p.final_notes);
-    if (p.items) this.fillChips('pItems', p.items, 'pItemsChips', 'pItemsInput');
-    
+
     if (typeof syncUnifiedLayout === 'function') {
       syncUnifiedLayout();
     }
@@ -540,19 +531,10 @@ const app = {
       logo_pos: getRadio('postLogoPos'),
       post_type: this.postType,
       formats: [...this.postFmts],
-      headline: f('pHeadline'), subtitle: f('pSubtitle'), cta: f('pCta'),
       content_notes: JSON.stringify(contentNotesData),
-      items: this.chipData.pItems,
-      stat_number: f('pStatNum'), stat_context: f('pStatCtx'), stat_source: f('pStatSrc'),
-      comp_a: f('pCompA'), comp_b: f('pCompB'),
-      anuncio_price: f('pAnPrice'), anuncio_benefit: f('pAnBenefit'),
-      urgencia_prazo: f('pUrgPrazo'), urgencia_oque: f('pUrgOque'),
-      quote_text: f('pQuoteText'), quote_author: f('pQuoteAuthor'), quote_role: f('pQuoteRole'),
-      article_body: f('pArtBody'),
       layout_1x1_text_pos: f('pL1TextPos'), layout_1x1_bg: f('pL1Bg'), layout_1x1_notes: f('pL1Notes'),
       layout_4x5_text_pos: f('pL4TextPos'), layout_4x5_bg: f('pL4Bg'), layout_4x5_notes: f('pL4Notes'),
       layout_9x16_text_pos: f('pL9TextPos'), layout_9x16_bg: f('pL9Bg'), layout_9x16_notes: f('pL9Notes'),
-      forbidden: f('pForbidden'), delivery_format: f('pDelivery'), font_base64: f('pFontB64'),
       final_notes: f('pFinalNotes'),
     };
   },
@@ -610,11 +592,7 @@ const app = {
     document.querySelectorAll('#appContent select').forEach(e => { if (e.options.length) e.value = e.options[0].value; });
     document.querySelectorAll('.radio-item,.logo-pos-item,.type-card').forEach(e => e.classList.remove('selected'));
     document.querySelectorAll('#appContent input[type="radio"]').forEach(e => e.checked = false);
-    ['personality','goal','pItems','hashtag','topic'].forEach(k => {
-      this.chipData[k] = [];
-      const ids = { personality:'personalityChips', goal:'goalChips', pItems:'pItemsChips', hashtag:'hashtagChips', topic:'topicChips' };
-      if (ids[k]) document.querySelectorAll(`#${ids[k]} .chip`).forEach(c => c.remove());
-    });
+    ['personality','goal','pItems','hashtag','topic'].forEach(k => { this.chipData[k] = []; });
     const defs = { cPrimary:'#1E40AF',cSecondary:'#3B82F6',cAccent:'#FFFFFF',cDark:'#0A0F1E',cLight:'#F0F4FF',cText:'#F5F0E8' };
     Object.entries(defs).forEach(([id,v]) => { const el = document.getElementById(id); if(el)el.value=v; const hex = document.getElementById(id+'Hex'); if(hex)hex.value=v; });
     const bActive = document.getElementById('bLogoActive');
@@ -626,7 +604,6 @@ const app = {
     this.postFmts.clear();
     ['1x1','4x5','9x16'].forEach(id => document.getElementById(`pFmt${id}`)?.classList.remove('checked'));
     document.getElementById('pTypeInfo').style.display = 'none';
-    document.getElementById('pDynamic').style.display = 'none';
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
   },
