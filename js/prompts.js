@@ -139,10 +139,17 @@ const prompts = {
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
-5. **VISUAL DAS FONTES (CRÍTICO):**
+5. **COMPOSIÇÃO VISUAL DOS SLIDES (CRÍTICO):**
+   - **Slide Hero (capa):** Impacto máximo — ocupe o canvas com a cor/gradiente principal da marca; headline em tamanho dominante (mínimo 55% da altura do canvas); inclua obrigatoriamente um elemento gráfico de apoio (forma geométrica, faixa diagonal, número grande em baixo contraste como segundo plano, textura sutil). Nunca uma capa com texto centralizado e fundo liso sem nenhum elemento gráfico de personalidade.
+   - **Slides de conteúdo:** Escolha UM padrão e mantenha-o consistente em todos os slides: **(a) Sidebar colorida** — faixa lateral de 20-25% da largura na cor de acento/secundária com número do slide ou ícone, corpo do conteúdo no restante; **(b) Card sobre fundo** — fundo com textura ou gradiente da marca, card (branco, escuro ou colorido) centralizado com o conteúdo sobreposto e leve sombra; **(c) Header colorido** — faixa colorida no topo (25-30% da altura) com título/número do slide, corpo na área abaixo. Não misture padrões entre os slides de conteúdo.
+   - **Hierarquia por slide:** Pelo menos 3 camadas de peso visual obrigatórias: (1) elemento de destaque — headline ou número do item, 2-3× maior que o corpo; (2) corpo do texto; (3) número/label do slide, rodapé, handle — bem menor. Nunca três blocos no mesmo peso visual.
+   - **Slide CTA:** Use a cor principal da marca como fundo; CTA em destaque máximo com botão/badge de cor de acento; sem blocos de texto densos — máximo 2 linhas de texto + CTA.
+   - **Espaço vazio:** Nenhum slide pode ter mais de 15% de área vazia não-preenchida. Se sobrar espaço, redistribua o conteúdo, aumente os elementos ou adicione um elemento decorativo da paleta.
+   - **Tipografia exata:** Aplique os tamanhos especificados em TAMANHO TÍTULO, TAMANHO SUBTÍTULO e TAMANHO CORPO do BASE rigorosamente no CSS. Se não especificados, use escala proporcional — título ≥ 2× o corpo, subtítulo ≈ 1.4× o corpo.
+6. **VISUAL DAS FONTES (CRÍTICO):**
    - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
    - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do carrossel seja mantido.
-6. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
+7. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
 
@@ -202,7 +209,7 @@ const prompts = {
     s.push(`# INSTRUÇÕES DE SAÍDA
 1. Atue como um desenvolvedor frontend sênior e designer especialista em conversão.
 2. Crie o layout do post em HTML completo (com estilos CSS incorporados na tag <style>), aplicando rigorosamente as cores, tipografia, formatos e regras visuais especificadas nas seções anteriores.
-3. Utilize o conteúdo textual (Headline, Subtítulo, CTA, Citações ou Itens) fornecido nas especificações de conteúdo.
+3. Utilize o conteúdo fornecido em ## CONTEÚDO (campo TEXTO LIVRE / COPY DIRETA) como base da peça. Se o campo não estiver preenchido, crie um texto adequado ao TIPO do post. Distribua o conteúdo nos elementos visuais do padrão de composição escolhido — nunca despeje tudo em um único bloco de texto centralizado.
 4. **ACENTUAÇÃO E CODIFICAÇÃO (CRÍTICO):**
    - Todos os textos e conteúdos gerados devem manter rigorosamente a acentuação e caracteres especiais originais da língua portuguesa (como á, é, í, ó, ú, ç, ã, õ, etc.).
    - Certifique-se de incluir a tag \`<meta charset="UTF-8">\` na seção \`<head>\` do HTML.
@@ -214,8 +221,10 @@ ${compositionDirective}
    - **Limite de espaço vazio não-preenchido:** nenhum espaço entre dois blocos de conteúdo consecutivos pode exceder ~8% da altura total do canvas sem conter um elemento decorativo (forma, linha, textura, gradiente, número de fundo) preenchendo-o. Se sobrar espaço depois de posicionar todo o conteúdo, redistribua o conteúdo, aumente os elementos do padrão de composição, ou adicione um elemento gráfico de apoio — nunca deixe um vão vazio sem função.
    - Adicione pelo menos 1 elemento de apoio visual (não textual) por peça, escolhido conforme o conteúdo: eyebrow/label curto acima do headline, número grande estilizado, ícone ou forma geométrica de acento, linha/divisor sutil, badge ou tag, aspas estilizadas para citações, etc. Use a cor de acento da marca nesses elementos para criar ponto de cor.
    - Garanta contraste forte entre fundo e texto e use a paleta da marca para criar profundidade (ex: fundo escuro + acento vibrante + texto claro), evitando o padrão default "texto preto sobre fundo branco, tudo centralizado".
-6. **VISUAL DAS FONTES (CRÍTICO):**
-   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
+6. **TIPOGRAFIA EXATA (CRÍTICO):**
+   - Use as fontes especificadas em FONTE DISPLAY (para headlines e títulos) e FONTE CORPO (para textos e legendas). Nunca substitua por Arial, Helvetica ou fontes genéricas de sistema.
+   - Aplique os tamanhos especificados em TAMANHO TÍTULO, TAMANHO SUBTÍTULO e TAMANHO CORPO do BASE rigorosamente no CSS (ex: se TAMANHO TÍTULO = "32px", use exatamente \`font-size: 32px\` no headline — não ajuste para suas preferências). Se tamanhos não foram especificados, use escala proporcional: título ≥ 2× o corpo, subtítulo ≈ 1.4× o corpo.
+   - Aplique o PESO DOS TÍTULOS (PESO TÍTULO) especificado. Se não especificado, use 700 (Bold) como mínimo para headlines.
    - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
 7. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
