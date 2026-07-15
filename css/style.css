@@ -685,3 +685,145 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
   .app-sidebar-toggle{display:inline-flex;}
 }
 
+/* ══ ADMIN GRID LAYOUT & SIDEBAR ══ */
+.admin-grid-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .admin-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-sidebar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.admin-sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-sidebar-header h3 {
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+  margin: 0;
+}
+
+.admin-sidebar-count {
+  background: var(--acc-base);
+  color: #0E0E0E;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.admin-shared-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.admin-shared-item {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-shared-item:hover {
+  border-color: var(--border-hi);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-shared-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.admin-shared-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.admin-shared-meta {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.admin-shared-owner {
+  font-size: 10px;
+  color: var(--acc-base);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.admin-shared-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.admin-table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table-header h3 {
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ══ IMPERSONATION BANNER ══ */
+.impersonation-banner {
+  background: linear-gradient(90deg, #FF6B35 0%, #FF5C5C 100%);
+  color: #0E0E0E;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+

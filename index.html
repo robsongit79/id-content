@@ -25,6 +25,12 @@
   </div>
 </div>
 
+<!-- ══ IMPERSONATION BANNER ══ -->
+<div id="impersonationBanner" class="impersonation-banner" style="display:none;">
+  <span>Você está acessando a conta de: <strong id="impersonatedUserEmail"></strong></span>
+  <button class="btn" style="background:#0E0E0E;color:#fff;border:none;padding:4px 10px;font-size:11px;cursor:pointer;border-radius:4px;font-weight:600;" onclick="app.exitImpersonation()">Sair do Acesso</button>
+</div>
+
 <!-- ══ APP SHELL ══ -->
 <div id="appShell" class="app-shell">
   <nav class="app-sidebar">
@@ -509,23 +515,44 @@
       <h1 class="list-title">Painel Administrativo</h1>
       <p class="list-subtitle">Gerencie as contas de usuários cadastrados e controle os privilégios de acesso.</p>
     </div>
+    <button class="btn btn-ghost" onclick="app.showScreen('editor')" style="display:inline-flex;gap:6px;align-items:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Voltar ao Editor
+    </button>
   </div>
   <div class="admin-container">
-    <div class="admin-table-card">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>E-mail</th>
-            <th>Função</th>
-            <th>Criado em</th>
-            <th>Último acesso</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="adminUserList">
-          <!-- Preenchido dinamicamente via JS -->
-        </tbody>
-      </table>
+    <div class="admin-grid-layout">
+      <!-- Painel Lateral: Marcas Compartilhadas -->
+      <div class="admin-sidebar-card">
+        <div class="admin-sidebar-header">
+          <h3>Marcas Compartilhadas</h3>
+          <span class="admin-sidebar-count" id="adminSharedCount">0</span>
+        </div>
+        <div id="adminSharedBrandsList" class="admin-shared-list">
+          <!-- Preenchido via JS -->
+        </div>
+      </div>
+      
+      <!-- Painel de Administração de Usuários -->
+      <div class="admin-table-card">
+        <div class="admin-table-header">
+          <h3>Gerenciamento de Usuários</h3>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Função</th>
+              <th>Criado em</th>
+              <th>Último acesso</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adminUserList">
+            <!-- Preenchido dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

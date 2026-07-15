@@ -71,6 +71,7 @@ def start_server(port=3000):
     
     print(f"🚀 Starting preview on port {port}...")
     
+    is_windows = sys.platform == 'win32'
     with open(LOG_FILE, "w") as log:
         process = subprocess.Popen(
             cmd,
@@ -78,7 +79,7 @@ def start_server(port=3000):
             stdout=log,
             stderr=log,
             env=env,
-            shell=True # Required for npm on windows often, or consistent path handling
+            shell=is_windows
         )
     
     PID_FILE.write_text(str(process.pid))

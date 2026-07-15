@@ -4,6 +4,7 @@ const app = {
   currentTab: 'base',
   isDirty: false,
   isAdminUser: false,
+  impersonatedUser: null,
   currentBrandOriginalLogoUrl: null,
   chipData: { personality: [], goal: [], pItems: [], hashtag: [], topic: [] },
   presets: [],
@@ -48,6 +49,23 @@ const app = {
   async showAuthenticatedApp() {
     document.getElementById('screenLogin').style.display = 'none';
     document.getElementById('btnLogout').style.display = 'inline-flex';
+
+    // Restaurar estado de impersonificação se houver
+    const savedImpersonated = sessionStorage.getItem('impersonated_user');
+    if (savedImpersonated) {
+      try {
+        this.impersonatedUser = JSON.parse(savedImpersonated);
+        const banner = document.getElementById('impersonationBanner');
+        const emailEl = document.getElementById('impersonatedUserEmail');
+        if (banner && emailEl) {
+          emailEl.textContent = this.impersonatedUser.email;
+          banner.style.display = 'flex';
+        }
+      } catch (e) {
+        console.warn('Erro ao restaurar usuário impersonado:', e);
+        sessionStorage.removeItem('impersonated_user');
+      }
+    }
 
     // 1. Configurar mensagem de boas-vindas com e-mail do usuário
     const user = auth.getUser();
@@ -122,6 +140,7 @@ const app = {
     this.renderTopbar(screen);
     if (screen === 'admin') {
       this.loadAdminUsers();
+      this.loadAdminSharedBrands();
     }
   },
 
@@ -232,11 +251,11 @@ const app = {
   filterBrands() {
     const searchEl = document.getElementById('brandSearch');
     const q = searchEl ? searchEl.value.toLowerCase().trim() : '';
-    const user = auth.getUser();
+    const user = app.impersonatedUser || auth.getUser();
 
     let filtered = this.allBrands.filter(b => {
       // 1. Controle de Privacidade / Compartilhamento
-      if (user && !app.isAdminUser) {
+      if (user && (!app.isAdminUser || app.impersonatedUser)) {
         let meta = { user_id: null, is_shared: false };
         if (b.logo_url) {
           try {
@@ -268,7 +287,7 @@ const app = {
   // ── NEW BRAND ──
   async newBrand() {
     try {
-      const user = auth.getUser();
+      const user = app.impersonatedUser || auth.getUser();
       const meta = {
         user_id: user ? user.id : null,
         created_by: user ? user.email : null,
@@ -462,7 +481,7 @@ const app = {
   },
 
   collectBrand() {
-    const user = auth.getUser();
+    const user = app.impersonatedUser || auth.getUser();
     
     // Tenta carregar metadados anteriores do cache original para preservar dono
     let meta = { user_id: null, is_shared: false, created_by: null };
@@ -815,6 +834,116 @@ const app = {
     }
   },
 
+  impersonate(userId, email) {
+    this.impersonatedUser = { id: userId, email: email };
+    sessionStorage.setItem('impersonated_user', JSON.stringify(this.impersonatedUser));
+    
+    // Update banner
+    const banner = document.getElementById('impersonationBanner');
+    const emailEl = document.getElementById('impersonatedUserEmail');
+    if (banner && emailEl) {
+      emailEl.textContent = email;
+      banner.style.display = 'flex';
+    }
+    
+    // Reset active brand to prevent showing admin's last active brand
+    this.currentBrandId = null;
+    this.currentDestination = 'welcome';
+    
+    // Go to editor
+    this.showScreen('editor');
+    
+    // Update sidebar navigation elements (disable nav elements since no brand is active yet)
+    ['navIdentity', 'navCreate', 'navHistory'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('disabled');
+    });
+    
+    // Set active brand switcher name
+    const activeBrandNameEl = document.getElementById('appActiveBrandName');
+    if (activeBrandNameEl) activeBrandNameEl.textContent = 'Selecionar marca';
+    
+    // Reload brand list
+    this.loadBrandList();
+    
+    toast(`Acessando como ${email}`, 'success');
+  },
+
+  exitImpersonation() {
+    this.impersonatedUser = null;
+    sessionStorage.removeItem('impersonated_user');
+    
+    // Hide banner
+    const banner = document.getElementById('impersonationBanner');
+    if (banner) banner.style.display = 'none';
+    
+    // Reset active brand
+    this.currentBrandId = null;
+    
+    // Reload brand list
+    this.loadBrandList();
+    
+    // Go to admin panel
+    this.showScreen('admin');
+    
+    toast('Acesso do administrador finalizado.', 'info');
+  },
+
+  async loadAdminSharedBrands() {
+    const listEl = document.getElementById('adminSharedBrandsList');
+    const countEl = document.getElementById('adminSharedCount');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--muted);font-size:11px;">Carregando marcas...</div>';
+    if (countEl) countEl.textContent = '0';
+
+    try {
+      if (!this.allBrands || this.allBrands.length === 0) {
+        this.allBrands = await db.listBrands();
+      }
+
+      const sharedBrands = this.allBrands.filter(b => {
+        let meta = { is_shared: false };
+        if (b.logo_url) {
+          try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
+        }
+        return !!meta.is_shared;
+      });
+
+      if (countEl) countEl.textContent = sharedBrands.length;
+
+      if (sharedBrands.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--muted);font-size:11px;">Nenhuma marca compartilhada.</div>';
+        return;
+      }
+
+      listEl.innerHTML = sharedBrands.map(b => {
+        let meta = { created_by: 'Desconhecido' };
+        if (b.logo_url) {
+          try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
+        }
+        const ownerEmail = meta.created_by || 'Desconhecido';
+        return `
+          <div class="admin-shared-item">
+            <div class="admin-shared-item-header">
+              <span class="admin-shared-name">${b.name}</span>
+            </div>
+            <div class="admin-shared-meta">${b.niche || 'Sem nicho'}</div>
+            <div class="admin-shared-owner" title="${ownerEmail}">Dono: ${ownerEmail}</div>
+            <div class="admin-shared-actions">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;color:var(--acc-base);border-color:rgba(180,130,255,0.2);" onclick="app.openSharedBrandFromAdmin('${b.id}')">Visualizar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch(e) {
+      listEl.innerHTML = `<div style="text-align:center;padding:10px;color:var(--red);font-size:11px;">Erro: ${e.message}</div>`;
+    }
+  },
+
+  openSharedBrandFromAdmin(brandId) {
+    this.openBrand(brandId);
+  },
+
   async loadAdminUsers() {
     const listEl = document.getElementById('adminUserList');
     if (!listEl) return;
@@ -859,6 +988,7 @@ const app = {
             <td data-label="Último acesso">${lastSignIn}</td>
             <td data-label="Ações" style="display:flex;gap:8px;">
               ${isSelf ? '<span style="color:var(--muted);font-size:11px;padding:6px 0;">Você</span>' : `
+                <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;color:var(--accent2);border-color:rgba(71,255,212,0.2);" onclick="app.impersonate('${u.id}', '${u.email.replace(/'/g, "\\'")}')">Acessar</button>
                 <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;" onclick="app.toggleAdminStatus('${u.id}', '${role}')">${toggleBtnLabel}</button>
                 <button class="btn btn-danger" style="padding:4px 8px;font-size:10px;" onclick="app.deleteAdminUser('${u.id}', '${u.email}')">Excluir</button>
               `}
@@ -1015,7 +1145,7 @@ const app = {
         throw new Error('Marca não encontrada para duplicação.');
       }
       
-      const user = auth.getUser();
+      const user = app.impersonatedUser || auth.getUser();
       const meta = {
         user_id: user ? user.id : null,
         created_by: user ? user.email : null,
@@ -1145,7 +1275,7 @@ const app = {
       return;
     }
 
-    const user = auth.getUser();
+    const user = app.impersonatedUser || auth.getUser();
     const meta = {
       user_id: user ? user.id : null,
       created_by: user ? user.email : null,
