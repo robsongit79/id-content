@@ -47,11 +47,20 @@
         <button class="btn btn-base" style="width:100%;justify-content:center;" onclick="app.showTemplateModal()">+ Nova marca</button>
       </div>
     </div>
-    <div class="app-sidebar-nav">
+    <div class="app-sidebar-nav" style="flex-shrink:0;">
       <a class="app-nav-item disabled" id="navIdentity" onclick="app.switchDestination('identity')">Identidade</a>
       <a class="app-nav-item disabled" id="navCreate" onclick="app.switchDestination('create')">Criar conteúdo</a>
       <a class="app-nav-item disabled" id="navHistory" onclick="app.switchDestination('history')">Histórico</a>
     </div>
+    
+    <!-- Novo container de marcas compartilhadas no painel lateral do administrador -->
+    <div id="adminSharedBrandsSidebar" style="display:none; padding:14px 10px; border-top:1px solid var(--border); margin-top:10px; flex:1; flex-direction:column; overflow:hidden;">
+      <div style="font-family:var(--font-d); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:8px; padding-left:12px;">Marcas Compartilhadas</div>
+      <div id="appSidebarSharedBrandsList" style="display:flex; flex-direction:column; gap:2px; overflow-y:auto; flex:1;">
+        <!-- Preenchido via JS -->
+      </div>
+    </div>
+    
     <div class="app-sidebar-footer">
       <span id="userWelcome" class="user-welcome" style="display:none;">Olá, <span id="userEmail" class="user-email"></span></span>
       <button class="btn btn-ghost" id="btnAdminPanel" onclick="app.showScreen('admin')" style="display:none;color:var(--acc-base);border-color:rgba(180,130,255,0.3);justify-content:center;">Painel Admin</button>
@@ -521,38 +530,25 @@
     </button>
   </div>
   <div class="admin-container">
-    <div class="admin-grid-layout">
-      <!-- Painel Lateral: Marcas Compartilhadas -->
-      <div class="admin-sidebar-card">
-        <div class="admin-sidebar-header">
-          <h3>Marcas Compartilhadas</h3>
-          <span class="admin-sidebar-count" id="adminSharedCount">0</span>
-        </div>
-        <div id="adminSharedBrandsList" class="admin-shared-list">
-          <!-- Preenchido via JS -->
-        </div>
+    <!-- Painel de Administração de Usuários -->
+    <div class="admin-table-card">
+      <div class="admin-table-header">
+        <h3>Gerenciamento de Usuários</h3>
       </div>
-      
-      <!-- Painel de Administração de Usuários -->
-      <div class="admin-table-card">
-        <div class="admin-table-header">
-          <h3>Gerenciamento de Usuários</h3>
-        </div>
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>E-mail</th>
-              <th>Função</th>
-              <th>Criado em</th>
-              <th>Último acesso</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="adminUserList">
-            <!-- Preenchido dinamicamente via JS -->
-          </tbody>
-        </table>
-      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>E-mail</th>
+            <th>Função</th>
+            <th>Criado em</th>
+            <th>Último acesso</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserList">
+          <!-- Preenchido dinamicamente via JS -->
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

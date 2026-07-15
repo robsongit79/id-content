@@ -140,7 +140,6 @@ const app = {
     this.renderTopbar(screen);
     if (screen === 'admin') {
       this.loadAdminUsers();
-      this.loadAdminSharedBrands();
     }
   },
 
@@ -284,6 +283,7 @@ const app = {
     filtered = [...filtered].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
     this.renderBrandGrid(filtered);
+    this.renderSidebarSharedBrands();
   },
 
   formatDate(iso) {
@@ -897,59 +897,43 @@ const app = {
     toast('Acesso do administrador finalizado.', 'info');
   },
 
-  async loadAdminSharedBrands() {
-    const listEl = document.getElementById('adminSharedBrandsList');
-    const countEl = document.getElementById('adminSharedCount');
-    if (!listEl) return;
-    listEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--muted);font-size:11px;">Carregando marcas...</div>';
-    if (countEl) countEl.textContent = '0';
+  renderSidebarSharedBrands() {
+    const sidebarEl = document.getElementById('adminSharedBrandsSidebar');
+    const listEl = document.getElementById('appSidebarSharedBrandsList');
+    if (!sidebarEl || !listEl) return;
 
-    try {
-      if (!this.allBrands || this.allBrands.length === 0) {
-        this.allBrands = await db.listBrands();
-      }
-
-      const sharedBrands = this.allBrands.filter(b => {
-        let meta = { is_shared: false };
-        if (b.logo_url) {
-          try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
-        }
-        return !!meta.is_shared;
-      });
-
-      if (countEl) countEl.textContent = sharedBrands.length;
-
-      if (sharedBrands.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--muted);font-size:11px;">Nenhuma marca compartilhada.</div>';
-        return;
-      }
-
-      listEl.innerHTML = sharedBrands.map(b => {
-        let meta = { created_by: 'Desconhecido' };
-        if (b.logo_url) {
-          try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
-        }
-        const ownerEmail = meta.created_by || 'Desconhecido';
-        return `
-          <div class="admin-shared-item">
-            <div class="admin-shared-item-header">
-              <span class="admin-shared-name">${b.name}</span>
-            </div>
-            <div class="admin-shared-meta">${b.niche || 'Sem nicho'}</div>
-            <div class="admin-shared-owner" title="${ownerEmail}">Dono: ${ownerEmail}</div>
-            <div class="admin-shared-actions">
-              <button class="btn btn-ghost" style="padding:4px 8px;font-size:10px;color:var(--acc-base);border-color:rgba(180,130,255,0.2);" onclick="app.openSharedBrandFromAdmin('${b.id}')">Visualizar</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } catch(e) {
-      listEl.innerHTML = `<div style="text-align:center;padding:10px;color:var(--red);font-size:11px;">Erro: ${e.message}</div>`;
+    if (!this.isAdminUser) {
+      sidebarEl.style.display = 'none';
+      return;
     }
-  },
 
-  openSharedBrandFromAdmin(brandId) {
-    this.openBrand(brandId);
+    sidebarEl.style.display = 'flex';
+
+    const sharedBrands = this.allBrands.filter(b => {
+      let meta = { is_shared: false };
+      if (b.logo_url) {
+        try { meta = JSON.parse(b.logo_url) || meta; } catch(e) {}
+      }
+      return !!meta.is_shared;
+    });
+
+    if (sharedBrands.length === 0) {
+      listEl.innerHTML = '<div style="padding:8px 12px; font-size:11px; color:var(--muted); font-style:italic; text-align:center;">Nenhuma marca</div>';
+      return;
+    }
+
+    listEl.innerHTML = sharedBrands.map(b => {
+      const isActive = b.id === this.currentBrandId;
+      return `
+        <a class="app-nav-item${isActive ? ' active' : ''}" style="padding:6px 12px; font-size:11px; display:flex; align-items:center; gap:6px; overflow:hidden;" onclick="app.openBrand('${b.id}')">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${b.name}</span>
+        </a>
+      `;
+    }).join('');
   },
 
   async loadAdminUsers() {
