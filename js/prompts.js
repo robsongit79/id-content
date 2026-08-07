@@ -207,7 +207,10 @@ const prompts = {
     else p1.push(`LOGO:           Nenhuma — não exibir placeholder. O post deve ser criado sem nenhum tipo de logo.`);
     if (p1.length) p.push(`## LOGO\n${p1.join('\n')}`);
 
-    if (app.postType) p.push(`## TIPO\nTIPO:           ${app.postTypeConfig[app.postType].label}`);
+    if (app.postType) {
+      const ptc = app.postTypeConfig[app.postType];
+      p.push(`## TIPO\nTIPO:           ${ptc.label}${ptc.desc ? ' — ' + ptc.desc : ''}`);
+    }
     if (app.postFmts.size) p.push(`## FORMATOS\nFORMATOS:       ${[...app.postFmts].join(', ')}\nGerar uma versão de layout adaptada para cada formato.`);
 
     const p4 = [];
