@@ -45,6 +45,10 @@ function removeChip(el, key) {
 
 // ── FONT LOADER ──
 const fontCache = {};
+// Guarda a URL do Google Fonts já validada por nome de fonte, para que
+// prompts.js possa injetá-la no prompt em vez do LLM ter que reconstruí-la
+// de memória a partir só do nome.
+const fontMeta = {};
 let fontTimers = {};
 
 function loadFont(inputId, previewId, statusId) {
@@ -56,21 +60,24 @@ function loadFont(inputId, previewId, statusId) {
     status.textContent = '⏳';
     if (fontCache[name] === 'ok') { preview.style.fontFamily = `'${name}',serif`; status.textContent = '✓'; status.style.color = 'var(--accent2)'; return; }
     if (fontCache[name] === 'err') { status.textContent = '✗'; status.style.color = 'var(--red)'; return; }
+    const slug = name.replace(/ /g, '+'), lid = `gf-link-${inputId}`;
+    const url = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@0,400;0,700;1,400&display=swap`;
     try {
-      const slug = name.replace(/ /g, '+'), lid = `gf-link-${inputId}`;
       let l = document.getElementById(lid);
       if (!l) {
         l = document.createElement('link'); l.id = lid; l.rel = 'stylesheet';
         document.head.appendChild(l);
       }
-      l.href = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@0,400;0,700;1,400&display=swap`;
+      l.href = url;
       await Promise.race([document.fonts.load(`700 20px '${name}'`), new Promise(r => setTimeout(r, 3000))]);
       if (document.fonts.check(`400 20px '${name}'`) || document.fonts.check(`700 20px '${name}'`)) {
-        fontCache[name] = 'ok'; preview.style.fontFamily = `'${name}',serif`;
+        fontCache[name] = 'ok'; fontMeta[name] = { status: 'ok', url };
+        preview.style.fontFamily = `'${name}',serif`;
         status.textContent = '✓'; status.style.color = 'var(--accent2)';
       } else throw new Error();
     } catch (e) {
-      fontCache[name] = 'err'; preview.style.fontFamily = '';
+      fontCache[name] = 'err'; fontMeta[name] = { status: 'err', url };
+      preview.style.fontFamily = '';
       status.textContent = '✗'; status.style.color = 'var(--red)';
     }
   }, 600);

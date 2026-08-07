@@ -19,6 +19,29 @@ const POST_COMPOSITION_PATTERNS = {
   'mini-artigo':    { name: 'Card sobreposto', desc: 'o corpo do texto organizado num cartão sobreposto a um fundo com textura sutil, mantendo legibilidade e hierarquia entre título e corpo.' },
 };
 
+// Espelha o texto de .radio-desc de cada opção de #styleGrid em index.html —
+// mantenha os dois sincronizados manualmente se um dos lados mudar.
+const STYLE_VISUAL_DESCRIPTIONS = {
+  'Minimalista e limpo': 'Espaço generoso, poucos elementos.',
+  'Bold e agressivo':    'Alto contraste, tipografia pesada.',
+  'Premium e editorial': 'Serifado, dourado, sofisticado.',
+  'Tech e moderno':      'Geométrico, neon, data-driven.',
+  'Orgânico e humano':   'Arredondado, acolhedor, quente.',
+  'Brutalist e cru':     'Bordas, grid exposto, raw.',
+};
+
+// Monta a linha de fonte anexando a URL do Google Fonts já validada no
+// navegador (ver fontMeta em ui.js), para o LLM não precisar reconstruir
+// o slug/URL de memória a partir só do nome.
+function fontLine(label, id) {
+  const name = f(id);
+  if (!name) return null;
+  const meta = typeof fontMeta !== 'undefined' ? fontMeta[name] : null;
+  if (meta?.status === 'ok')  return `${label}${name} — Google Fonts confirmado, use exatamente esta URL: ${meta.url}`;
+  if (meta?.status === 'err') return `${label}${name} — ATENÇÃO: não encontrada no Google Fonts pela ferramenta; confirme o nome exato antes de usar ou trate como fonte customizada`;
+  return `${label}${name}`;
+}
+
 // Prompt builders
 const prompts = {
 
@@ -46,7 +69,7 @@ const prompts = {
     if (f('bName'))        s1.push(`MARCA:          ${f('bName')}`);
     const activeLogo = document.getElementById('bLogoActive')?.checked || false;
     if (activeLogo) {
-      s1.push("LOGO:           Ativa — Solicite o envio do link da logo ao usuário.");
+      s1.push("LOGO:           Ativa — Solicite o envio da imagem da logo ao usuário (upload, não link).");
     } else {
       s1.push("LOGO:           Nenhuma — não exibir logo.");
     }
@@ -62,8 +85,8 @@ const prompts = {
     if (s2.length) s.push(`## 02 · PALETA\n${s2.join('\n')}`);
 
     const s3 = [];
-    if (f('bFontDisplay'))  s3.push(`FONTE DISPLAY:  ${f('bFontDisplay')}`);
-    if (f('bFontBody'))     s3.push(`FONTE CORPO:    ${f('bFontBody')}`);
+    if (f('bFontDisplay'))  s3.push(fontLine('FONTE DISPLAY:  ', 'bFontDisplay'));
+    if (f('bFontBody'))     s3.push(fontLine('FONTE CORPO:    ', 'bFontBody'));
     if (f('bSizeTitle'))    s3.push(`TAMANHO TÍTULO: ${f('bSizeTitle')}`);
     if (f('bSizeSubtitle')) s3.push(`TAMANHO SUBTÍT: ${f('bSizeSubtitle')}`);
     if (f('bSizeBody'))     s3.push(`TAMANHO CORPO:  ${f('bSizeBody')}`);
@@ -73,7 +96,10 @@ const prompts = {
     if (s3.length) s.push(`## 03 · TIPOGRAFIA\n${s3.join('\n')}`);
 
     const s5 = [], sv = getRadio('styleVisual');
-    if (sv)               s5.push(`ESTILO:         ${sv}`);
+    if (sv) {
+      const svDesc = STYLE_VISUAL_DESCRIPTIONS[sv];
+      s5.push(`ESTILO:         ${sv}${svDesc ? ' — ' + svDesc : ''}`);
+    }
     if (f('bBorderUse'))  s5.push(`BORDAS:         ${f('bBorderUse')}`);
     if (f('bCornerRadius'))s5.push(`CANTOS:         ${f('bCornerRadius')}`);
     if (f('bBgRhythm'))   s5.push(`RITMO FUNDOS:   ${f('bBgRhythm')}`);
@@ -151,8 +177,8 @@ const prompts = {
    - **Espaço negativo como elemento de design:** Espaço vazio não é "espaço não preenchido" — é uma ferramenta de respiro e hierarquia. Um slide pode ter margens generosas e área negativa intencional ao redor do elemento de destaque, desde que isso reforce a leitura (por exemplo, isolar a headline para dar peso a ela). O que não pode acontecer é espaço vazio por falta de composição: se sobrar área sem função, redistribua o conteúdo, reforce a escala do elemento principal, ou ancore-a com o elemento de assinatura da marca — nunca a preencha só para "não deixar vazio".
    - **Tipografia exata:** Aplique os tamanhos especificados em TAMANHO TÍTULO, TAMANHO SUBTÍTULO e TAMANHO CORPO do BASE rigorosamente no CSS. Se não especificados, use escala proporcional ousada — título ≥ 2,5× o corpo, subtítulo ≈ 1.4× o corpo — evitando escalas tímidas e pouco contrastadas.
 7. **VISUAL DAS FONTES (CRÍTICO):**
-   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO.
-   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do carrossel seja mantido.
+   - Use exatamente as fontes especificadas em FONTE DISPLAY e FONTE CORPO. Se uma URL do Google Fonts vier indicada ao lado do nome da fonte ("Google Fonts confirmado, use exatamente esta URL: ..."), use exatamente essa URL — não a reconstrua de memória.
+   - Carregue as fontes sempre via Google Fonts, usando \`@import\` no topo da tag <style> ou links <link> no <head>. **NUNCA invente ou alucine uma string base64 fictícia** para embutir fontes: strings inválidas impedem o carregamento da fonte e quebram o visual do carrossel.
 8. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
@@ -226,10 +252,10 @@ ${compositionDirective}
    - Adicione pelo menos 1 elemento de apoio visual (não textual) por peça, escolhido conforme o conteúdo: eyebrow/label curto acima do headline, número grande estilizado, ícone ou forma geométrica de acento, linha/divisor sutil, badge ou tag, aspas estilizadas para citações, etc. Use a cor de acento da marca nesses elementos para criar ponto de cor.
    - Garanta contraste forte entre fundo e texto e use a paleta da marca para criar profundidade (ex: fundo escuro + acento vibrante + texto claro), evitando o padrão default "texto preto sobre fundo branco, tudo centralizado".
 6. **TIPOGRAFIA EXATA (CRÍTICO):**
-   - Use as fontes especificadas em FONTE DISPLAY (para headlines e títulos) e FONTE CORPO (para textos e legendas). Nunca substitua por Arial, Helvetica ou fontes genéricas de sistema.
+   - Use as fontes especificadas em FONTE DISPLAY (para headlines e títulos) e FONTE CORPO (para textos e legendas). Nunca substitua por Arial, Helvetica ou fontes genéricas de sistema. Se uma URL do Google Fonts vier indicada ao lado do nome da fonte ("Google Fonts confirmado, use exatamente esta URL: ..."), use exatamente essa URL — não a reconstrua de memória.
    - Aplique os tamanhos especificados em TAMANHO TÍTULO, TAMANHO SUBTÍTULO e TAMANHO CORPO do BASE rigorosamente no CSS (ex: se TAMANHO TÍTULO = "32px", use exatamente \`font-size: 32px\` no headline — não ajuste para suas preferências). Se tamanhos não foram especificados, use escala proporcional: título ≥ 2× o corpo, subtítulo ≈ 1.4× o corpo.
    - Aplique o PESO DOS TÍTULOS (PESO TÍTULO) especificado. Se não especificado, use 700 (Bold) como mínimo para headlines.
-   - Caso a especificação de FONTES indique "Embutir fontes em base64 no CSS" e você não possua os dados binários reais da fonte em base64 válidos, **NUNCA invente ou alucine uma string base64 fictícia** (pois strings inválidas impedem o carregamento da fonte e quebram o visual). Em vez disso, faça o carregamento direto das fontes do Google Fonts usando \`@import\` no topo da tag <style> ou links <link> no <head> para garantir que o visual do post seja mantido.
+   - Carregue as fontes sempre via Google Fonts, usando \`@import\` no topo da tag <style> ou links <link> no <head>. **NUNCA invente ou alucine uma string base64 fictícia** para embutir fontes: strings inválidas impedem o carregamento da fonte e quebram o visual do post.
 7. **REGRAS DE RESPOSTA CRÍTICAS (CRUCIAIS PARA CÓPIA DIRETA):**
    - Retorne APENAS o código final completo (HTML + CSS) dentro de um bloco de código Markdown (\`\`\`html ... \`\`\`).
    - Não inclua nenhuma saudação, introdução, explicação textual ou observações de desenvolvimento antes ou depois do bloco de código. O usuário deve ser capaz de simplesmente copiar o código gerado direto da tela e usar.`);
