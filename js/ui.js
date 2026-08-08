@@ -208,6 +208,13 @@ function togglePostFmt(fmt) {
   markDirty(); updatePreviews();
 }
 
+function resetPostFmtChecks() {
+  document.querySelectorAll('.post-fmt').forEach(card => {
+    card.classList.remove('checked');
+    card.setAttribute('aria-checked', 'false');
+  });
+}
+
 function syncUnifiedLayout() {
   const isUnified = document.getElementById('pUnifiedLayout')?.checked;
   const layoutUnified = document.getElementById('pLayoutUnified');
@@ -366,8 +373,7 @@ function initTooltips() {
     icon.className = 'field-tip';
     icon.setAttribute('data-tip', tip);
     icon.setAttribute('tabindex', '0');
-    icon.setAttribute('role', 'button');
-    icon.setAttribute('aria-label', tip);
+    icon.setAttribute('aria-hidden', 'true');
     icon.textContent = '?';
     label.appendChild(icon);
   });

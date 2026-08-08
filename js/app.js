@@ -626,7 +626,7 @@ const app = {
     ['bStatusDisplay','bStatusBody'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = ''; });
     this.postType = '';
     this.postFmts.clear();
-    ['1x1','4x5','9x16'].forEach(id => document.getElementById(`pFmt${id}`)?.classList.remove('checked'));
+    resetPostFmtChecks();
     document.getElementById('pTypeInfo').style.display = 'none';
     document.getElementById('pLayoutPlaceholder').style.display = 'block';
     ['pLayout1x1','pLayout4x5','pLayout9x16'].forEach(id => document.getElementById(id).style.display = 'none');
@@ -722,7 +722,7 @@ const app = {
       const lp = preset.layout.logo_pos;
       if (lp) document.querySelectorAll(`input[name="postLogoPos"]`).forEach(r => { const s = r.value === lp; r.checked = s; r.closest('.logo-pos-item')?.classList.toggle('selected', s); });
       if (preset.layout.post_type) { const card = document.querySelector(`input[name="pType"][value="${preset.layout.post_type}"]`); if (card) selectPostType(card.closest('.type-card'), preset.layout.post_type); }
-      if (preset.layout.formats) { app.postFmts.clear(); document.querySelectorAll(`.post-fmt`).forEach(c => c.classList.remove('checked')); preset.layout.formats.forEach(fmt => togglePostFmt(fmt)); }
+      if (preset.layout.formats) { app.postFmts.clear(); resetPostFmtChecks(); preset.layout.formats.forEach(fmt => togglePostFmt(fmt)); }
       
       let content_notes = '', free_text = '', unified_layout = false;
       if (preset.layout.content_notes) {
