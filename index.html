@@ -459,35 +459,6 @@
   </div>
 </div>
 
-<!-- ══ CLAUDE GENERATE MODAL ══ -->
-<div id="claudeModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)claudeGenerate.close()">
-  <div class="modal-card" style="max-width:680px;width:calc(100% - 40px);">
-    <div class="modal-header">
-      <div class="modal-title">Montar prompt</div>
-      <div class="modal-subtitle">Cole o conteúdo bruto e o app combina com a configuração da marca — pronto para você copiar e colar no Claude.</div>
-    </div>
-    <div style="padding:0 24px 12px;">
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button class="claude-mode-btn active" id="claudeModeCar" onclick="claudeGenerate.setMode('carousel')">Carrossel</button>
-        <button class="claude-mode-btn" id="claudeModePost" onclick="claudeGenerate.setMode('post')">Post</button>
-      </div>
-      <label class="field-label">Conteúdo bruto</label>
-      <textarea id="claudeContent" placeholder="Cole aqui o texto, roteiro, dados ou qualquer conteúdo que o Claude deve usar para criar o carrossel ou post..." style="width:100%;height:150px;resize:vertical;margin-top:6px;box-sizing:border-box;"></textarea>
-    </div>
-    <div id="claudeResultArea" style="display:none;padding:0 24px 16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <label class="field-label" style="margin:0;">Prompt montado — copie e cole no Claude</label>
-        <button class="btn btn-ai" onclick="claudeGenerate.copyResult()" style="font-size:11px;padding:5px 12px;">Copiar tudo</button>
-      </div>
-      <textarea id="claudeResult" readonly style="width:100%;height:220px;resize:vertical;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;box-sizing:border-box;"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="claudeGenerate.close()">Fechar</button>
-      <button class="btn btn-ai" onclick="claudeGenerate.build()" style="display:inline-flex;align-items:center;gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Montar prompt</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══ TEMPLATE MODAL ══ -->
 <div id="templateModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)app.closeTemplateModal()">
   <div class="modal-card" style="max-width: 460px;">
@@ -588,7 +559,6 @@
 <script src="js/prompts.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/templates.js"></script>
-<script src="js/claude-generate.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
