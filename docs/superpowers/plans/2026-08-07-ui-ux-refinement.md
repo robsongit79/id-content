@@ -312,7 +312,7 @@ git commit -m "feat(a11y): tooltips de campo passam a reagir também ao foco de 
 
 **Interfaces:**
 - Consumes: `#templateModal` (existente).
-- Produces: `openModal(id)`, `closeModal(id)` — helpers genéricos de abrir/fechar modal com memória de foco, reutilizados pela Task 18 (modal de exclusão de marca). `MODAL_CLOSE_FNS` — mapa de id→função de fechamento consultado por `initModalEscapeHandling()`, estendido pela Task 18.
+- Produces: `openModal(id)`, `closeModal(id)` — helpers genéricos de abrir/fechar modal com memória de foco, reutilizados pela Task 17 (modal de exclusão de marca). `MODAL_CLOSE_FNS` — mapa de id→função de fechamento consultado por `initModalEscapeHandling()`, estendido pela Task 17.
 
 - [ ] **Step 1: Adicionar helpers de modal em `js/ui.js`**
 
@@ -526,11 +526,11 @@ input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{color:#8A8A
 input::-moz-placeholder,textarea::-moz-placeholder{color:#8A8A8A !important;opacity:1 !important;}
 ```
 
-- [ ] **Step 2: Verificar**
+- [ ] **Step 3: Verificar**
 
 Abrir o Carrossel e olhar os placeholders de "Sequência de slides"/"Slide hero — estrutura" (os mais longos e ricos em exemplo) — devem estar claramente legíveis contra o fundo do campo (`--surface:#161616`). Textos de `.field-hint`/`.section-desc` também devem ficar visivelmente mais legíveis.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add css/style.css
