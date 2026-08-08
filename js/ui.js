@@ -68,39 +68,71 @@ function reloadDisplayFont() {
   loadFont('bFontDisplay', 'bPreviewDisplay', 'bStatusDisplay', titleWeightNum());
 }
 
+// Aplica o resultado de uma checagem de fonte (ok/warn/err) no ícone de status,
+// incluindo um tooltip nativo (title) quando o peso pedido não existe de verdade.
+function renderFontStatus(status, result) {
+  if (result.status === 'err') {
+    status.textContent = '✗'; status.style.color = 'var(--red)';
+    status.title = 'Fonte não encontrada no Google Fonts.';
+  } else if (result.status === 'warn') {
+    status.textContent = '⚠'; status.style.color = 'var(--acc-post)';
+    status.title = `Peso ${result.missingWeight} não existe nesta fonte — pesos reais disponíveis: ${result.weights.join(', ')}.`;
+  } else {
+    status.textContent = '✓'; status.style.color = 'var(--accent2)';
+    status.title = '';
+  }
+}
+
 function loadFont(inputId, previewId, statusId, extraWeight) {
   const name = f(inputId);
   const preview = document.getElementById(previewId), status = document.getElementById(statusId);
-  if (!name) { status.textContent = ''; preview.style.fontFamily = ''; return; }
+  if (!name) { status.textContent = ''; status.title = ''; preview.style.fontFamily = ''; return; }
   clearTimeout(fontTimers[inputId]);
   fontTimers[inputId] = setTimeout(async () => {
-    status.textContent = '⏳';
+    status.textContent = '⏳'; status.title = '';
     const weights = [...new Set([400, 700, extraWeight].filter(Boolean))].sort((a, b) => a - b);
     const cacheKey = `${name}__${weights.join(',')}`;
-    if (fontCache[cacheKey] === 'ok') { preview.style.fontFamily = `'${name}',serif`; status.textContent = '✓'; status.style.color = 'var(--accent2)'; return; }
-    if (fontCache[cacheKey] === 'err') { status.textContent = '✗'; status.style.color = 'var(--red)'; return; }
+    const cached = fontCache[cacheKey];
+    if (cached) {
+      preview.style.fontFamily = cached.status === 'err' ? '' : `'${name}',serif`;
+      renderFontStatus(status, cached);
+      return;
+    }
     const slug = name.replace(/ /g, '+'), lid = `gf-link-${inputId}`;
     const axis = weights.flatMap(w => [`0,${w}`, `1,${w}`]).join(';');
     const url = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@${axis}&display=swap`;
+    let result;
     try {
+      // Busca o CSS de verdade do Google Fonts para conferir quais pesos a
+      // família realmente tem. document.fonts.check() não serve pra isso: o
+      // algoritmo de correspondência de peso do CSS sempre resolve para uma
+      // face próxima (ex: 700) mesmo quando o peso pedido (ex: 900) não
+      // existe de verdade — o check() antigo dava "✓" em falso nesse caso.
+      const cssRes = await fetch(url);
+      if (!cssRes.ok) throw new Error('fonte não encontrada');
+      const css = await cssRes.text();
+      const availableWeights = weights.filter(w => new RegExp(`font-weight:\\s*${w}\\b`).test(css));
+      if (!availableWeights.length) throw new Error('nenhum peso solicitado existe nesta fonte');
+
       let l = document.getElementById(lid);
       if (!l) {
         l = document.createElement('link'); l.id = lid; l.rel = 'stylesheet';
         document.head.appendChild(l);
       }
       l.href = url;
-      const checkWeight = weights[weights.length - 1];
+      const checkWeight = availableWeights[availableWeights.length - 1];
       await Promise.race([document.fonts.load(`${checkWeight} 20px '${name}'`), new Promise(r => setTimeout(r, 3000))]);
-      if (weights.some(w => document.fonts.check(`${w} 20px '${name}'`))) {
-        fontCache[cacheKey] = 'ok'; fontMeta[name] = { status: 'ok', url, weights };
-        preview.style.fontFamily = `'${name}',serif`;
-        status.textContent = '✓'; status.style.color = 'var(--accent2)';
-      } else throw new Error();
+
+      const missingWeight = (extraWeight && !availableWeights.includes(extraWeight)) ? extraWeight : null;
+      result = { status: missingWeight ? 'warn' : 'ok', url, weights: availableWeights, missingWeight };
+      preview.style.fontFamily = `'${name}',serif`;
     } catch (e) {
-      fontCache[cacheKey] = 'err'; fontMeta[name] = { status: 'err', url, weights };
+      result = { status: 'err', url, weights };
       preview.style.fontFamily = '';
-      status.textContent = '✗'; status.style.color = 'var(--red)';
     }
+    fontCache[cacheKey] = result;
+    fontMeta[name] = result;
+    renderFontStatus(status, result);
   }, 600);
 }
 

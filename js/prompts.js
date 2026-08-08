@@ -37,7 +37,11 @@ function fontLine(label, id) {
   const name = f(id);
   if (!name) return null;
   const meta = typeof fontMeta !== 'undefined' ? fontMeta[name] : null;
-  if (meta?.status === 'ok')  return `${label}${name} — Google Fonts confirmado, use exatamente esta URL: ${meta.url} (pesos disponíveis nesta URL: ${meta.weights.join(', ')} — não use font-weight fora desta lista, senão o navegador vai sintetizar/"fake bold" o peso e ele não vai bater com o especificado)`;
+  if (meta?.status === 'ok' || meta?.status === 'warn') {
+    let line = `${label}${name} — Google Fonts confirmado, use exatamente esta URL: ${meta.url} (pesos REAIS disponíveis nesta fonte: ${meta.weights.join(', ')} — não use font-weight fora desta lista, senão o navegador vai sintetizar/"fake bold" o peso e ele não vai bater com o especificado)`;
+    if (meta.status === 'warn') line += ` [ATENÇÃO: o peso ${meta.missingWeight} pedido em PESO TÍTULO não existe nesta fonte — use o peso disponível mais próximo da lista acima]`;
+    return line;
+  }
   if (meta?.status === 'err') return `${label}${name} — ATENÇÃO: não encontrada no Google Fonts pela ferramenta; confirme o nome exato antes de usar ou trate como fonte customizada`;
   return `${label}${name}`;
 }
