@@ -1,6 +1,6 @@
 :root {
   --bg:#0E0E0E; --surface:#161616; --border:#2A2A2A; --border-hi:#3D3D3D;
-  --text:#F0F0F0; --muted:#666; --label:#999; --red:#FF5C5C; --accent2:#47FFD4;
+  --text:#F0F0F0; --muted:#9A9A9A; --label:#999; --red:#FF5C5C; --accent2:#47FFD4;
   --acc-base:#B482FF; --acc-car:#E8FF47; --acc-post:#FF6B35;
   --font-d:'Montserrat',sans-serif; --font-m:'IBM Plex Mono',monospace;
 }
@@ -189,9 +189,9 @@ input[type="text"]:user-invalid,input[type="url"]:user-invalid,input[type="email
 .post-focus .field:has(input:focus,textarea:focus,select:focus) .field-label{color:var(--acc-post);transition:color 0.2s ease;}
 textarea{resize:vertical;min-height:76px;}
 select option{background:#1A1A1A;color:var(--text);}
-input::placeholder,textarea::placeholder{color:#4a4a4a !important;opacity:1 !important;}
-input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{color:#4a4a4a !important;opacity:1 !important;}
-input::-moz-placeholder,textarea::-moz-placeholder{color:#4a4a4a !important;opacity:1 !important;}
+input::placeholder,textarea::placeholder{color:#8A8A8A !important;opacity:1 !important;}
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{color:#8A8A8A !important;opacity:1 !important;}
+input::-moz-placeholder,textarea::-moz-placeholder{color:#8A8A8A !important;opacity:1 !important;}
 .base-focus input:focus,.base-focus textarea:focus,.base-focus select:focus{border-color:var(--acc-base);}
 .car-focus input:focus,.car-focus textarea:focus,.car-focus select:focus{border-color:var(--acc-car);}
 .post-focus input:focus,.post-focus textarea:focus,.post-focus select:focus{border-color:var(--acc-post);}
