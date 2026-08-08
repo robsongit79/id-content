@@ -586,14 +586,7 @@ const app = {
   // ── DELETE ──
   async confirmDelete() {
     const name = f('bName') || 'esta marca';
-    if (!confirm(`Excluir "${name}"? Esta ação não pode ser desfeita.`)) return;
-    try {
-      await db.deleteBrand(this.currentBrandId);
-      toast('Marca excluída.', 'success');
-      this.goHome();
-    } catch (e) {
-      toast('Erro ao excluir: ' + e.message, 'error');
-    }
+    openDeleteBrandModal(this.currentBrandId, name, this.presets.length);
   },
 
   // ── HOME ──
@@ -1194,14 +1187,7 @@ const app = {
   },
 
   async deleteBrandById(id, name) {
-    if (!confirm(`Excluir "${name}"? Esta ação não pode ser desfeita.`)) return;
-    try {
-      await db.deleteBrand(id);
-      toast('Marca excluída com sucesso.', 'success');
-      await this.loadBrandList();
-    } catch (e) {
-      toast('Erro ao excluir: ' + e.message, 'error');
-    }
+    openDeleteBrandModal(id, name, null);
   },
 
   async toggleShareBrand(id) {
@@ -1334,6 +1320,37 @@ const app = {
 function savePreset(type) { app.savePreset(type); }
 function applyPreset(index) { app.applyPreset(index); }
 function deletePreset(index) { app.deletePreset(index); }
+
+// ── DELETE BRAND MODAL ──
+let _pendingDeleteBrand = null;
+
+function openDeleteBrandModal(id, name, presetCount) {
+  _pendingDeleteBrand = { id, name };
+  document.getElementById('deleteBrandName').textContent = name;
+  document.getElementById('deleteBrandDetail').textContent = presetCount != null
+    ? `Isso apaga permanentemente a identidade de marca, a configuração de Carrossel e Post, e ${presetCount} preset(s) salvo(s). Esta ação não pode ser desfeita.`
+    : `Isso apaga permanentemente a identidade de marca, a configuração de Carrossel e Post, e todos os presets salvos desta marca. Esta ação não pode ser desfeita.`;
+  openModal('deleteBrandModal');
+}
+
+function closeDeleteBrandModal() {
+  closeModal('deleteBrandModal');
+  _pendingDeleteBrand = null;
+}
+
+async function confirmDeleteBrandModal() {
+  if (!_pendingDeleteBrand) return;
+  const { id, name } = _pendingDeleteBrand;
+  const isCurrent = id === app.currentBrandId;
+  closeDeleteBrandModal();
+  try {
+    await db.deleteBrand(id);
+    toast(`Marca "${name}" excluída.`, 'success');
+    if (isCurrent) { app.goHome(); } else { await app.loadBrandList(); }
+  } catch (e) {
+    toast('Erro ao excluir: ' + e.message, 'error');
+  }
+}
 
 window.authMode = 'login';
 

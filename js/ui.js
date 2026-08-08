@@ -453,6 +453,7 @@ function closeModal(id) {
 
 const MODAL_CLOSE_FNS = {
   templateModal: () => app.closeTemplateModal(),
+  deleteBrandModal: () => closeDeleteBrandModal(),
 };
 
 function initModalEscapeHandling() {
