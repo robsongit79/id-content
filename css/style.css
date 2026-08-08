@@ -221,6 +221,16 @@ input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none;}
 .base-radio .radio-item.selected{border-color:var(--acc-base);background:rgba(180,130,255,0.05);}
 .car-radio .radio-item.selected,.car-radio .logo-pos-item.selected{border-color:var(--acc-car);background:rgba(232,255,71,0.05);color:var(--acc-car);}
 .post-radio .radio-item.selected,.post-radio .logo-pos-item.selected{border-color:var(--acc-post);background:rgba(255,107,53,0.05);color:var(--acc-post);}
+.radio-item:has(input:focus-visible),
+.logo-pos-item:has(input:focus-visible),
+.type-card:has(input:focus-visible){
+  outline:2px solid var(--accent2);
+  outline-offset:2px;
+}
+.format-card:focus-visible{
+  outline:2px solid var(--accent2);
+  outline-offset:2px;
+}
 
 /* ══ LOGO POS ══ */
 .logo-pos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
