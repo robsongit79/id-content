@@ -206,7 +206,7 @@ const app = {
             <button class="topbar-menu-item topbar-menu-danger" onclick="app.confirmDelete();app.closeMenu()">Excluir marca</button>
           </div>
         </div>
-        <button class="btn btn-ghost topbar-save-btn" onclick="app.save()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
+        <button class="btn btn-ghost topbar-save-btn" id="topbarSaveBtn" onclick="app.save()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar</button>
       `;
     }
   },
@@ -577,6 +577,7 @@ const app = {
       await db.saveAll(this.currentBrandId, this.collectBrand(), this.collectCarousel(), this.collectPost());
       setSaveStatus('saved');
       this.isDirty = false;
+      flashSaveButton();
     } catch (e) {
       setSaveStatus('error');
       toast('Erro ao salvar: ' + e.message, 'error');
