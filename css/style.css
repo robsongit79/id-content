@@ -184,7 +184,9 @@ a{color:inherit;text-decoration:none;}
 .field-tip:hover::after,.field-tip:hover::before,.field-tip:focus-visible::after,.field-tip:focus-visible::before{opacity:1;}
 input[type="text"],input[type="url"],input[type="email"],input[type="password"],textarea,select{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px;color:var(--text);font-family:var(--font-m);font-size:12px;outline:none;transition:border-color 0.15s;width:100%;-webkit-appearance:none;}
 input[type="text"]:user-invalid,input[type="url"]:user-invalid,input[type="email"]:user-invalid,input[type="password"]:user-invalid,textarea:user-invalid{border-color:var(--red) !important;background:rgba(255,92,92,0.02) !important;}
-.field:has(input:focus,textarea:focus,select:focus) .field-label{color:var(--accent2);transition:color 0.2s ease;}
+.base-focus .field:has(input:focus,textarea:focus,select:focus) .field-label{color:var(--acc-base);transition:color 0.2s ease;}
+.car-focus .field:has(input:focus,textarea:focus,select:focus) .field-label{color:var(--acc-car);transition:color 0.2s ease;}
+.post-focus .field:has(input:focus,textarea:focus,select:focus) .field-label{color:var(--acc-post);transition:color 0.2s ease;}
 textarea{resize:vertical;min-height:76px;}
 select option{background:#1A1A1A;color:var(--text);}
 input::placeholder,textarea::placeholder{color:#4a4a4a !important;opacity:1 !important;}
