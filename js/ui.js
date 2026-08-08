@@ -55,17 +55,33 @@ const fontCache = {};
 const fontMeta = {};
 let fontTimers = {};
 
-function loadFont(inputId, previewId, statusId) {
+// Extrai o número do peso a partir do valor de #bWeightTitle (ex: "800 — ExtraBold" → 800).
+function titleWeightNum() {
+  const m = f('bWeightTitle').match(/^\d+/);
+  return m ? parseInt(m[0], 10) : null;
+}
+
+// Recarrega a fonte de display já considerando o peso de título atual —
+// chamar sempre que o nome da fonte OU o peso do título mudar, senão a URL
+// do Google Fonts carregada fica presa no primeiro peso validado.
+function reloadDisplayFont() {
+  loadFont('bFontDisplay', 'bPreviewDisplay', 'bStatusDisplay', titleWeightNum());
+}
+
+function loadFont(inputId, previewId, statusId, extraWeight) {
   const name = f(inputId);
   const preview = document.getElementById(previewId), status = document.getElementById(statusId);
   if (!name) { status.textContent = ''; preview.style.fontFamily = ''; return; }
   clearTimeout(fontTimers[inputId]);
   fontTimers[inputId] = setTimeout(async () => {
     status.textContent = '⏳';
-    if (fontCache[name] === 'ok') { preview.style.fontFamily = `'${name}',serif`; status.textContent = '✓'; status.style.color = 'var(--accent2)'; return; }
-    if (fontCache[name] === 'err') { status.textContent = '✗'; status.style.color = 'var(--red)'; return; }
+    const weights = [...new Set([400, 700, extraWeight].filter(Boolean))].sort((a, b) => a - b);
+    const cacheKey = `${name}__${weights.join(',')}`;
+    if (fontCache[cacheKey] === 'ok') { preview.style.fontFamily = `'${name}',serif`; status.textContent = '✓'; status.style.color = 'var(--accent2)'; return; }
+    if (fontCache[cacheKey] === 'err') { status.textContent = '✗'; status.style.color = 'var(--red)'; return; }
     const slug = name.replace(/ /g, '+'), lid = `gf-link-${inputId}`;
-    const url = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@0,400;0,700;1,400&display=swap`;
+    const axis = weights.flatMap(w => [`0,${w}`, `1,${w}`]).join(';');
+    const url = `https://fonts.googleapis.com/css2?family=${slug}:ital,wght@${axis}&display=swap`;
     try {
       let l = document.getElementById(lid);
       if (!l) {
@@ -73,14 +89,15 @@ function loadFont(inputId, previewId, statusId) {
         document.head.appendChild(l);
       }
       l.href = url;
-      await Promise.race([document.fonts.load(`700 20px '${name}'`), new Promise(r => setTimeout(r, 3000))]);
-      if (document.fonts.check(`400 20px '${name}'`) || document.fonts.check(`700 20px '${name}'`)) {
-        fontCache[name] = 'ok'; fontMeta[name] = { status: 'ok', url };
+      const checkWeight = weights[weights.length - 1];
+      await Promise.race([document.fonts.load(`${checkWeight} 20px '${name}'`), new Promise(r => setTimeout(r, 3000))]);
+      if (weights.some(w => document.fonts.check(`${w} 20px '${name}'`))) {
+        fontCache[cacheKey] = 'ok'; fontMeta[name] = { status: 'ok', url, weights };
         preview.style.fontFamily = `'${name}',serif`;
         status.textContent = '✓'; status.style.color = 'var(--accent2)';
       } else throw new Error();
     } catch (e) {
-      fontCache[name] = 'err'; fontMeta[name] = { status: 'err', url };
+      fontCache[cacheKey] = 'err'; fontMeta[name] = { status: 'err', url, weights };
       preview.style.fontFamily = '';
       status.textContent = '✗'; status.style.color = 'var(--red)';
     }

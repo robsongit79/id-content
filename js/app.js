@@ -375,7 +375,7 @@ const app = {
       });
     }
 
-    if (b.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
+    if (b.font_display) reloadDisplayFont();
     if (b.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
 
     const bActive = document.getElementById('bLogoActive');
@@ -695,7 +695,7 @@ const app = {
     setVal('bSizeTitle', preset.fonts.size_title); setVal('bSizeSubtitle', preset.fonts.size_subtitle);
     setVal('bSizeBody', preset.fonts.size_body); setVal('bWeightTitle', preset.fonts.weight_title);
     setVal('bItalicUse', preset.fonts.italic_use); setVal('bTypoNotes', preset.fonts.typo_notes);
-    if (preset.fonts.font_display) loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay');
+    if (preset.fonts.font_display) reloadDisplayFont();
     if (preset.fonts.font_body) loadFont('bFontBody','bPreviewBody','bStatusBody');
 
     if (preset.type === 'carousel') {
