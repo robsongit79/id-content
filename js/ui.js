@@ -356,6 +356,9 @@ function initTooltips() {
     const icon = document.createElement('span');
     icon.className = 'field-tip';
     icon.setAttribute('data-tip', tip);
+    icon.setAttribute('tabindex', '0');
+    icon.setAttribute('role', 'button');
+    icon.setAttribute('aria-label', tip);
     icon.textContent = '?';
     label.appendChild(icon);
   });
