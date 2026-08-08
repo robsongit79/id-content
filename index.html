@@ -98,7 +98,7 @@
       <section class="section" id="b1">
         <div class="section-header"><div><div class="section-num base-num">01</div><h2 class="section-title">Identidade da Marca</h2><p class="section-desc">Informações base usadas em todos os tipos de conteúdo.</p></div></div>
         <div class="field-group">
-          <div class="field"><label class="field-label">Nome da marca <span class="required">*</span></label><input type="text" id="bName" placeholder="Ex: CFC Produtivo" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label" for="bName">Nome da marca <span class="required">*</span></label><input type="text" id="bName" placeholder="Ex: CFC Produtivo" oninput="markDirty()"></div>
         </div>
         <div class="divider"></div>
         <div class="field-group" style="margin-top:14px;">
@@ -124,46 +124,46 @@
       <section class="section" id="b2">
         <div class="section-header"><div><div class="section-num base-num">02</div><h2 class="section-title">Paleta de Cores</h2></div></div>
         <div class="palette-grid">
-          <div class="field"><div class="field-label">Primária <span class="required">*</span></div><div class="palette-swatch-row"><input type="color" id="cPrimary" value="#1E40AF" oninput="document.getElementById('cPrimaryHex').value=this.value;markDirty()"><input type="text" id="cPrimaryHex" value="#1E40AF" oninput="syncColor('cPrimary','cPrimaryHex')" style="flex:1;"></div></div>
-          <div class="field"><div class="field-label">Secundária</div><div class="palette-swatch-row"><input type="color" id="cSecondary" value="#3B82F6" oninput="document.getElementById('cSecondaryHex').value=this.value;markDirty()"><input type="text" id="cSecondaryHex" value="#3B82F6" oninput="syncColor('cSecondary','cSecondaryHex')" style="flex:1;"></div></div>
-          <div class="field"><div class="field-label">Acento</div><div class="palette-swatch-row"><input type="color" id="cAccent" value="#FFFFFF" oninput="document.getElementById('cAccentHex').value=this.value;markDirty()"><input type="text" id="cAccentHex" value="#FFFFFF" oninput="syncColor('cAccent','cAccentHex')" style="flex:1;"></div></div>
-          <div class="field"><div class="field-label">Fundo escuro</div><div class="palette-swatch-row"><input type="color" id="cDark" value="#0A0F1E" oninput="document.getElementById('cDarkHex').value=this.value;markDirty()"><input type="text" id="cDarkHex" value="#0A0F1E" oninput="syncColor('cDark','cDarkHex')" style="flex:1;"></div></div>
-          <div class="field"><div class="field-label">Fundo claro</div><div class="palette-swatch-row"><input type="color" id="cLight" value="#F0F4FF" oninput="document.getElementById('cLightHex').value=this.value;markDirty()"><input type="text" id="cLightHex" value="#F0F4FF" oninput="syncColor('cLight','cLightHex')" style="flex:1;"></div></div>
-          <div class="field"><div class="field-label">Texto</div><div class="palette-swatch-row"><input type="color" id="cText" value="#F5F0E8" oninput="document.getElementById('cTextHex').value=this.value;markDirty()"><input type="text" id="cTextHex" value="#F5F0E8" oninput="syncColor('cText','cTextHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cPrimaryHex">Primária <span class="required">*</span></label><div class="palette-swatch-row"><input type="color" id="cPrimary" value="#1E40AF" oninput="document.getElementById('cPrimaryHex').value=this.value;markDirty()"><input type="text" id="cPrimaryHex" value="#1E40AF" oninput="syncColor('cPrimary','cPrimaryHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cSecondaryHex">Secundária</label><div class="palette-swatch-row"><input type="color" id="cSecondary" value="#3B82F6" oninput="document.getElementById('cSecondaryHex').value=this.value;markDirty()"><input type="text" id="cSecondaryHex" value="#3B82F6" oninput="syncColor('cSecondary','cSecondaryHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cAccentHex">Acento</label><div class="palette-swatch-row"><input type="color" id="cAccent" value="#FFFFFF" oninput="document.getElementById('cAccentHex').value=this.value;markDirty()"><input type="text" id="cAccentHex" value="#FFFFFF" oninput="syncColor('cAccent','cAccentHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cDarkHex">Fundo escuro</label><div class="palette-swatch-row"><input type="color" id="cDark" value="#0A0F1E" oninput="document.getElementById('cDarkHex').value=this.value;markDirty()"><input type="text" id="cDarkHex" value="#0A0F1E" oninput="syncColor('cDark','cDarkHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cLightHex">Fundo claro</label><div class="palette-swatch-row"><input type="color" id="cLight" value="#F0F4FF" oninput="document.getElementById('cLightHex').value=this.value;markDirty()"><input type="text" id="cLightHex" value="#F0F4FF" oninput="syncColor('cLight','cLightHex')" style="flex:1;"></div></div>
+          <div class="field"><label class="field-label" for="cTextHex">Texto</label><div class="palette-swatch-row"><input type="color" id="cText" value="#F5F0E8" oninput="document.getElementById('cTextHex').value=this.value;markDirty()"><input type="text" id="cTextHex" value="#F5F0E8" oninput="syncColor('cText','cTextHex')" style="flex:1;"></div></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="bColorsNotes" placeholder="Ex: Nunca usar o azul primário sobre o fundo claro. Gradiente permitido apenas no CTA." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="bColorsNotes">Notas</label><textarea id="bColorsNotes" placeholder="Ex: Nunca usar o azul primário sobre o fundo claro. Gradiente permitido apenas no CTA." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="b3">
         <div class="section-header"><div><div class="section-num base-num">03</div><h2 class="section-title">Tipografia</h2><p class="section-desc">Nome exato como aparece em <a href="https://fonts.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">fonts.google.com</a></p></div></div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Fonte de display <span class="required">*</span></label><div style="position:relative;"><input type="text" id="bFontDisplay" placeholder="Ex: Playfair Display" oninput="markDirty();loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay')" style="padding-right:36px;"><span id="bStatusDisplay" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewDisplay" style="font-size:22px;">Título de exemplo</div></div>
-          <div class="field"><label class="field-label">Fonte de corpo</label><div style="position:relative;"><input type="text" id="bFontBody" placeholder="Ex: DM Sans" oninput="markDirty();loadFont('bFontBody','bPreviewBody','bStatusBody')" style="padding-right:36px;"><span id="bStatusBody" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewBody" style="font-size:14px;">Texto de corpo. Clareza e leitura fluida.</div></div>
+          <div class="field"><label class="field-label" for="bFontDisplay">Fonte de display <span class="required">*</span></label><div style="position:relative;"><input type="text" id="bFontDisplay" placeholder="Ex: Playfair Display" oninput="markDirty();loadFont('bFontDisplay','bPreviewDisplay','bStatusDisplay')" style="padding-right:36px;"><span id="bStatusDisplay" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewDisplay" style="font-size:22px;">Título de exemplo</div></div>
+          <div class="field"><label class="field-label" for="bFontBody">Fonte de corpo</label><div style="position:relative;"><input type="text" id="bFontBody" placeholder="Ex: DM Sans" oninput="markDirty();loadFont('bFontBody','bPreviewBody','bStatusBody')" style="padding-right:36px;"><span id="bStatusBody" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;"></span></div><div class="font-preview" id="bPreviewBody" style="font-size:14px;">Texto de corpo. Clareza e leitura fluida.</div></div>
         </div>
         <div class="field-group cols-3">
-          <div class="field"><label class="field-label">Tamanho — Título</label><input type="text" id="bSizeTitle" placeholder="28–36px" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Tamanho — Subtítulo</label><input type="text" id="bSizeSubtitle" placeholder="16–20px" oninput="markDirty()"></div>
-          <div class="field"><label class="field-label">Tamanho — Corpo</label><input type="text" id="bSizeBody" placeholder="13–15px" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label" for="bSizeTitle">Tamanho — Título</label><input type="text" id="bSizeTitle" placeholder="28–36px" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label" for="bSizeSubtitle">Tamanho — Subtítulo</label><input type="text" id="bSizeSubtitle" placeholder="16–20px" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label" for="bSizeBody">Tamanho — Corpo</label><input type="text" id="bSizeBody" placeholder="13–15px" oninput="markDirty()"></div>
         </div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Peso dos títulos</label><select id="bWeightTitle" oninput="markDirty()"><option value="">Selecione</option><option>300 — Light</option><option>400 — Regular</option><option>500 — Medium</option><option>600 — SemiBold</option><option>700 — Bold</option><option>800 — ExtraBold</option><option>900 — Black</option></select></div>
-          <div class="field"><label class="field-label">Itálico</label><select id="bItalicUse" oninput="markDirty()"><option value="">Selecione</option><option>Nunca usar itálico</option><option>Itálico apenas em palavras-chave dos títulos</option><option>Itálico em citações e pull quotes</option><option>Itálico usado livremente para ênfase</option></select></div>
+          <div class="field"><label class="field-label" for="bWeightTitle">Peso dos títulos</label><select id="bWeightTitle" oninput="markDirty()"><option value="">Selecione</option><option>300 — Light</option><option>400 — Regular</option><option>500 — Medium</option><option>600 — SemiBold</option><option>700 — Bold</option><option>800 — ExtraBold</option><option>900 — Black</option></select></div>
+          <div class="field"><label class="field-label" for="bItalicUse">Itálico</label><select id="bItalicUse" oninput="markDirty()"><option value="">Selecione</option><option>Nunca usar itálico</option><option>Itálico apenas em palavras-chave dos títulos</option><option>Itálico em citações e pull quotes</option><option>Itálico usado livremente para ênfase</option></select></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas tipográficas</label><textarea id="bTypoNotes" placeholder="Ex: Sempre usar caixa alta nos títulos de capa. Nunca misturar mais de 2 fontes no mesmo slide." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="bTypoNotes">Notas tipográficas</label><textarea id="bTypoNotes" placeholder="Ex: Sempre usar caixa alta nos títulos de capa. Nunca misturar mais de 2 fontes no mesmo slide." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="b5">
         <div class="section-header"><div><div class="section-num base-num">04</div><h2 class="section-title">Estrutura Visual</h2></div></div>
         <div class="field-group"><div class="field"><label class="field-label">Estilo visual geral</label><div class="radio-grid base-radio" id="styleGrid"><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Minimalista e limpo"><span class="radio-title">Minimalista</span><span class="radio-desc">Espaço generoso, poucos elementos</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Bold e agressivo"><span class="radio-title">Bold / Agressivo</span><span class="radio-desc">Alto contraste, tipografia pesada</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Premium e editorial"><span class="radio-title">Premium / Editorial</span><span class="radio-desc">Serifado, dourado, sofisticado</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Tech e moderno"><span class="radio-title">Tech / Moderno</span><span class="radio-desc">Geométrico, neon, data-driven</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Orgânico e humano"><span class="radio-title">Orgânico / Humano</span><span class="radio-desc">Arredondado, acolhedor, quente</span></label><label class="radio-item" onclick="selectRadio(this,'styleGrid')"><input type="radio" name="styleVisual" value="Brutalist e cru"><span class="radio-title">Brutalist / Cru</span><span class="radio-desc">Bordas, grid exposto, raw</span></label></div></div></div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Bordas</label><select id="bBorderUse" oninput="markDirty()"><option value="">Selecione</option><option>Sem bordas</option><option>Bordas finas e sutis (1px)</option><option>Bordas coloridas como elemento de design</option><option>Linhas ornamentais (topo, base)</option><option>Quadros e molduras nos cards</option></select></div>
-          <div class="field"><label class="field-label">Cantos</label><select id="bCornerRadius" oninput="markDirty()"><option value="">Selecione</option><option>Sharp — sem arredondamento (0px)</option><option>Levemente arredondado (4–6px)</option><option>Arredondado médio (10–14px)</option><option>Muito arredondado (20px+)</option><option>Misto — cards arredondados, layout sharp</option></select></div>
+          <div class="field"><label class="field-label" for="bBorderUse">Bordas</label><select id="bBorderUse" oninput="markDirty()"><option value="">Selecione</option><option>Sem bordas</option><option>Bordas finas e sutis (1px)</option><option>Bordas coloridas como elemento de design</option><option>Linhas ornamentais (topo, base)</option><option>Quadros e molduras nos cards</option></select></div>
+          <div class="field"><label class="field-label" for="bCornerRadius">Cantos</label><select id="bCornerRadius" oninput="markDirty()"><option value="">Selecione</option><option>Sharp — sem arredondamento (0px)</option><option>Levemente arredondado (4–6px)</option><option>Arredondado médio (10–14px)</option><option>Muito arredondado (20px+)</option><option>Misto — cards arredondados, layout sharp</option></select></div>
         </div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Ritmo de fundo</label><select id="bBgRhythm" oninput="markDirty()"><option value="">Selecione</option><option>Todos escuros</option><option>Todos claros</option><option>Alternado: escuro / claro</option><option>Maioria escuro, CTA diferente</option><option>Gradiente da marca no hero e CTA</option></select></div>
-          <div class="field"><label class="field-label">Gradientes</label><select id="bGradientUse" oninput="markDirty()"><option value="">Selecione</option><option>Não usar gradientes</option><option>Apenas na barra de progresso</option><option>Gradiente no slide CTA</option><option>Gradientes liberados em qualquer slide</option></select></div>
+          <div class="field"><label class="field-label" for="bBgRhythm">Ritmo de fundo</label><select id="bBgRhythm" oninput="markDirty()"><option value="">Selecione</option><option>Todos escuros</option><option>Todos claros</option><option>Alternado: escuro / claro</option><option>Maioria escuro, CTA diferente</option><option>Gradiente da marca no hero e CTA</option></select></div>
+          <div class="field"><label class="field-label" for="bGradientUse">Gradientes</label><select id="bGradientUse" oninput="markDirty()"><option value="">Selecione</option><option>Não usar gradientes</option><option>Apenas na barra de progresso</option><option>Gradiente no slide CTA</option><option>Gradientes liberados em qualquer slide</option></select></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Assinatura visual</label><textarea id="bVisualSig" placeholder="Ex: Linha fina na base de cada slide. Número do slide em destaque no canto superior direito. Ícone geométrico como marcador de seção." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="bVisualSig">Assinatura visual</label><textarea id="bVisualSig" placeholder="Ex: Linha fina na base de cada slide. Número do slide em destaque no canto superior direito. Ícone geométrico como marcador de seção." oninput="markDirty()"></textarea></div></div>
       </section>
 
     </main>
@@ -221,17 +221,17 @@
 
       <section class="section" id="c5">
         <div class="section-header"><div><div class="section-num car-num">01</div><h2 class="section-title">Conteúdo</h2><p class="section-desc">Conteúdo bruto que servirá de base para a geração dos slides do carrossel.</p></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Conteúdo do carrossel</label><textarea id="cContent" placeholder="Cole o conteúdo bruto (roteiro, tópicos, ideias) aqui..." oninput="markDirty()" style="min-height:120px;"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cContent">Conteúdo do carrossel</label><textarea id="cContent" placeholder="Cole o conteúdo bruto (roteiro, tópicos, ideias) aqui..." oninput="markDirty()" style="min-height:120px;"></textarea></div></div>
       </section>
 
       <section class="section" id="c2">
         <div class="section-header"><div><div class="section-num car-num">02</div><h2 class="section-title">Estrutura do Carrossel</h2></div></div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Formato padrão</label><select id="cFormat" oninput="markDirty()"><option value="">Selecione</option><option>4:5 — Instagram padrão (1080×1350)</option><option>1:1 — Quadrado (1080×1080)</option><option>9:16 — Stories (1080×1920)</option></select></div>
-          <div class="field"><label class="field-label">Nº de slides padrão</label><input type="text" id="cSlideCount" placeholder="Ex: 5 a 10 slides" oninput="markDirty()"></div>
+          <div class="field"><label class="field-label" for="cFormat">Formato padrão</label><select id="cFormat" oninput="markDirty()"><option value="">Selecione</option><option>4:5 — Instagram padrão (1080×1350)</option><option>1:1 — Quadrado (1080×1080)</option><option>9:16 — Stories (1080×1920)</option></select></div>
+          <div class="field"><label class="field-label" for="cSlideCount">Nº de slides padrão</label><input type="text" id="cSlideCount" placeholder="Ex: 5 a 10 slides" oninput="markDirty()"></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Sequência de slides</label><textarea id="cSequence" placeholder="Ex: 1 - Capa (headline provocativa) · 2 a 6 - Slides de conteúdo (dica por slide) · 7 - CTA com oferta ou chamada para seguir." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Elementos fixos</label><textarea id="cFixedEl" placeholder="Ex: Logo no topo esq. em todos os slides. Número do slide no canto dir. Linha decorativa na base." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cSequence">Sequência de slides</label><textarea id="cSequence" placeholder="Ex: 1 - Capa (headline provocativa) · 2 a 6 - Slides de conteúdo (dica por slide) · 7 - CTA com oferta ou chamada para seguir." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cFixedEl">Elementos fixos</label><textarea id="cFixedEl" placeholder="Ex: Logo no topo esq. em todos os slides. Número do slide no canto dir. Linha decorativa na base." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="c1">
@@ -263,16 +263,16 @@
       <section class="section" id="c3">
         <div class="section-header"><div><div class="section-num car-num">04</div><h2 class="section-title">Slides Especiais</h2></div></div>
         <div class="field-group cols-2">
-          <div class="field"><label class="field-label">Slide hero — estrutura</label><textarea id="cSlide1" style="min-height:80px;" placeholder="Ex: Headline em caixa alta ocupando 60% da área. Subtítulo em corpo abaixo. Logo no topo esq. Fundo escuro." oninput="markDirty()"></textarea></div>
-          <div class="field"><label class="field-label">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" placeholder="Ex: Logo centralizada. Frase de ação abaixo. Handle do Instagram. Fundo com gradiente da marca." oninput="markDirty()"></textarea></div>
+          <div class="field"><label class="field-label" for="cSlide1">Slide hero — estrutura</label><textarea id="cSlide1" style="min-height:80px;" placeholder="Ex: Headline em caixa alta ocupando 60% da área. Subtítulo em corpo abaixo. Logo no topo esq. Fundo escuro." oninput="markDirty()"></textarea></div>
+          <div class="field"><label class="field-label" for="cSlideCta">Slide CTA — estrutura</label><textarea id="cSlideCta" style="min-height:80px;" placeholder="Ex: Logo centralizada. Frase de ação abaixo. Handle do Instagram. Fundo com gradiente da marca." oninput="markDirty()"></textarea></div>
         </div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas de carrossel</label><textarea id="cNotes" placeholder="Ex: Manter ritmo de leitura progressivo — do problema (slide 1) para a solução (slide final). Não ultrapassar 30 palavras por slide de conteúdo." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cNotes">Notas de carrossel</label><textarea id="cNotes" placeholder="Ex: Manter ritmo de leitura progressivo — do problema (slide 1) para a solução (slide final). Não ultrapassar 30 palavras por slide de conteúdo." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="c4">
         <div class="section-header"><div><div class="section-num car-num">05</div><h2 class="section-title">Restrições & Entrega</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">O que não fazer</label><textarea id="cForbidden" placeholder="Ex: Não usar fundo branco neste carrossel. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Notas finais</label><textarea id="cFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cForbidden">O que não fazer</label><textarea id="cForbidden" placeholder="Ex: Não usar fundo branco neste carrossel. Não empilar mais de 3 elementos no centro da imagem." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="cFinalNotes">Notas finais</label><textarea id="cFinalNotes" placeholder="Ex: Entregar versão 1:1 primeiro para validação. Já deixar estrutura pronta para adaptar 9:16." oninput="markDirty()"></textarea></div></div>
       </section>
     </main>
     <aside class="preview-panel">
@@ -360,13 +360,13 @@
         <div class="section-header"><div><div class="section-num post-num">03</div><h2 class="section-title">Conteúdo do Post</h2></div></div>
         <div class="field-group" style="margin-top:14px;">
           <div class="field">
-            <label class="field-label">Texto livre / Copy do Post (Opcional)</label>
+            <label class="field-label" for="pFreeText">Texto livre / Copy do Post (Opcional)</label>
             <div class="field-hint">Se preferir colar a copy pronta em vez de preencher os campos acima, use este campo.</div>
             <textarea id="pFreeText" placeholder="Cole sua copy aqui..." oninput="markDirty()" style="min-height:100px;"></textarea>
           </div>
         </div>
 
-        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group" style="margin-top:14px;"><div class="field"><label class="field-label" for="pContentNotes">Observações de conteúdo</label><textarea id="pContentNotes" placeholder="Ex: Destacar o número '14 dias' em cor de acento. Não mencionar concorrentes pelo nome." oninput="markDirty()"></textarea></div></div>
       </section>
 
       <section class="section" id="p3">
@@ -396,7 +396,7 @@
           <div class="format-layout-title"><span class="format-badge" style="background:rgba(255,107,53,0.1);color:var(--acc-post);">Unificado</span> Todos os Formatos</div>
           <div class="field-group cols-2">
             <div class="field">
-              <label class="field-label">Posição do texto</label>
+              <label class="field-label" for="pUnifiedTextPos">Posição do texto</label>
               <select id="pUnifiedTextPos" oninput="syncUnifiedLayout();markDirty()">
                 <option value="">Claude decide</option>
                 <option>Centralizado</option>
@@ -406,7 +406,7 @@
               </select>
             </div>
             <div class="field">
-              <label class="field-label">Fundo</label>
+              <label class="field-label" for="pUnifiedBg">Fundo</label>
               <select id="pUnifiedBg" oninput="syncUnifiedLayout();markDirty()">
                 <option value="">Claude decide</option>
                 <option>Cor sólida da marca</option>
@@ -419,22 +419,22 @@
           </div>
           <div class="field-group">
             <div class="field">
-              <label class="field-label">Notas</label>
+              <label class="field-label" for="pUnifiedNotes">Notas</label>
               <textarea id="pUnifiedNotes" style="min-height:56px;" oninput="syncUnifiedLayout();markDirty()"></textarea>
             </div>
           </div>
         </div>
 
         <!-- Layouts Independentes (Padrão antigo) -->
-        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
-        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout1x1" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-sq">1:1</span> 1080×1080px</div><div class="field-group cols-2"><div class="field"><label class="field-label" for="pL1TextPos">Posição do texto</label><select id="pL1TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado</option><option>Alinhado à esquerda</option><option>Canto inferior esquerdo</option><option>Dividido — topo e base</option></select></div><div class="field"><label class="field-label" for="pL1Bg">Fundo</label><select id="pL1Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label" for="pL1Notes">Notas</label><textarea id="pL1Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout4x5" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-port">4:5</span> 1080×1350px</div><div class="field-group cols-2"><div class="field"><label class="field-label" for="pL4TextPos">Posição do texto</label><select id="pL4TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centralizado vertical</option><option>Terço inferior</option><option>Terço superior</option><option>Bloco central com padding</option></select></div><div class="field"><label class="field-label" for="pL4Bg">Fundo</label><select id="pL4Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente da marca</option><option>Foto com overlay</option><option>Padrão / textura</option><option>Branco / claro</option></select></div></div><div class="field-group"><div class="field"><label class="field-label" for="pL4Notes">Notas</label><textarea id="pL4Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
+        <div id="pLayout9x16" style="display:none;" class="format-layout-group"><div class="format-layout-title"><span class="format-badge fmt-stor">9:16</span> 1080×1920px</div><div class="field-group cols-2"><div class="field"><label class="field-label" for="pL9TextPos">Posição do texto</label><select id="pL9TextPos" oninput="markDirty()"><option value="">Claude decide</option><option>Centro absoluto</option><option>Terço inferior (safe zone)</option><option>Terço superior</option><option>Full screen empilhado</option></select></div><div class="field"><label class="field-label" for="pL9Bg">Fundo</label><select id="pL9Bg" oninput="markDirty()"><option value="">Claude decide</option><option>Cor sólida da marca</option><option>Gradiente vertical</option><option>Foto com overlay</option><option>Padrão / textura</option></select></div></div><div class="field-group"><div class="field"><label class="field-label" for="pL9Notes">Notas</label><textarea id="pL9Notes" style="min-height:56px;" oninput="markDirty()"></textarea></div></div></div>
         <div id="pLayoutPlaceholder" style="padding:18px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--border);border-radius:6px;">← Selecione os formatos na seção 04</div>
       </section>
 
       <section class="section" id="p5">
         <div class="section-header"><div><div class="section-num post-num">06</div><h2 class="section-title">Obrigatoriedades</h2></div></div>
-        <div class="field-group"><div class="field"><label class="field-label">Obrigatoriedades</label><textarea id="pFinalNotes" placeholder="Ex: Sempre incluir o telefone de contato no rodapé. Usar sempre a logo no topo." oninput="markDirty()"></textarea></div></div>
+        <div class="field-group"><div class="field"><label class="field-label" for="pFinalNotes">Obrigatoriedades</label><textarea id="pFinalNotes" placeholder="Ex: Sempre incluir o telefone de contato no rodapé. Usar sempre a logo no topo." oninput="markDirty()"></textarea></div></div>
       </section>
     </main>
     <aside class="preview-panel">
@@ -562,7 +562,9 @@
       <div class="login-subtitle" id="authSubtitle">Entre com suas credenciais do Supabase para gerenciar suas marcas.</div>
     </div>
     <form class="login-form" id="loginForm" onsubmit="event.preventDefault(); handleLoginSubmit();">
+      <label class="sr-only" for="loginEmail">E-mail</label>
       <input type="email" id="loginEmail" placeholder="E-mail" required autocomplete="username">
+      <label class="sr-only" for="loginPassword">Senha</label>
       <input type="password" id="loginPassword" placeholder="Senha" required autocomplete="current-password">
       <div id="loginError" class="login-error" style="display:none;"></div>
       <button type="submit" class="login-btn" id="loginBtn">
