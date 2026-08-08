@@ -372,9 +372,9 @@
       <section class="section" id="p3">
         <div class="section-header"><div><div class="section-num post-num">04</div><h2 class="section-title">Formatos</h2></div></div>
         <div class="format-row">
-          <div class="format-card post-fmt" id="pFmt1x1" onclick="togglePostFmt('1x1')"><div class="format-visual format-sq"></div><div><div class="format-label">Feed Quadrado</div><div class="format-ratio">1080×1080 · 1:1</div></div><div class="format-check" id="pCheck1x1">✓</div></div>
-          <div class="format-card post-fmt" id="pFmt4x5" onclick="togglePostFmt('4x5')"><div class="format-visual format-port"></div><div><div class="format-label">Feed Retrato</div><div class="format-ratio">1080×1350 · 4:5</div></div><div class="format-check" id="pCheck4x5">✓</div></div>
-          <div class="format-card post-fmt" id="pFmt9x16" onclick="togglePostFmt('9x16')"><div class="format-visual format-stor"></div><div><div class="format-label">Stories / Reels</div><div class="format-ratio">1080×1920 · 9:16</div></div><div class="format-check" id="pCheck9x16">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt1x1" role="checkbox" aria-checked="false" tabindex="0" onclick="togglePostFmt('1x1')" onkeydown="activateOnKey(event, () => togglePostFmt('1x1'))"><div class="format-visual format-sq"></div><div><div class="format-label">Feed Quadrado</div><div class="format-ratio">1080×1080 · 1:1</div></div><div class="format-check" id="pCheck1x1">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt4x5" role="checkbox" aria-checked="false" tabindex="0" onclick="togglePostFmt('4x5')" onkeydown="activateOnKey(event, () => togglePostFmt('4x5'))"><div class="format-visual format-port"></div><div><div class="format-label">Feed Retrato</div><div class="format-ratio">1080×1350 · 4:5</div></div><div class="format-check" id="pCheck4x5">✓</div></div>
+          <div class="format-card post-fmt" id="pFmt9x16" role="checkbox" aria-checked="false" tabindex="0" onclick="togglePostFmt('9x16')" onkeydown="activateOnKey(event, () => togglePostFmt('9x16'))"><div class="format-visual format-stor"></div><div><div class="format-label">Stories / Reels</div><div class="format-ratio">1080×1920 · 9:16</div></div><div class="format-check" id="pCheck9x16">✓</div></div>
         </div>
       </section>
 

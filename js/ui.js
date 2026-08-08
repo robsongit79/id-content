@@ -18,6 +18,10 @@ function selectRadio(el, gridId) {
   setTimeout(updatePreviews, 50);
 }
 
+function activateOnKey(e, fn) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
+}
+
 // ── CHIPS ──
 function addChip(e, wrapId, key) {
   if (e.key !== 'Enter') return;
@@ -195,11 +199,11 @@ function selectPostType(el, type) {
 
 function togglePostFmt(fmt) {
   const card = document.getElementById(`pFmt${fmt}`);
-  if (app.postFmts.has(fmt)) { app.postFmts.delete(fmt); card.classList.remove('checked'); }
-  else { app.postFmts.add(fmt); card.classList.add('checked'); }
+  if (app.postFmts.has(fmt)) { app.postFmts.delete(fmt); card.classList.remove('checked'); card.setAttribute('aria-checked', 'false'); }
+  else { app.postFmts.add(fmt); card.classList.add('checked'); card.setAttribute('aria-checked', 'true'); }
   const has = app.postFmts.size > 0;
   document.getElementById('pLayoutPlaceholder').style.display = has ? 'none' : 'block';
-  
+
   syncUnifiedLayout();
   markDirty(); updatePreviews();
 }
