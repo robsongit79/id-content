@@ -195,7 +195,7 @@ input::-moz-placeholder,textarea::-moz-placeholder{color:#8A8A8A !important;opac
 .base-focus input:focus,.base-focus textarea:focus,.base-focus select:focus{border-color:var(--acc-base);}
 .car-focus input:focus,.car-focus textarea:focus,.car-focus select:focus{border-color:var(--acc-car);}
 .post-focus input:focus,.post-focus textarea:focus,.post-focus select:focus{border-color:var(--acc-post);}
-.divider{height:1px;background:var(--border);margin:22px 0;}
+.divider{height:1px;background:var(--border);margin:28px 0;}
 
 /* ══ PALETTE ══ */
 .palette-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
