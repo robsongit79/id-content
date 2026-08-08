@@ -386,15 +386,15 @@ function initScrollNav() {
 function renderPresets() {
   const cList = document.getElementById('cPresetsList');
   const pList = document.getElementById('pPresetsList');
-  
+
   if (cList) cList.innerHTML = '';
   if (pList) pList.innerHTML = '';
-  
+
   const presets = app.presets || [];
-  
+
   let cCount = 0;
   let pCount = 0;
-  
+
   presets.forEach((preset, index) => {
     const card = document.createElement('div');
     card.className = 'preset-card';
@@ -404,13 +404,13 @@ function renderPresets() {
       card.classList.add('active');
     }
     card.setAttribute('onclick', `applyPreset(${index})`);
-    
+
     // Nome do preset
     const title = document.createElement('span');
     title.className = 'preset-title';
     title.textContent = preset.name;
     card.appendChild(title);
-    
+
     // Botão de deletar
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
@@ -418,7 +418,7 @@ function renderPresets() {
     delBtn.innerHTML = '✕';
     delBtn.setAttribute('onclick', `event.stopPropagation(); deletePreset(${index})`);
     card.appendChild(delBtn);
-    
+
     if (preset.type === 'carousel') {
       if (cList) {
         cList.appendChild(card);
@@ -431,9 +431,37 @@ function renderPresets() {
       }
     }
   });
-  
+
   if (pCount === 0 && pList) {
     pList.innerHTML = '<span style="font-size:11px;color:var(--muted);grid-column:span 3;text-align:center;padding:12px 0;">Nenhum preset de post salvo para esta marca.</span>';
   }
+}
+
+// ── MODAL HELPERS (foco + Esc) ──
+let _modalTriggerEl = null;
+
+function openModal(id) {
+  _modalTriggerEl = document.activeElement;
+  document.getElementById(id).style.display = 'flex';
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+  if (_modalTriggerEl && typeof _modalTriggerEl.focus === 'function') _modalTriggerEl.focus();
+  _modalTriggerEl = null;
+}
+
+const MODAL_CLOSE_FNS = {
+  templateModal: () => app.closeTemplateModal(),
+};
+
+function initModalEscapeHandling() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    for (const [id, closeFn] of Object.entries(MODAL_CLOSE_FNS)) {
+      const el = document.getElementById(id);
+      if (el && el.style.display === 'flex') { closeFn(); return; }
+    }
+  });
 }
 

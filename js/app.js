@@ -89,6 +89,7 @@ const app = {
     this.loadBrandList();
     initScrollNav();
     initTooltips();
+    initModalEscapeHandling();
 
     // 2. Checagem real via API (cobre adminEmails e mudanças de permissão em tempo real)
     if (btnAdmin) {
@@ -778,11 +779,11 @@ const app = {
 
   // ── TEMPLATE MODAL ──
   showTemplateModal() {
-    document.getElementById('templateModal').style.display = 'flex';
+    openModal('templateModal');
   },
 
   closeTemplateModal() {
-    document.getElementById('templateModal').style.display = 'none';
+    closeModal('templateModal');
   },
 
   async newBrandFromTemplate(key) {
